@@ -28,6 +28,6 @@ export class AppController {
       calendarId,
     );
     // console.log(responseText);
-    return responseText;
+    return JSON.stringify(responseText);
   }
 }
