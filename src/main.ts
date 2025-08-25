@@ -5,8 +5,9 @@ import * as fs from 'fs';
 const APP_PORT = 8443 as const;
 const ORIGINS_WHITELIST = [
   'http://localhost:3000',
-  'http://umbertoloria.com:80',
-  'https://umbertoloria.com:443',
+  // 'http://umbertoloria.com',
+  'https://umbertoloria.com',
+  'https://www.umbertoloria.com',
 ] as const;
 
 async function bootstrap() {
@@ -19,6 +20,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin: any, callback: any) => {
+      // console.log('request from origin', origin);
       if (!origin || ORIGINS_WHITELIST.indexOf(origin) !== -1) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         callback(null, true);
