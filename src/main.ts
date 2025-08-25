@@ -1,18 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as fs from 'fs';
 
-const whitelist = [
+const APP_PORT = 8443 as const;
+const ORIGINS_WHITELIST = [
   'http://localhost:3000',
   'http://umbertoloria.com:80',
   'https://umbertoloria.com:443',
-];
+] as const;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions: {
+      key: fs.readFileSync('./secrets/server.key'),
+      cert: fs.readFileSync('./secrets/server.cert'),
+    },
+  });
 
   app.enableCors({
     origin: (origin: any, callback: any) => {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      if (!origin || ORIGINS_WHITELIST.indexOf(origin) !== -1) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         callback(null, true);
       } else {
@@ -25,7 +32,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(APP_PORT);
 }
 
 bootstrap();
