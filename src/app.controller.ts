@@ -1,10 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   NotFoundException,
   Param,
   Post,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { getSDK } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
@@ -16,29 +16,41 @@ export class AppController {
     private configService: ConfigService,
   ) {}
 
+  @Post('/calendars')
+  async readCalendars(@Body() bodyParams: any): Promise<string> {
+    // Validation
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+    const dateFrom = bodyParams['date-from'];
+    // TODO: Improve date validation
+    if (typeof dateFrom !== 'string' || !dateFrom) {
+      throw new BadRequestException("Param 'date-from' required");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const showAll = bodyParams['show-all'] === 'true';
+
+    // Forward
+    return getSDK(this.configService, bodyParams)
+      .readCalendars({
+        dateFrom,
+        seeAllCalendars: showAll,
+      })
+      .then(JSON.stringify);
+  }
+
   @Post('/calendars/:cid')
   async readCalendarById(
-    @Param('cid') cid: string,
     @Body() bodyParams: any,
+    @Param('cid') cid: string,
   ): Promise<string> {
+    // Validation
     const calendarId = parseInt(cid);
     if (Number.isNaN(calendarId)) {
       throw new NotFoundException('Invalid cid ' + cid);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { em, sp } = bodyParams;
-    if (!(typeof em === 'string' && !!em && typeof sp === 'string' && !!sp)) {
-      throw new UnauthorizedException();
-    }
-    const phpBaseUrl = this.configService.get<string>('PHP_BASE_URL');
-    const phpApiKey = this.configService.get<string>('PHP_API_KEY');
-    const responseText = await getSDK(
-      phpBaseUrl,
-      phpApiKey,
-      em,
-      sp,
-    ).readCalendarByID(calendarId);
-    // console.log(responseText);
-    return JSON.stringify(responseText);
+
+    // Forward
+    return getSDK(this.configService, bodyParams)
+      .readCalendarByID(calendarId)
+      .then(JSON.stringify);
   }
 }
