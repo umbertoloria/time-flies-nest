@@ -9,6 +9,7 @@ import {
 import { getSDK, getSDKPure } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
 import { getFromConfigService } from './auth';
+import { get_required_string } from './lib/validate';
 
 @Controller()
 export class AppController {
@@ -20,18 +21,8 @@ export class AppController {
   @Post('/auth/login')
   async authLogin(@Body() bodyParams: any): Promise<string> {
     // Validation
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const email = bodyParams['email'];
-    // TODO: Validate date
-    if (typeof email !== 'string' || !email) {
-      throw new BadRequestException("Param 'email' required");
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const password = bodyParams['password'];
-    // TODO: Validate date
-    if (typeof password !== 'string' || !password) {
-      throw new BadRequestException("Param 'password' required");
-    }
+    const email = get_required_string(bodyParams, 'email');
+    const password = get_required_string(bodyParams, 'password');
 
     // Forward
     const { phpBaseUrl, phpApiKey } = getFromConfigService(this.configService);
@@ -59,12 +50,8 @@ export class AppController {
   @Post('/calendars')
   async readCalendars(@Body() bodyParams: any): Promise<string> {
     // Validation
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const dateFrom = bodyParams['date-from'];
     // TODO: Validate date
-    if (typeof dateFrom !== 'string' || !dateFrom) {
-      throw new BadRequestException("Param 'date-from' required");
-    }
+    const dateFrom = get_required_string(bodyParams, 'date-from');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const showAll = bodyParams['show-all'] === 'true';
 
@@ -97,24 +84,10 @@ export class AppController {
   @Post('/calendars-create')
   async createCalendar(@Body() bodyParams: any): Promise<string> {
     // Validation
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const name = bodyParams['name'];
-    // TODO: Validate
-    if (typeof name !== 'string' || !name) {
-      throw new BadRequestException("Param 'name' required");
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const color = bodyParams['color'];
-    // TODO: Validate
-    if (typeof color !== 'string' || !color) {
-      throw new BadRequestException("Param 'color' required");
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const plannedColor = bodyParams['planned-color'];
-    // TODO: Validate
-    if (typeof plannedColor !== 'string' || !plannedColor) {
-      throw new BadRequestException("Param 'planned-color' required");
-    }
+    const name = get_required_string(bodyParams, 'name');
+    // TODO: Validate color
+    const color = get_required_string(bodyParams, 'color');
+    const plannedColor = get_required_string(bodyParams, 'planned-color');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const usesNotes = bodyParams['uses-notes'];
     // TODO: Validate
