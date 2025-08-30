@@ -9,7 +9,12 @@ import {
 import { getSDK, getSDKPure } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
 import { getFromConfigService } from './auth';
-import { get_required_local_date, get_required_string } from './lib/validate';
+import {
+  get_optional_bool,
+  get_required_bool,
+  get_required_local_date,
+  get_required_string,
+} from './lib/validate';
 
 @Controller()
 export class AppController {
@@ -51,8 +56,7 @@ export class AppController {
   async readCalendars(@Body() bodyParams: any): Promise<string> {
     // Validation
     const dateFrom = get_required_local_date(bodyParams, 'date-from');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const showAll = bodyParams['show-all'] === 'true';
+    const showAll = get_optional_bool(bodyParams, 'show-all') || false;
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -87,13 +91,7 @@ export class AppController {
     // TODO: Validate color
     const color = get_required_string(bodyParams, 'color');
     const plannedColor = get_required_string(bodyParams, 'planned-color');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const usesNotes = bodyParams['uses-notes'];
-    // TODO: Validate
-    if (usesNotes !== 'true' && usesNotes !== 'false') {
-      throw new BadRequestException("Param 'uses-notes' required");
-    }
-    const boolUsesNotes = usesNotes === 'true';
+    const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -101,7 +99,7 @@ export class AppController {
         name,
         color,
         plannedColor,
-        usesNotes: boolUsesNotes,
+        usesNotes,
       })
       .then(JSON.stringify);
   }
@@ -136,13 +134,7 @@ export class AppController {
     if (typeof plannedColor === 'string' && !!plannedColor) {
       realPlannedColor = plannedColor;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const usesNotes = bodyParams['uses-notes'];
-    let boolUsesNotes: undefined | boolean = undefined;
-    // TODO: Validate
-    if (usesNotes === 'true' || usesNotes === 'false') {
-      boolUsesNotes = usesNotes === 'true';
-    }
+    const usesNotes = get_optional_bool(bodyParams, 'uses-notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -150,7 +142,7 @@ export class AppController {
         name: realName,
         color: realColor,
         plannedColor: realPlannedColor,
-        usesNotes: boolUsesNotes,
+        usesNotes,
       })
       .then(JSON.stringify);
   }
@@ -184,6 +176,7 @@ export class AppController {
     if (Number.isNaN(calendarId)) {
       throw new NotFoundException('Invalid cid ' + cid);
     }
+    // TODO: Validate "date"
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const notes = bodyParams['notes'];
     let realNotes: undefined | string = undefined;
@@ -208,6 +201,7 @@ export class AppController {
     if (Number.isNaN(calendarId)) {
       throw new NotFoundException('Invalid cid ' + cid);
     }
+    // TODO: Validate "date"
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const notes = bodyParams['notes'];
     let realNotes: undefined | string = undefined;
@@ -232,6 +226,7 @@ export class AppController {
     if (Number.isNaN(calendarId)) {
       throw new NotFoundException('Invalid cid ' + cid);
     }
+    // TODO: Validate "date"
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const notes = bodyParams['notes'];
     let realNotes: undefined | string = undefined;
@@ -318,7 +313,6 @@ export class AppController {
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const mode = bodyParams['mode'];
-    // TODO: Validate date
     if (mode !== 'done' && mode !== 'missed') {
       throw new BadRequestException("Param 'mode' invalid");
     }

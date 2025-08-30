@@ -13,6 +13,7 @@ export function get_required_string(
 }
 
 const REG_EXP_LOCAL_DATE = new RegExp('^(\\d{4})-(\\d{2})-(\\d{2})$');
+
 export function get_required_local_date(
   bodyParams: any,
   paramName: string,
@@ -72,4 +73,29 @@ export function checkdate(year: number, month: number, day: number): boolean {
     date.getMonth() === month - 1 &&
     date.getDate() === day
   );
+}
+
+export function get_optional_bool(
+  bodyParams: any,
+  paramName: string,
+): undefined | boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+  const value = bodyParams[paramName];
+  if (value === 'true') {
+    return true;
+  } else if (value === 'false') {
+    return false;
+  } else {
+    return undefined;
+  }
+}
+
+export function get_required_bool(bodyParams: any, paramName: string): boolean {
+  const value = get_optional_bool(bodyParams, paramName);
+  if (value !== true && value !== false) {
+    throw new BadRequestException(
+      `Param "${paramName}" invalid: must be a boolean`,
+    );
+  }
+  return value;
 }
