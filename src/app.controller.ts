@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  NotFoundException,
   Param,
   Post,
 } from '@nestjs/common';
@@ -11,9 +10,14 @@ import { ConfigService } from '@nestjs/config';
 import { getFromConfigService } from './auth';
 import {
   get_optional_bool,
+  get_optional_color,
+  get_optional_string,
   get_required_bool,
+  get_required_color,
+  get_required_int,
   get_required_local_date,
   get_required_string,
+  validate_int,
 } from './lib/validate';
 
 @Controller()
@@ -73,10 +77,7 @@ export class AppController {
     @Param('cid') cid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -88,9 +89,8 @@ export class AppController {
   async createCalendar(@Body() bodyParams: any): Promise<string> {
     // Validation
     const name = get_required_string(bodyParams, 'name');
-    // TODO: Validate color
-    const color = get_required_string(bodyParams, 'color');
-    const plannedColor = get_required_string(bodyParams, 'planned-color');
+    const color = get_required_color(bodyParams, 'color');
+    const plannedColor = get_required_color(bodyParams, 'planned-color');
     const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
     // Forward
@@ -107,41 +107,18 @@ export class AppController {
   @Post('/calendar-update')
   async updateCalendar(@Body() bodyParams: any): Promise<string> {
     // Validation
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const calendarId = bodyParams['cid'];
-    // TODO: Validate
-    if (typeof calendarId !== 'string' || !calendarId) {
-      throw new BadRequestException("Param 'cid' required");
-    }
-    const intCalendarId = parseInt(calendarId);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const name = bodyParams['name'];
-    let realName: undefined | string = undefined;
-    if (typeof name === 'string' && !!name) {
-      realName = name;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const color = bodyParams['color'];
-    let realColor: undefined | string = undefined;
-    // TODO: Validate
-    if (typeof color === 'string' && !!color) {
-      realColor = color;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const plannedColor = bodyParams['planned-color'];
-    let realPlannedColor: undefined | string = undefined;
-    // TODO: Validate
-    if (typeof plannedColor === 'string' && !!plannedColor) {
-      realPlannedColor = plannedColor;
-    }
+    const calendarId = get_required_int(bodyParams, 'cid');
+    const name = get_optional_string(bodyParams, 'name');
+    const color = get_optional_color(bodyParams, 'color');
+    const plannedColor = get_optional_color(bodyParams, 'planned-color');
     const usesNotes = get_optional_bool(bodyParams, 'uses-notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
-      .updateCalendar(intCalendarId, {
-        name: realName,
-        color: realColor,
-        plannedColor: realPlannedColor,
+      .updateCalendar(calendarId, {
+        name: name,
+        color,
+        plannedColor,
         usesNotes,
       })
       .then(JSON.stringify);
@@ -154,10 +131,7 @@ export class AppController {
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -172,21 +146,13 @@ export class AppController {
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
     // TODO: Validate "date"
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const notes = bodyParams['notes'];
-    let realNotes: undefined | string = undefined;
-    if (typeof notes === 'string' && !!notes) {
-      realNotes = notes;
-    }
+    const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
-      .createCalendarDate(calendarId, date, realNotes)
+      .createCalendarDate(calendarId, date, notes)
       .then(JSON.stringify);
   }
 
@@ -197,21 +163,13 @@ export class AppController {
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
     // TODO: Validate "date"
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const notes = bodyParams['notes'];
-    let realNotes: undefined | string = undefined;
-    if (typeof notes === 'string' && !!notes) {
-      realNotes = notes;
-    }
+    const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
-      .updateCalendarDateNotes(calendarId, date, realNotes)
+      .updateCalendarDateNotes(calendarId, date, notes)
       .then(JSON.stringify);
   }
 
@@ -222,21 +180,13 @@ export class AppController {
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
     // TODO: Validate "date"
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const notes = bodyParams['notes'];
-    let realNotes: undefined | string = undefined;
-    if (typeof notes === 'string' && !!notes) {
-      realNotes = notes;
-    }
+    const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
-      .createPlannedEvent(calendarId, date, realNotes)
+      .createPlannedEvent(calendarId, date, notes)
       .then(JSON.stringify);
   }
 
@@ -247,24 +197,13 @@ export class AppController {
     @Param('tid') tid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
-    const todoId = parseInt(tid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid tid ' + cid);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const notes = bodyParams['notes'];
-    let realNotes: undefined | string = undefined;
-    if (typeof notes === 'string' && !!notes) {
-      realNotes = notes;
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const todoId = validate_int(tid, 'Invalid TodoID');
+    const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
     return getSDK(this.configService, bodyParams)
-      .updatePlannedEvent(calendarId, todoId, realNotes)
+      .updatePlannedEvent(calendarId, todoId, notes)
       .then(JSON.stringify);
   }
 
@@ -275,20 +214,9 @@ export class AppController {
     @Param('tid') tid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
-    const todoId = parseInt(tid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid tid ' + cid);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const date = bodyParams['date'];
-    // TODO: Validate date
-    if (typeof date !== 'string' || !date) {
-      throw new BadRequestException("Param 'date' required");
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const todoId = validate_int(tid, 'Invalid TodoID');
+    const date = get_required_local_date(bodyParams, 'date');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -303,33 +231,18 @@ export class AppController {
     @Param('tid') tid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = parseInt(cid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid cid ' + cid);
-    }
-    const todoId = parseInt(tid);
-    if (Number.isNaN(calendarId)) {
-      throw new NotFoundException('Invalid tid ' + cid);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const mode = bodyParams['mode'];
-    if (mode !== 'done' && mode !== 'missed') {
-      throw new BadRequestException("Param 'mode' invalid");
-    }
+    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const todoId = validate_int(tid, 'Invalid TodoID');
+    const mode = get_required_string(bodyParams, 'mode');
     if (mode === 'done') {
       // Validation
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-      const notes = bodyParams['notes'];
-      let realNotes: undefined | string = undefined;
-      if (typeof notes === 'string' && !!notes) {
-        realNotes = notes;
-      }
+      const notes = get_optional_string(bodyParams, 'notes');
 
       // Forward
       return getSDK(this.configService, bodyParams)
         .setPlannedEventAsDone(calendarId, todoId, {
           type: 'done',
-          notes: realNotes,
+          notes,
         })
         .then(JSON.stringify);
     } else if (mode === 'missed') {
