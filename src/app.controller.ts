@@ -9,7 +9,7 @@ import {
 import { getSDK, getSDKPure } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
 import { getFromConfigService } from './auth';
-import { get_required_string } from './lib/validate';
+import { get_required_local_date, get_required_string } from './lib/validate';
 
 @Controller()
 export class AppController {
@@ -50,8 +50,7 @@ export class AppController {
   @Post('/calendars')
   async readCalendars(@Body() bodyParams: any): Promise<string> {
     // Validation
-    // TODO: Validate date
-    const dateFrom = get_required_string(bodyParams, 'date-from');
+    const dateFrom = get_required_local_date(bodyParams, 'date-from');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const showAll = bodyParams['show-all'] === 'true';
 
