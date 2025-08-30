@@ -2,6 +2,17 @@ import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { getApiAuth, getFromConfigService } from '../auth';
 
+function makeFormData(args: Record<string, string | undefined>) {
+  const formData = new FormData();
+  for (const key in args) {
+    const value = args[key];
+    if (value !== undefined) {
+      formData.set(key, value);
+    }
+  }
+  return formData;
+}
+
 export const getSDKPure = (
   phpBaseUrl: string | undefined,
   apiKey: string | undefined,
@@ -20,37 +31,46 @@ export const getSDKPure = (
   // TODO: FormData required here
   return {
     authLogin(email: string, password: string) {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('password', password);
       return api
-        .post('?a=login', formData)
+        .post(
+          '?a=login',
+          makeFormData({
+            email,
+            password,
+          }),
+        )
         .then((response) => response.data as object);
     },
     readAuthStatus() {
-      const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
       return api
-        .post('?a=status', formData)
+        .post(
+          '?a=status',
+          makeFormData({
+            em,
+            sp,
+          }),
+        )
         .then((response) => response.data as object);
     },
     readStreamline() {
-      const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
       return api
-        .post('?a=planned-event-read', formData)
+        .post(
+          '?a=planned-event-read',
+          makeFormData({
+            em,
+            sp,
+          }),
+        )
         .then((response) => response.data as object);
     },
     readCalendars(filters: { dateFrom: string; seeAllCalendars: boolean }) {
-      const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
       return api
         .post(
           `?a=calendars-read&date-from=${filters.dateFrom}${filters.seeAllCalendars ? '&show-all=true' : ''}`,
-          formData,
+          makeFormData({
+            em,
+            sp,
+          }),
         )
         .then((response) => response.data as object);
     },
@@ -101,19 +121,25 @@ export const getSDKPure = (
         .then((response) => response.data as object);
     },
     readCalendarByID(calendarId: number) {
-      const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
       return api
-        .post(`?a=calendar-read&cid=${calendarId}`, formData)
+        .post(
+          `?a=calendar-read&cid=${calendarId}`,
+          makeFormData({
+            em,
+            sp,
+          }),
+        )
         .then((response) => response.data as object);
     },
     readCalendarDate(calendarId: number, date: string) {
-      const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
       return api
-        .post(`?a=calendar-date-read&cid=${calendarId}&date=${date}`, formData)
+        .post(
+          `?a=calendar-date-read&cid=${calendarId}&date=${date}`,
+          makeFormData({
+            em,
+            sp,
+          }),
+        )
         .then((response) => response.data as object);
     },
     createCalendarDate(
@@ -185,14 +211,17 @@ export const getSDKPure = (
         .then((response) => response.data as object);
     },
     movePlannedEvent(calendarId: number, todoId: number, date: string) {
-      const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
-      formData.append('cid', `${calendarId}`);
-      formData.append('eid', `${todoId}`);
-      formData.append('date', date);
       return api
-        .post('?a=planned-event-move', formData)
+        .post(
+          '?a=planned-event-move',
+          makeFormData({
+            em,
+            sp,
+            cid: `${calendarId}`,
+            eid: `${todoId}`,
+            date,
+          }),
+        )
         .then((response) => response.data as object);
     },
     setPlannedEventAsDone(

@@ -37,7 +37,7 @@ export class AppController {
     const { phpBaseUrl, phpApiKey } = getFromConfigService(this.configService);
     return getSDKPure(phpBaseUrl, phpApiKey, '', '')
       .authLogin(email, password)
-      .then(JSON.stringify);
+      .then(() => 'ok-login');
   }
 
   @Post('/auth/status')
