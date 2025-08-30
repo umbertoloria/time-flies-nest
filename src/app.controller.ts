@@ -17,6 +17,7 @@ import {
   get_required_int,
   get_required_local_date,
   get_required_string,
+  validate_date,
   validate_int,
 } from './lib/validate';
 
@@ -74,10 +75,10 @@ export class AppController {
   @Post('/calendars/:cid')
   async readCalendarById(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
+    @Param('cid') urlCid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -127,11 +128,11 @@ export class AppController {
   @Post('/calendars/:cid/date/:date')
   async readCalendarDate(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
+    @Param('cid') urlCid: string,
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // Forward
     return getSDK(this.configService, bodyParams)
@@ -142,11 +143,12 @@ export class AppController {
   @Post('/calendars/:cid/date-create/:date')
   async createCalendarDate(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
-    @Param('date') date: string,
+    @Param('cid') urlCid: string,
+    @Param('date') urlDate: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const date = validate_date(urlDate, 'Invalid Date');
     // TODO: Validate "date"
     const notes = get_optional_string(bodyParams, 'notes');
 
@@ -159,11 +161,11 @@ export class AppController {
   @Post('/calendars/:cid/date-upd-notes/:date')
   async updateCalendarDate(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
+    @Param('cid') urlCid: string,
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
     // TODO: Validate "date"
     const notes = get_optional_string(bodyParams, 'notes');
 
@@ -176,11 +178,11 @@ export class AppController {
   @Post('/calendars/:cid/todo-create/:date')
   async createTodo(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
+    @Param('cid') urlCid: string,
     @Param('date') date: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
     // TODO: Validate "date"
     const notes = get_optional_string(bodyParams, 'notes');
 
@@ -193,12 +195,12 @@ export class AppController {
   @Post('/calendars/:cid/todo-upd/:tid')
   async updateTodoNotes(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
-    @Param('tid') tid: string,
+    @Param('cid') urlCid: string,
+    @Param('tid') urlTid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
-    const todoId = validate_int(tid, 'Invalid TodoID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const todoId = validate_int(urlTid, 'Invalid TodoID');
     const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
@@ -210,12 +212,12 @@ export class AppController {
   @Post('/calendars/:cid/todo-move/:tid')
   async moveTodo(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
-    @Param('tid') tid: string,
+    @Param('cid') urlCid: string,
+    @Param('tid') urlTid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
-    const todoId = validate_int(tid, 'Invalid TodoID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const todoId = validate_int(urlTid, 'Invalid TodoID');
     const date = get_required_local_date(bodyParams, 'date');
 
     // Forward
@@ -227,12 +229,12 @@ export class AppController {
   @Post('/calendars/:cid/todo-done/:tid')
   async doneOrMissedTodo(
     @Body() bodyParams: any,
-    @Param('cid') cid: string,
-    @Param('tid') tid: string,
+    @Param('cid') urlCid: string,
+    @Param('tid') urlTid: string,
   ): Promise<string> {
     // Validation
-    const calendarId = validate_int(cid, 'Invalid CalendarID');
-    const todoId = validate_int(tid, 'Invalid TodoID');
+    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const todoId = validate_int(urlTid, 'Invalid TodoID');
     const mode = get_required_string(bodyParams, 'mode');
     if (mode === 'done') {
       // Validation
