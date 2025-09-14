@@ -72,23 +72,7 @@ export const getSDKPure = (
         )
         .then((response) => response.data as ResponseType);
     },
-    createCalendar(data: {
-      name: string;
-      color: string; // Es. "#115599"
-      plannedColor: string; // Es. "#115599"
-      usesNotes: boolean;
-    }) {
-      const formData = new FormData();
-      formData.append('uid', `${uid}`);
-      formData.append('name', data.name);
-      formData.append('color', data.color);
-      formData.append('planned-color', data.plannedColor);
-      formData.append('uses-notes', data.usesNotes ? 'true' : 'false');
-      return api
-        .post(`?a=calendar-create`, formData)
-        .then((response) => response.data as object);
-    },
-    updateCalendar(
+    async updateCalendar(
       calendarId: number,
       data: {
         name?: string;
@@ -97,6 +81,13 @@ export const getSDKPure = (
         usesNotes?: boolean;
       },
     ) {
+      type ResponseType =
+        | {
+            response: 'calendar-uses-notes-cannot-be-disabled';
+          }
+        | {
+            response: 'ok-update';
+          };
       const formData = new FormData();
       formData.append('uid', `${uid}`);
       formData.append('cid', `${calendarId}`);
@@ -114,7 +105,7 @@ export const getSDKPure = (
       }
       return api
         .post('?a=calendar-update', formData)
-        .then((response) => response.data as object);
+        .then((response) => response.data as ResponseType);
     },
     async readCalendarByID(calendarId: number) {
       type ResponseType =

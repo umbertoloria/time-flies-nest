@@ -12,7 +12,6 @@ import { getSDK } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
 import {
   get_optional_bool,
-  get_optional_color,
   get_optional_string,
   get_required_bool,
   get_required_color,
@@ -209,41 +208,82 @@ export class AppController {
 
   @Post('/calendars-create')
   async createCalendar(@Body() bodyParams: any): Promise<string> {
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
     // Validation
     const name = get_required_string(bodyParams, 'name');
     const color = get_required_color(bodyParams, 'color');
     const plannedColor = get_required_color(bodyParams, 'planned-color');
     const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .createCalendar({
-        name,
-        color,
-        plannedColor,
-        usesNotes,
-      })
-      .then(JSON.stringify);
+    // BL
+    const createdCalendar = await this.prismaService.createCalendar(dbUser.id, {
+      name,
+      color,
+      plannedColor,
+      usesNotes,
+    });
+
+    // Response
+    return JSON.stringify({
+      id: createdCalendar.id,
+    });
   }
 
   @Post('/calendar-update')
   async updateCalendar(@Body() bodyParams: any): Promise<string> {
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
     // Validation
     const calendarId = get_required_int(bodyParams, 'cid');
-    const name = get_optional_string(bodyParams, 'name');
-    const color = get_optional_color(bodyParams, 'color');
-    const plannedColor = get_optional_color(bodyParams, 'planned-color');
-    const usesNotes = get_optional_bool(bodyParams, 'uses-notes');
+    // TODO: Here every field is required
+    const name = get_required_string(bodyParams, 'name');
+    const color = get_required_color(bodyParams, 'color');
+    const plannedColor = get_required_color(bodyParams, 'planned-color');
+    const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .updateCalendar(calendarId, {
-        name: name,
+    // PHP API
+    const phpResponse = await (
+      await getSDK(this.prismaService, this.configService, bodyParams)
+    ).updateCalendar(calendarId, {
+      name,
+      color,
+      plannedColor,
+      usesNotes,
+    });
+    if (
+      !phpResponse ||
+      typeof phpResponse !== 'object' ||
+      !phpResponse?.response
+    ) {
+      throw new InternalServerErrorException('Err 1');
+    }
+    if (phpResponse.response === 'calendar-uses-notes-cannot-be-disabled') {
+      return 'calendar-uses-notes-cannot-be-disabled';
+    }
+    if (phpResponse.response !== 'ok-update') {
+      throw new InternalServerErrorException('Err 2');
+    }
+
+    // BL
+    const updateResponse = await this.prismaService.updateCalendar(
+      calendarId,
+      dbUser.id,
+      {
+        name,
         color,
         plannedColor,
         usesNotes,
-      })
-      .then(JSON.stringify);
+      },
+    );
+    if (updateResponse === 'not-found' || typeof updateResponse !== 'object') {
+      throw new NotFoundException('Calendar not found');
+    }
+
+    // Response
+    return 'ok-updated';
   }
 
   @Post('/calendars/:cid/date/:date')
