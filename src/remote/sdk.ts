@@ -29,25 +29,48 @@ export const getSDKPure = (
 
   // TODO: FormData required here
   return {
-    readStreamline() {
+    async readStreamline(calendarIds: number[]) {
+      type ResponseType = {
+        dates: {
+          date: string;
+          calendars: {
+            api_calendar_id: number;
+            todos: {
+              id: number;
+              notes?: string;
+            }[];
+          }[];
+        }[];
+      };
       return api
         .post(
-          '?a=planned-event-read',
+          `?a=planned-event-read&cids=${calendarIds.join(',')}`,
           makeFormData({
             uid: `${uid}`,
           }),
         )
-        .then((response) => response.data as object);
+        .then((response) => response.data as ResponseType);
     },
-    readCalendars(filters: { dateFrom: string; seeAllCalendars: boolean }) {
+    async readCalendars(filters: { dateFrom: string; calendarIds: number[] }) {
+      type ResponseType = {
+        api_calendars: {
+          cid: number;
+          done_tasks: {
+            date: string;
+          }[];
+          todos: {
+            date: string;
+          }[];
+        }[];
+      };
       return api
         .post(
-          `?a=calendars-read&date-from=${filters.dateFrom}${filters.seeAllCalendars ? '&show-all=true' : ''}`,
+          `?a=calendars-read&date-from=${filters.dateFrom}&cids=${filters.calendarIds.join(',')}`,
           makeFormData({
             uid: `${uid}`,
           }),
         )
-        .then((response) => response.data as object);
+        .then((response) => response.data as ResponseType);
     },
     createCalendar(data: {
       name: string;
@@ -93,7 +116,22 @@ export const getSDKPure = (
         .post('?a=calendar-update', formData)
         .then((response) => response.data as object);
     },
-    readCalendarByID(calendarId: number) {
+    async readCalendarByID(calendarId: number) {
+      type ResponseType =
+        | 'unable'
+        | {
+            api_calendar: {
+              cid: number;
+              done_tasks: {
+                date: string;
+                notes?: string;
+              }[];
+              todos: {
+                date: string;
+                notes?: string;
+              }[];
+            };
+          };
       return api
         .post(
           `?a=calendar-read&cid=${calendarId}`,
@@ -101,9 +139,21 @@ export const getSDKPure = (
             uid: `${uid}`,
           }),
         )
-        .then((response) => response.data as object);
+        .then((response) => response.data as ResponseType);
     },
-    readCalendarDate(calendarId: number, date: string) {
+    async readCalendarDate(calendarId: number, date: string) {
+      type ResponseType = {
+        api_calendar_id: number;
+        date: string;
+        doneTasks: {
+          id: number;
+          notes?: string;
+        }[];
+        todos: {
+          id: number;
+          notes?: string;
+        }[];
+      };
       return api
         .post(
           `?a=calendar-date-read&cid=${calendarId}&date=${date}`,
@@ -111,7 +161,7 @@ export const getSDKPure = (
             uid: `${uid}`,
           }),
         )
-        .then((response) => response.data as object);
+        .then((response) => response.data as ResponseType);
     },
     createCalendarDate(
       calendarId: number,

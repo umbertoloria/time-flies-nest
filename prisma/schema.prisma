@@ -15,8 +15,20 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @db.VarChar(150)
-  email    String @db.VarChar(150)
-  password String @db.VarChar(150)
+  id        Int        @id @default(autoincrement())
+  username  String     @db.VarChar(150)
+  email     String     @db.VarChar(150)
+  password  String     @db.VarChar(150)
+  calendars Calendar[]
+}
+
+model Calendar {
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [user_id], references: [id])
+  user_id       Int
+  name          String   @db.VarChar(50)
+  color         String   @db.VarChar(7)
+  planned_color String   @db.VarChar(7)
+  uses_notes    Boolean? @db.Boolean
+  sorted_pin    Int?
 }

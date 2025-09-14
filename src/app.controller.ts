@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Post,
   UnauthorizedException,
@@ -22,6 +24,13 @@ import {
 } from './lib/validate';
 import { PrismaService } from './prisma.service';
 import { requireAuth } from './auth';
+import {
+  TAuthStatus,
+  TCalendar,
+  TCalendarPrev,
+  TCalendarSDK,
+  TDay,
+} from './remote/types';
 
 @Controller()
 export class AppController {
@@ -50,16 +59,7 @@ export class AppController {
     // Auth
     const dbUser = await requireAuth(this.prismaService, bodyParams);
 
-    // Inner SDK (for now)
-    type TAuthStatus = {
-      user: TAuthUser;
-    };
-    type TAuthUser = {
-      id: number;
-      email: string;
-    };
-
-    // Forward
+    // Response
     const response: TAuthStatus = {
       user: {
         id: dbUser.id,
@@ -71,25 +71,93 @@ export class AppController {
 
   @Post('/streamline')
   async streamlineRead(@Body() bodyParams: any): Promise<string> {
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .readStreamline()
-      .then(JSON.stringify);
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
+    // BL
+    const dbCalendars =
+      await this.prismaService.readCalendarIDsFromUserIdViaSortedPin(
+        dbUser.id,
+        true,
+      );
+    const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
+
+    // PHP API
+    const phpResponse = await (
+      await getSDK(this.prismaService, this.configService, bodyParams)
+    ).readStreamline(dbCalendarIds);
+    if (!phpResponse) {
+      throw new InternalServerErrorException();
+    }
+
+    // Response
+    const response: TCalendarSDK.ReadPlannedEventsResponse = {
+      dates: phpResponse.dates.map(({ date, calendars }) => ({
+        date,
+        calendars: calendars.map(({ api_calendar_id, todos }) => {
+          const dbCalendar = dbCalendars.find(
+            (dbCalendar) => dbCalendar.id === api_calendar_id,
+          )!;
+          return {
+            id: dbCalendar.id,
+            name: dbCalendar.name,
+            color: dbCalendar.color,
+            plannedColor: dbCalendar.planned_color,
+            usesNotes: dbCalendar.uses_notes || undefined,
+            todos: todos.map((todo) => ({
+              id: todo.id,
+              notes: todo.notes || undefined,
+            })),
+          };
+        }),
+      })),
+    };
+    return JSON.stringify(response);
   }
 
   @Post('/calendars')
   async readCalendars(@Body() bodyParams: any): Promise<string> {
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
     // Validation
     const dateFrom = get_required_local_date(bodyParams, 'date-from');
     const showAll = get_optional_bool(bodyParams, 'show-all') || false;
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .readCalendars({
-        dateFrom,
-        seeAllCalendars: showAll,
-      })
-      .then(JSON.stringify);
+    // BL
+    const dbCalendars =
+      await this.prismaService.readCalendarIDsFromUserIdViaSortedPin(
+        dbUser.id,
+        showAll,
+      );
+    const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
+
+    // PHP API
+    const phpResponse = await (
+      await getSDK(this.prismaService, this.configService, bodyParams)
+    ).readCalendars({
+      dateFrom,
+      calendarIds: dbCalendarIds,
+    });
+
+    // Response
+    const response: { calendars: TCalendarPrev[] } = {
+      calendars: dbCalendars.map<TCalendarPrev>((dbCalendar) => {
+        const { done_tasks, todos } = phpResponse.api_calendars.find(
+          ({ cid }) => cid === dbCalendar.id,
+        )!;
+        return {
+          id: dbCalendar.id,
+          name: dbCalendar.name,
+          color: dbCalendar.color,
+          plannedColor: dbCalendar.planned_color,
+          usesNotes: dbCalendar.uses_notes || undefined,
+          doneTaskDates: done_tasks.map(({ date }) => date),
+          todoDates: todos.map(({ date }) => date),
+        };
+      }),
+    };
+    return JSON.stringify(response);
   }
 
   @Post('/calendars/:cid')
@@ -97,13 +165,46 @@ export class AppController {
     @Body() bodyParams: any,
     @Param('cid') urlCid: string,
   ): Promise<string> {
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
     // Validation
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .readCalendarByID(calendarId)
-      .then(JSON.stringify);
+    // BL
+    const dbCalendar = await this.prismaService.readCalendarByIDAndUser(
+      calendarId,
+      dbUser.id,
+    );
+    if (!dbCalendar) {
+      throw new NotFoundException('Calendar not found');
+    }
+
+    // PHP API
+    const phpResponse = await (
+      await getSDK(this.prismaService, this.configService, bodyParams)
+    ).readCalendarByID(calendarId);
+    if (phpResponse === 'unable' || typeof phpResponse !== 'object') {
+      throw new InternalServerErrorException();
+    }
+
+    // Response
+    const response: TCalendar = {
+      id: dbCalendar.id,
+      name: dbCalendar.name,
+      color: dbCalendar.color,
+      plannedColor: dbCalendar.planned_color,
+      usesNotes: dbCalendar.uses_notes || undefined,
+      days: phpResponse.api_calendar.done_tasks.map<TDay>((done_task) => ({
+        date: done_task.date,
+        notes: done_task.notes || undefined,
+      })),
+      plannedDays: phpResponse.api_calendar.todos.map<TDay>((todo) => ({
+        date: todo.date,
+        notes: todo.notes || undefined,
+      })),
+    };
+    return JSON.stringify(response);
   }
 
   @Post('/calendars-create')
@@ -151,13 +252,49 @@ export class AppController {
     @Param('cid') urlCid: string,
     @Param('date') date: string,
   ): Promise<string> {
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
     // Validation
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .readCalendarDate(calendarId, date)
-      .then(JSON.stringify);
+    // BL
+    const dbCalendar = await this.prismaService.readCalendarByIDAndUser(
+      calendarId,
+      dbUser.id,
+    );
+    if (!dbCalendar) {
+      throw new NotFoundException('Calendar not found');
+    }
+
+    // PHP API
+    const phpResponse = await (
+      await getSDK(this.prismaService, this.configService, bodyParams)
+    ).readCalendarDate(calendarId, date);
+    if (!phpResponse) {
+      throw new InternalServerErrorException();
+    }
+
+    // Response
+    const response: TCalendarSDK.ReadDateResponse = {
+      calendar: {
+        id: dbCalendar.id,
+        name: dbCalendar.name,
+        color: dbCalendar.color,
+        plannedColor: dbCalendar.planned_color,
+        usesNotes: dbCalendar.uses_notes || undefined,
+      },
+      date,
+      doneTasks: phpResponse.doneTasks.map((doneTask) => ({
+        id: doneTask.id,
+        notes: doneTask.notes || undefined,
+      })),
+      todos: phpResponse.todos.map((todo) => ({
+        id: todo.id,
+        notes: todo.notes || undefined,
+      })),
+    };
+    return JSON.stringify(response);
   }
 
   @Post('/calendars/:cid/date-create/:date')
