@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from './prisma.service';
 
 export function getApiAuth(bodyParams: any) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
@@ -22,4 +23,17 @@ export function getFromConfigService(configService: ConfigService) {
     phpBaseUrl,
     phpApiKey,
   };
+}
+
+export async function requireAuth(
+  prismaService: PrismaService,
+  bodyParams: any,
+) {
+  // Auth
+  const { em, sp } = getApiAuth(bodyParams);
+  const dbUser = await prismaService.userLogin(em, sp);
+  if (!dbUser) {
+    throw new UnauthorizedException('No session found');
+  }
+  return dbUser;
 }

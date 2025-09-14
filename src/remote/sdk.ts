@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { getApiAuth, getFromConfigService } from '../auth';
+import { getFromConfigService, requireAuth } from '../auth';
+import { PrismaService } from '../prisma.service';
 
 function makeFormData(args: Record<string, string | undefined>) {
   const formData = new FormData();
@@ -16,9 +17,7 @@ function makeFormData(args: Record<string, string | undefined>) {
 export const getSDKPure = (
   phpBaseUrl: string | undefined,
   apiKey: string | undefined,
-  // Just for now. Pwd is cyphered.
-  em: string,
-  sp: string,
+  uid: number,
 ) => {
   const api = axios.create({
     baseURL: phpBaseUrl,
@@ -30,35 +29,12 @@ export const getSDKPure = (
 
   // TODO: FormData required here
   return {
-    authLogin(email: string, password: string) {
-      return api
-        .post(
-          '?a=login',
-          makeFormData({
-            email,
-            password,
-          }),
-        )
-        .then((response) => response.data as object);
-    },
-    readAuthStatus() {
-      return api
-        .post(
-          '?a=status',
-          makeFormData({
-            em,
-            sp,
-          }),
-        )
-        .then((response) => response.data as object);
-    },
     readStreamline() {
       return api
         .post(
           '?a=planned-event-read',
           makeFormData({
-            em,
-            sp,
+            uid: `${uid}`,
           }),
         )
         .then((response) => response.data as object);
@@ -68,8 +44,7 @@ export const getSDKPure = (
         .post(
           `?a=calendars-read&date-from=${filters.dateFrom}${filters.seeAllCalendars ? '&show-all=true' : ''}`,
           makeFormData({
-            em,
-            sp,
+            uid: `${uid}`,
           }),
         )
         .then((response) => response.data as object);
@@ -81,8 +56,7 @@ export const getSDKPure = (
       usesNotes: boolean;
     }) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('name', data.name);
       formData.append('color', data.color);
       formData.append('planned-color', data.plannedColor);
@@ -101,8 +75,7 @@ export const getSDKPure = (
       },
     ) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('cid', `${calendarId}`);
       if (data.name) {
         formData.append('name', data.name);
@@ -125,8 +98,7 @@ export const getSDKPure = (
         .post(
           `?a=calendar-read&cid=${calendarId}`,
           makeFormData({
-            em,
-            sp,
+            uid: `${uid}`,
           }),
         )
         .then((response) => response.data as object);
@@ -136,8 +108,7 @@ export const getSDKPure = (
         .post(
           `?a=calendar-date-read&cid=${calendarId}&date=${date}`,
           makeFormData({
-            em,
-            sp,
+            uid: `${uid}`,
           }),
         )
         .then((response) => response.data as object);
@@ -148,8 +119,7 @@ export const getSDKPure = (
       notes: undefined | string,
     ) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('id', `${calendarId}`);
       formData.append('local-date', date);
       if (notes) {
@@ -165,8 +135,7 @@ export const getSDKPure = (
       notes: undefined | string,
     ) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('calendar-id', `${calendarId}`);
       formData.append('local-date', date);
       if (notes) {
@@ -182,8 +151,7 @@ export const getSDKPure = (
       notes: undefined | string,
     ) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('id', `${calendarId}`);
       formData.append('local-date', date);
       if (notes) {
@@ -199,8 +167,7 @@ export const getSDKPure = (
       notes: undefined | string,
     ) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('cid', `${calendarId}`);
       formData.append('eid', `${todoId}`);
       if (notes) {
@@ -215,8 +182,7 @@ export const getSDKPure = (
         .post(
           '?a=planned-event-move',
           makeFormData({
-            em,
-            sp,
+            uid: `${uid}`,
             cid: `${calendarId}`,
             eid: `${todoId}`,
             date,
@@ -237,8 +203,7 @@ export const getSDKPure = (
           },
     ) {
       const formData = new FormData();
-      formData.append('em', em);
-      formData.append('sp', sp);
+      formData.append('uid', `${uid}`);
       formData.append('calendar_id', `${calendarId}`);
       formData.append('event_id', `${todoId}`);
       if (mode.type === 'done') {
@@ -255,8 +220,16 @@ export const getSDKPure = (
   };
 };
 
-export function getSDK(configService: ConfigService, bodyParams: any) {
-  const { em, sp } = getApiAuth(bodyParams);
+export async function getSDK(
+  prismaService: PrismaService,
+  configService: ConfigService,
+  bodyParams: any,
+) {
+  // Auth
+  const dbUser = await requireAuth(prismaService, bodyParams);
+  const uid = dbUser.id;
+
+  // SDK
   const { phpBaseUrl, phpApiKey } = getFromConfigService(configService);
-  return getSDKPure(phpBaseUrl, phpApiKey, em, sp);
+  return getSDKPure(phpBaseUrl, phpApiKey, uid);
 }

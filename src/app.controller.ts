@@ -4,10 +4,10 @@ import {
   Controller,
   Param,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { getSDK, getSDKPure } from './remote/sdk';
+import { getSDK } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
-import { getFromConfigService } from './auth';
 import {
   get_optional_bool,
   get_optional_color,
@@ -20,12 +20,15 @@ import {
   validate_date,
   validate_int,
 } from './lib/validate';
+import { PrismaService } from './prisma.service';
+import { requireAuth } from './auth';
 
 @Controller()
 export class AppController {
   constructor(
     // private readonly appService: AppService,
     private configService: ConfigService,
+    private prismaService: PrismaService,
   ) {}
 
   @Post('/auth/login')
@@ -34,25 +37,42 @@ export class AppController {
     const email = get_required_string(bodyParams, 'email');
     const password = get_required_string(bodyParams, 'password');
 
-    // Forward
-    const { phpBaseUrl, phpApiKey } = getFromConfigService(this.configService);
-    return getSDKPure(phpBaseUrl, phpApiKey, '', '')
-      .authLogin(email, password)
-      .then(() => 'ok-login');
+    // BL
+    const dbUser = await this.prismaService.userLogin(email, password);
+    if (!dbUser) {
+      throw new UnauthorizedException('No session found');
+    }
+    return 'ok-login';
   }
 
   @Post('/auth/status')
   async authStatus(@Body() bodyParams: any): Promise<string> {
+    // Auth
+    const dbUser = await requireAuth(this.prismaService, bodyParams);
+
+    // Inner SDK (for now)
+    type TAuthStatus = {
+      user: TAuthUser;
+    };
+    type TAuthUser = {
+      id: number;
+      email: string;
+    };
+
     // Forward
-    return getSDK(this.configService, bodyParams)
-      .readAuthStatus()
-      .then(JSON.stringify);
+    const response: TAuthStatus = {
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+      },
+    };
+    return JSON.stringify(response);
   }
 
   @Post('/streamline')
   async streamlineRead(@Body() bodyParams: any): Promise<string> {
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .readStreamline()
       .then(JSON.stringify);
   }
@@ -64,7 +84,7 @@ export class AppController {
     const showAll = get_optional_bool(bodyParams, 'show-all') || false;
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .readCalendars({
         dateFrom,
         seeAllCalendars: showAll,
@@ -81,7 +101,7 @@ export class AppController {
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .readCalendarByID(calendarId)
       .then(JSON.stringify);
   }
@@ -95,7 +115,7 @@ export class AppController {
     const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .createCalendar({
         name,
         color,
@@ -115,7 +135,7 @@ export class AppController {
     const usesNotes = get_optional_bool(bodyParams, 'uses-notes');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .updateCalendar(calendarId, {
         name: name,
         color,
@@ -135,7 +155,7 @@ export class AppController {
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .readCalendarDate(calendarId, date)
       .then(JSON.stringify);
   }
@@ -153,7 +173,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .createCalendarDate(calendarId, date, notes)
       .then(JSON.stringify);
   }
@@ -170,7 +190,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .updateCalendarDateNotes(calendarId, date, notes)
       .then(JSON.stringify);
   }
@@ -187,7 +207,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .createPlannedEvent(calendarId, date, notes)
       .then(JSON.stringify);
   }
@@ -204,7 +224,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .updatePlannedEvent(calendarId, todoId, notes)
       .then(JSON.stringify);
   }
@@ -221,7 +241,7 @@ export class AppController {
     const date = get_required_local_date(bodyParams, 'date');
 
     // Forward
-    return getSDK(this.configService, bodyParams)
+    return (await getSDK(this.prismaService, this.configService, bodyParams))
       .movePlannedEvent(calendarId, todoId, date)
       .then(JSON.stringify);
   }
@@ -241,7 +261,7 @@ export class AppController {
       const notes = get_optional_string(bodyParams, 'notes');
 
       // Forward
-      return getSDK(this.configService, bodyParams)
+      return (await getSDK(this.prismaService, this.configService, bodyParams))
         .setPlannedEventAsDone(calendarId, todoId, {
           type: 'done',
           notes,
@@ -249,7 +269,7 @@ export class AppController {
         .then(JSON.stringify);
     } else if (mode === 'missed') {
       // Forward
-      return getSDK(this.configService, bodyParams)
+      return (await getSDK(this.prismaService, this.configService, bodyParams))
         .setPlannedEventAsDone(calendarId, todoId, {
           type: 'missed',
         })
