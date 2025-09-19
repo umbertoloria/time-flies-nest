@@ -29,6 +29,8 @@ export const getSDKPure = (
 
   // TODO: FormData required here
   return {
+    /*
+    // TODO: Deprecated
     async readStreamline(calendarIds: number[]) {
       type ResponseType = {
         dates: {
@@ -51,6 +53,7 @@ export const getSDKPure = (
         )
         .then((response) => response.data as ResponseType);
     },
+    */
     async readCalendars(filters: { dateFrom: string; calendarIds: number[] }) {
       type ResponseType = {
         api_calendars: {

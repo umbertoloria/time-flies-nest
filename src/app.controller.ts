@@ -83,60 +83,49 @@ export class AppController {
 
     const dbUndoneTodos =
       await this.prismaService.readUndoneTodosByCalendars(dbCalendarIds);
-    const mapCalendar2Todos = dbCalendarIds.map((calendarId) => ({
-      calendarId,
-      todos: dbUndoneTodos.filter((todo) => todo.calendar_id === calendarId),
-    }));
-
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readStreamline(dbCalendarIds);
-    if (!phpResponse) {
-      throw new InternalServerErrorException();
-    }
 
     // Response
     const response: TCalendarSDK.ReadPlannedEventsResponse = {
-      dates: phpResponse.dates.map(({ date, calendars }) => ({
-        date,
-        calendars: calendars.map(({ api_calendar_id }) => {
-          const dbCalendar = dbCalendars.find(
-            (dbCalendar) => dbCalendar.id === api_calendar_id,
-          )!;
-          const jsTodos = mapCalendar2Todos
-            .find(({ calendarId }) => calendarId === api_calendar_id)!
-            .todos.filter((todo) => todo.date === date)
-            .map((todo) => ({
-              id: todo.id,
-              notes: todo.notes || undefined,
-            }));
-
-          /*
-          // Validity test +
-          const phpTodos = todos.map((todx) => ({
-            id: todx.id,
-            notes: todx.notes || undefined,
-          }));
-          const jsonOracle = JSON.stringify(phpTodos);
-          const jsonTest = JSON.stringify(jsTodos);
-          if (jsonOracle !== jsonTest) {
-            console.error('diff 4', jsonOracle, jsonTest);
-          }
-          // Validity test -
-          */
-
-          return {
-            id: dbCalendar.id,
-            name: dbCalendar.name,
-            color: dbCalendar.color,
-            plannedColor: dbCalendar.planned_color,
-            usesNotes: dbCalendar.uses_notes || undefined,
-            todos: jsTodos,
-          };
-        }),
-      })),
+      dates: [],
     };
+    let currDateI: null | number = null;
+    for (let i = 0; i < dbUndoneTodos.length; ++i) {
+      const todo = dbUndoneTodos[i];
+      const todoDate = todo['date'];
+      if (currDateI === null || response.dates[currDateI].date !== todoDate) {
+        currDateI = response.dates.length;
+        response.dates.push({
+          date: todoDate,
+          calendars: [],
+        });
+      }
+      const todoCalendar = dbCalendars.find(
+        (dbCalendar) => dbCalendar.id === todo.calendar_id,
+      )!;
+      let currDateCalendarI: null | number = null;
+      for (let j = 0; j < response.dates[currDateI].calendars.length; j++) {
+        const v = response.dates[currDateI].calendars[j];
+        if (v.id === todoCalendar.id) {
+          currDateCalendarI = j;
+        }
+      }
+      if (currDateCalendarI === null) {
+        currDateCalendarI = response.dates[currDateI].calendars.length;
+        response.dates[currDateI].calendars.push({
+          id: todoCalendar.id,
+          name: todoCalendar.name,
+          color: todoCalendar.color,
+          plannedColor: todoCalendar.planned_color,
+          usesNotes: todoCalendar.uses_notes || undefined,
+          todos: [],
+        });
+      }
+      response.dates[currDateI].calendars[currDateCalendarI].todos.push({
+        id: todo.id,
+        // date: todoDate,
+        notes: todo.notes || undefined,
+      });
+    }
     return JSON.stringify(response);
   }
 
