@@ -90,4 +90,37 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       },
     });
   }
+
+  readUndoneTodosByCalendars(calendarIds: number[]) {
+    return this.todo.findMany({
+      where: {
+        calendar_id: {
+          in: calendarIds,
+        },
+        done_date: null,
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+  }
+
+  readUndoneTodosByCalendar(calendarId: number, filterDate: string) {
+    return this.todo.findMany({
+      where: {
+        calendar_id: calendarId,
+        date: filterDate,
+        done_date: null,
+      },
+    });
+  }
+
+  readTodo(calendarId: number, todoId: number) {
+    return this.todo.findUnique({
+      where: {
+        calendar_id: calendarId,
+        id: todoId,
+      },
+    });
+  }
 }

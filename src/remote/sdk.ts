@@ -81,6 +81,7 @@ export const getSDKPure = (
         usesNotes?: boolean;
       },
     ) {
+      // TODO: Deprecated
       type ResponseType =
         | {
             response: 'calendar-uses-notes-cannot-be-disabled';
@@ -186,6 +187,8 @@ export const getSDKPure = (
         .post('?a=calendar-date-update-notes', formData)
         .then((response) => response.data as object);
     },
+    /*
+    // TODO: Deprecated
     createPlannedEvent(
       calendarId: number,
       date: string,
@@ -258,6 +261,7 @@ export const getSDKPure = (
         .post('?a=planned-event-set-as-done', formData)
         .then((response) => response.data as object);
     },
+    */
   };
 };
 

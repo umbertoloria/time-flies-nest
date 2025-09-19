@@ -81,6 +81,13 @@ export class AppController {
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
+    const dbUndoneTodos =
+      await this.prismaService.readUndoneTodosByCalendars(dbCalendarIds);
+    const mapCalendar2Todos = dbCalendarIds.map((calendarId) => ({
+      calendarId,
+      todos: dbUndoneTodos.filter((todo) => todo.calendar_id === calendarId),
+    }));
+
     // PHP API
     const phpResponse = await (
       await getSDK(this.prismaService, this.configService, bodyParams)
@@ -93,20 +100,39 @@ export class AppController {
     const response: TCalendarSDK.ReadPlannedEventsResponse = {
       dates: phpResponse.dates.map(({ date, calendars }) => ({
         date,
-        calendars: calendars.map(({ api_calendar_id, todos }) => {
+        calendars: calendars.map(({ api_calendar_id }) => {
           const dbCalendar = dbCalendars.find(
             (dbCalendar) => dbCalendar.id === api_calendar_id,
           )!;
+          const jsTodos = mapCalendar2Todos
+            .find(({ calendarId }) => calendarId === api_calendar_id)!
+            .todos.filter((todo) => todo.date === date)
+            .map((todo) => ({
+              id: todo.id,
+              notes: todo.notes || undefined,
+            }));
+
+          /*
+          // Validity test +
+          const phpTodos = todos.map((todx) => ({
+            id: todx.id,
+            notes: todx.notes || undefined,
+          }));
+          const jsonOracle = JSON.stringify(phpTodos);
+          const jsonTest = JSON.stringify(jsTodos);
+          if (jsonOracle !== jsonTest) {
+            console.error('diff 4', jsonOracle, jsonTest);
+          }
+          // Validity test -
+          */
+
           return {
             id: dbCalendar.id,
             name: dbCalendar.name,
             color: dbCalendar.color,
             plannedColor: dbCalendar.planned_color,
             usesNotes: dbCalendar.uses_notes || undefined,
-            todos: todos.map((todo) => ({
-              id: todo.id,
-              notes: todo.notes || undefined,
-            })),
+            todos: jsTodos,
           };
         }),
       })),
@@ -131,6 +157,15 @@ export class AppController {
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
+    const dbUndoneTodos =
+      await this.prismaService.readUndoneTodosByCalendars(dbCalendarIds);
+    const mapCalendar2Todos = dbCalendarIds.map((calendarId) => ({
+      calendarId,
+      todoDates: dbUndoneTodos
+        .filter((todo) => todo.calendar_id === calendarId)
+        .map((todo) => todo.date),
+    }));
+
     // PHP API
     const phpResponse = await (
       await getSDK(this.prismaService, this.configService, bodyParams)
@@ -142,9 +177,24 @@ export class AppController {
     // Response
     const response: { calendars: TCalendarPrev[] } = {
       calendars: dbCalendars.map<TCalendarPrev>((dbCalendar) => {
-        const { done_tasks, todos } = phpResponse.api_calendars.find(
+        const { done_tasks } = phpResponse.api_calendars.find(
           ({ cid }) => cid === dbCalendar.id,
         )!;
+        const todoDates = mapCalendar2Todos.find(
+          ({ calendarId }) => calendarId === dbCalendar.id,
+        )!.todoDates;
+
+        /*
+        // Validity test +
+        const phpTodosDates = phpTodos.map(({ date }) => date);
+        const jsonOracle = JSON.stringify(phpTodosDates);
+        const jsonTest = JSON.stringify(todoDates);
+        if (jsonOracle !== jsonTest) {
+          console.error('diff 1', jsonOracle, jsonTest);
+        }
+        // Validity test -
+        */
+
         return {
           id: dbCalendar.id,
           name: dbCalendar.name,
@@ -152,7 +202,7 @@ export class AppController {
           plannedColor: dbCalendar.planned_color,
           usesNotes: dbCalendar.uses_notes || undefined,
           doneTaskDates: done_tasks.map(({ date }) => date),
-          todoDates: todos.map(({ date }) => date),
+          todoDates,
         };
       }),
     };
@@ -179,6 +229,10 @@ export class AppController {
       throw new NotFoundException('Calendar not found');
     }
 
+    const dbUndoneTodos = await this.prismaService.readUndoneTodosByCalendars([
+      dbCalendar.id,
+    ]);
+
     // PHP API
     const phpResponse = await (
       await getSDK(this.prismaService, this.configService, bodyParams)
@@ -188,6 +242,25 @@ export class AppController {
     }
 
     // Response
+    const plannedDays = dbUndoneTodos.map((todo) => ({
+      date: todo.date,
+      notes: todo.notes || undefined,
+    }));
+
+    /*
+    // Validity test +
+    const phpPlannedDays = phpResponse.api_calendar.todos.map<TDay>((todx) => ({
+      date: todx.date,
+      notes: todx.notes || undefined,
+    }));
+    const jsonOracle = JSON.stringify(phpPlannedDays);
+    const jsonTest = JSON.stringify(plannedDays);
+    if (jsonOracle !== jsonTest) {
+      console.error('diff 2', jsonOracle, jsonTest);
+    }
+    // Validity test -
+    */
+
     const response: TCalendar = {
       id: dbCalendar.id,
       name: dbCalendar.name,
@@ -198,10 +271,7 @@ export class AppController {
         date: done_task.date,
         notes: done_task.notes || undefined,
       })),
-      plannedDays: phpResponse.api_calendar.todos.map<TDay>((todo) => ({
-        date: todo.date,
-        notes: todo.notes || undefined,
-      })),
+      plannedDays,
     };
     return JSON.stringify(response);
   }
@@ -307,6 +377,11 @@ export class AppController {
       throw new NotFoundException('Calendar not found');
     }
 
+    const dbUndoneTodos = await this.prismaService.readUndoneTodosByCalendar(
+      dbCalendar.id,
+      date,
+    );
+
     // PHP API
     const phpResponse = await (
       await getSDK(this.prismaService, this.configService, bodyParams)
@@ -316,6 +391,25 @@ export class AppController {
     }
 
     // Response
+    const todos = dbUndoneTodos.map((todo) => ({
+      id: todo.id,
+      notes: todo.notes || undefined,
+    }));
+
+    /*
+    // Validity test +
+    const phpTodos = phpResponse.todos.map((todx) => ({
+      id: todx.id,
+      notes: todx.notes || undefined,
+    }));
+    const jsonOracle = JSON.stringify(phpTodos);
+    const jsonTest = JSON.stringify(todos);
+    if (jsonOracle !== jsonTest) {
+      console.error('diff 3', jsonOracle, jsonTest);
+    }
+    // Validity test -
+    */
+
     const response: TCalendarSDK.ReadDateResponse = {
       calendar: {
         id: dbCalendar.id,
@@ -329,10 +423,7 @@ export class AppController {
         id: doneTask.id,
         notes: doneTask.notes || undefined,
       })),
-      todos: phpResponse.todos.map((todo) => ({
-        id: todo.id,
-        notes: todo.notes || undefined,
-      })),
+      todos,
     };
     return JSON.stringify(response);
   }
@@ -383,10 +474,29 @@ export class AppController {
     // TODO: Validate "date"
     const notes = get_optional_string(bodyParams, 'notes');
 
+    // BL
+    const insTodo = await this.prismaService.todo.create({
+      data: {
+        calendar_id: calendarId,
+        date: date,
+        done_date: null,
+        notes: notes || undefined,
+        // missed: undefined,
+      },
+    });
+    // TODO: Verify calendar is user's
+    console.log('created', insTodo);
+
+    /*
+    // TODO: Deprecated
     // Forward
     return (await getSDK(this.prismaService, this.configService, bodyParams))
       .createPlannedEvent(calendarId, date, notes)
       .then(JSON.stringify);
+    */
+
+    // Response
+    return 'ok';
   }
 
   @Post('/calendars/:cid/todo-upd/:tid')
@@ -400,10 +510,38 @@ export class AppController {
     const todoId = validate_int(urlTid, 'Invalid TodoID');
     const notes = get_optional_string(bodyParams, 'notes');
 
+    // BL
+    const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
+    if (!dbTodo) {
+      throw new BadRequestException('Todo not found');
+    }
+    // TODO: Verify calendar is user's
+    if (dbTodo.done_date) {
+      // To-do Notes can't be updated after it's Done.
+      throw new BadRequestException('Todo already done');
+    }
+
+    const updTodo = await this.prismaService.todo.update({
+      where: {
+        id: todoId,
+        calendar_id: calendarId,
+      },
+      data: {
+        notes: notes || null,
+      },
+    });
+    console.log('updated', updTodo);
+
+    /*
+    // TODO: Deprecated
     // Forward
     return (await getSDK(this.prismaService, this.configService, bodyParams))
       .updatePlannedEvent(calendarId, todoId, notes)
       .then(JSON.stringify);
+    */
+
+    // Response
+    return 'ok';
   }
 
   @Post('/calendars/:cid/todo-move/:tid')
@@ -417,10 +555,42 @@ export class AppController {
     const todoId = validate_int(urlTid, 'Invalid TodoID');
     const date = get_required_local_date(bodyParams, 'date');
 
+    // BL
+    const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
+    if (!dbTodo) {
+      throw new BadRequestException('Todo not found');
+    }
+    // TODO: Verify calendar is user's
+    if (dbTodo.done_date) {
+      // To-do can't be MOVED after it's Done.
+      throw new BadRequestException('Todo already done');
+    }
+
+    if (dbTodo.date !== date) {
+      const updTodo = await this.prismaService.todo.update({
+        where: {
+          id: todoId,
+          calendar_id: calendarId,
+        },
+        data: {
+          date,
+        },
+      });
+      console.log('updated', updTodo);
+      // TODO: There could be multiple ToDos on the same day
+    }
+    // Otherwise, pointless update...
+
+    /*
+    // TODO: Deprecated
     // Forward
     return (await getSDK(this.prismaService, this.configService, bodyParams))
       .movePlannedEvent(calendarId, todoId, date)
       .then(JSON.stringify);
+    */
+
+    // Response
+    return 'ok';
   }
 
   @Post('/calendars/:cid/todo-done/:tid')
@@ -437,6 +607,28 @@ export class AppController {
       // Validation
       const notes = get_optional_string(bodyParams, 'notes');
 
+      // BL
+      const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
+      if (!dbTodo) {
+        throw new BadRequestException('Todo not found');
+      }
+      // TODO: Verify calendar is user's
+
+      const todayDate = dbTodo.date; // Always using the To-do Date as "default".
+      const updTodo = await this.prismaService.todo.update({
+        where: {
+          id: dbTodo.id,
+        },
+        data: {
+          done_date: todayDate,
+          // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
+          notes: notes || undefined,
+        },
+      });
+      console.log('updated', updTodo);
+
+      /*
+      // TODO: Deprecated
       // Forward
       return (await getSDK(this.prismaService, this.configService, bodyParams))
         .setPlannedEventAsDone(calendarId, todoId, {
@@ -444,13 +636,25 @@ export class AppController {
           notes,
         })
         .then(JSON.stringify);
+      */
+
+      // PHP API
+      return (await getSDK(this.prismaService, this.configService, bodyParams))
+        .createCalendarDate(calendarId, dbTodo.date, updTodo.notes || undefined)
+        .then(JSON.stringify);
     } else if (mode === 'missed') {
+      // FIXME: Disable this function on frontend as well
+      throw new BadRequestException('Deprecated');
+
+      /*
+      // TODO: Deprecated
       // Forward
       return (await getSDK(this.prismaService, this.configService, bodyParams))
         .setPlannedEventAsDone(calendarId, todoId, {
           type: 'missed',
         })
         .then(JSON.stringify);
+      */
     } else {
       // Should never happen.
       throw new BadRequestException("Param 'mode' invalid");
