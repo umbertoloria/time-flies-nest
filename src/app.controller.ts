@@ -8,7 +8,6 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   get_optional_bool,
   get_optional_string,
@@ -29,21 +28,13 @@ import {
   TCalendarSDK,
   TDay,
 } from './remote/types';
-import {
-  areThereCalendarDaysWithNotes,
-  createCalendarDay,
-  getCalendarDaysOnDate,
-  getFullCalendarDays,
-  getShortCalendarDays,
-  updateCalendarDayNotes,
-} from './caldays';
+import { CalDaysService } from './caldays';
 
 @Controller()
 export class AppController {
   constructor(
-    // private readonly appService: AppService,
-    private configService: ConfigService,
     private prismaService: PrismaService,
+    private calDaysService: CalDaysService,
   ) {}
 
   @Post('/auth/login')
@@ -163,9 +154,7 @@ export class AppController {
     }));
 
     // Calendar Days
-    const allCalendarsDays = await getShortCalendarDays(
-      this.prismaService,
-      this.configService,
+    const allCalendarsDays = await this.calDaysService.getShortCalendarDays(
       bodyParams,
       dateFrom,
       dbCalendarIds,
@@ -219,9 +208,7 @@ export class AppController {
       dbCalendar.id,
     ]);
 
-    const calendarDays = await getFullCalendarDays(
-      this.prismaService,
-      this.configService,
+    const calendarDays = await this.calDaysService.getFullCalendarDays(
       bodyParams,
       calendarId,
     );
@@ -309,12 +296,11 @@ export class AppController {
 
     if (!usesNotes) {
       // Calendar "Uses Notes" cannot be disabled if it contains Notes.
-      const checkCalDaysWithNotes = await areThereCalendarDaysWithNotes(
-        this.prismaService,
-        this.configService,
-        bodyParams,
-        calendarId,
-      );
+      const checkCalDaysWithNotes =
+        await this.calDaysService.areThereCalendarDaysWithNotes(
+          bodyParams,
+          calendarId,
+        );
       if (checkCalDaysWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
         return 'calendar-uses-notes-cannot-be-disabled';
       } else if (checkCalDaysWithNotes !== 'ok') {
@@ -366,9 +352,7 @@ export class AppController {
       date,
     );
 
-    const doneTasks = await getCalendarDaysOnDate(
-      this.prismaService,
-      this.configService,
+    const doneTasks = await this.calDaysService.getCalendarDaysOnDate(
       bodyParams,
       calendarId,
       date,
@@ -425,16 +409,10 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    await createCalendarDay(
-      this.prismaService,
-      this.configService,
-      bodyParams,
-      calendarId,
-      {
-        date,
-        notes: notes || undefined,
-      },
-    );
+    await this.calDaysService.createCalendarDay(bodyParams, calendarId, {
+      date,
+      notes: notes || undefined,
+    });
 
     // Response
     return 'ok';
@@ -452,9 +430,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    await updateCalendarDayNotes(
-      this.prismaService,
-      this.configService,
+    await this.calDaysService.updateCalendarDayNotes(
       bodyParams,
       calendarId,
       date,
@@ -615,16 +591,10 @@ export class AppController {
       });
       console.log('updated', updTodo);
 
-      await createCalendarDay(
-        this.prismaService,
-        this.configService,
-        bodyParams,
-        calendarId,
-        {
-          date: dbTodo.date,
-          notes: updTodo.notes || undefined,
-        },
-      );
+      await this.calDaysService.createCalendarDay(bodyParams, calendarId, {
+        date: dbTodo.date,
+        notes: updTodo.notes || undefined,
+      });
 
       return 'ok';
     } else if (mode === 'missed') {
