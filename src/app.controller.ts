@@ -28,13 +28,13 @@ import {
   TCalendarSDK,
   TDay,
 } from './remote/types';
-import { CalDaysService } from './caldays';
+import { TaskService } from './task.service';
 
 @Controller()
 export class AppController {
   constructor(
     private prismaService: PrismaService,
-    private calDaysService: CalDaysService,
+    private taskService: TaskService,
   ) {}
 
   @Post('/auth/login')
@@ -153,19 +153,19 @@ export class AppController {
         .map((todo) => todo.date),
     }));
 
-    // Calendar Days
-    const allCalendarsDays = await this.calDaysService.getShortCalendarDays(
-      bodyParams,
-      dateFrom,
-      dbCalendarIds,
-    );
+    const mapCalendar2DoneTasks =
+      await this.taskService.readTasksDatesFromCalendars(
+        bodyParams,
+        dateFrom,
+        dbCalendarIds,
+      );
 
     // Response
     const response: { calendars: TCalendarPrev[] } = {
       calendars: dbCalendars.map<TCalendarPrev>((dbCalendar) => {
-        const calendarDays = allCalendarsDays.filter(
-          (calendarDay) => calendarDay.calendar_id === dbCalendar.id,
-        );
+        const doneTaskDates = mapCalendar2DoneTasks.find(
+          ({ calendarId }) => calendarId === dbCalendar.id,
+        )!.dates;
         const todoDates = mapCalendar2Todos.find(
           ({ calendarId }) => calendarId === dbCalendar.id,
         )!.todoDates;
@@ -176,7 +176,7 @@ export class AppController {
           color: dbCalendar.color,
           plannedColor: dbCalendar.planned_color,
           usesNotes: dbCalendar.uses_notes || undefined,
-          doneTaskDates: calendarDays.map(({ date }) => date),
+          doneTaskDates,
           todoDates,
         };
       }),
@@ -208,7 +208,7 @@ export class AppController {
       dbCalendar.id,
     ]);
 
-    const calendarDays = await this.calDaysService.getFullCalendarDays(
+    const tasks = await this.taskService.readTasksFromCalendar(
       bodyParams,
       calendarId,
     );
@@ -219,29 +219,15 @@ export class AppController {
       notes: todo.notes || undefined,
     }));
 
-    /*
-    // Validity test +
-    const phpPlannedDays = phpResponse.api_calendar.todos.map<TDay>((todx) => ({
-      date: todx.date,
-      notes: todx.notes || undefined,
-    }));
-    const jsonOracle = JSON.stringify(phpPlannedDays);
-    const jsonTest = JSON.stringify(plannedDays);
-    if (jsonOracle !== jsonTest) {
-      console.error('diff 2', jsonOracle, jsonTest);
-    }
-    // Validity test -
-    */
-
     const response: TCalendar = {
       id: dbCalendar.id,
       name: dbCalendar.name,
       color: dbCalendar.color,
       plannedColor: dbCalendar.planned_color,
       usesNotes: dbCalendar.uses_notes || undefined,
-      days: calendarDays.map<TDay>((done_task) => ({
-        date: done_task.date,
-        notes: done_task.notes || undefined,
+      days: tasks.map<TDay>((task) => ({
+        date: task.date,
+        notes: task.notes || undefined,
       })),
       plannedDays,
     };
@@ -296,14 +282,13 @@ export class AppController {
 
     if (!usesNotes) {
       // Calendar "Uses Notes" cannot be disabled if it contains Notes.
-      const checkCalDaysWithNotes =
-        await this.calDaysService.areThereCalendarDaysWithNotes(
-          bodyParams,
-          calendarId,
-        );
-      if (checkCalDaysWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
+      const checkTasksWithNotes = await this.taskService.areThereTasksWithNotes(
+        bodyParams,
+        calendarId,
+      );
+      if (checkTasksWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
         return 'calendar-uses-notes-cannot-be-disabled';
-      } else if (checkCalDaysWithNotes !== 'ok') {
+      } else if (checkTasksWithNotes !== 'ok') {
         throw new InternalServerErrorException('Err 3');
       }
     }
@@ -352,7 +337,7 @@ export class AppController {
       date,
     );
 
-    const doneTasks = await this.calDaysService.getCalendarDaysOnDate(
+    const doneTasks = await this.taskService.readTasksFromCalendarAndDate(
       bodyParams,
       calendarId,
       date,
@@ -409,7 +394,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    await this.calDaysService.createCalendarDay(bodyParams, calendarId, {
+    await this.taskService.createDoneTask(bodyParams, calendarId, {
       date,
       notes: notes || undefined,
     });
@@ -430,14 +415,9 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    await this.calDaysService.updateCalendarDayNotes(
-      bodyParams,
-      calendarId,
-      date,
-      {
-        notes: notes || undefined,
-      },
-    );
+    await this.taskService.updateTaskNotesByDate(bodyParams, calendarId, date, {
+      notes: notes || undefined,
+    });
 
     // Response
     return 'ok';
@@ -591,7 +571,7 @@ export class AppController {
       });
       console.log('updated', updTodo);
 
-      await this.calDaysService.createCalendarDay(bodyParams, calendarId, {
+      await this.taskService.createDoneTask(bodyParams, calendarId, {
         date: dbTodo.date,
         notes: updTodo.notes || undefined,
       });

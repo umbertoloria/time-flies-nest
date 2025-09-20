@@ -2,15 +2,16 @@ import { getSDK } from './remote/sdk';
 import { PrismaService } from './prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { isFirstOne } from './lib/list';
 
 @Injectable()
-export class CalDaysService {
+export class TaskService {
   constructor(
     private configService: ConfigService,
     private prismaService: PrismaService,
   ) {}
 
-  async getShortCalendarDays(
+  async readTasksDatesFromCalendars(
     bodyParams: any,
     dateFrom: string,
     dbCalendarIds: number[],
@@ -24,25 +25,15 @@ export class CalDaysService {
     });
 
     // Mapping
-    const result: {
-      // id: number;
-      calendar_id: number;
-      date: string;
-    }[] = [];
-    phpResponse.api_calendars.forEach((calendar) => {
-      calendar.done_tasks.forEach((calendar_day) => {
-        result.push({
-          // id: calendar_day.id,
-          calendar_id: calendar.cid,
-          date: calendar_day.date,
-        });
-      });
-    });
-
-    return result;
+    return phpResponse.api_calendars.map((calendar) => ({
+      calendarId: calendar.cid,
+      dates: calendar.done_tasks
+        .map((doneTask) => doneTask.date)
+        .filter(isFirstOne),
+    }));
   }
 
-  async getFullCalendarDays(bodyParams: any, calendarId: number) {
+  async readTasksFromCalendar(bodyParams: any, calendarId: number) {
     // PHP API
     const phpResponse = await (
       await getSDK(this.prismaService, this.configService, bodyParams)
@@ -53,7 +44,7 @@ export class CalDaysService {
     return phpResponse.api_calendar.done_tasks;
   }
 
-  async areThereCalendarDaysWithNotes(bodyParams: any, calendarId: number) {
+  async areThereTasksWithNotes(bodyParams: any, calendarId: number) {
     // PHP API
     const phpResponse = await (
       await getSDK(this.prismaService, this.configService, bodyParams)
@@ -76,7 +67,7 @@ export class CalDaysService {
     return 'ok';
   }
 
-  async getCalendarDaysOnDate(
+  async readTasksFromCalendarAndDate(
     bodyParams: any,
     calendarId: number,
     date: string,
@@ -91,7 +82,7 @@ export class CalDaysService {
     return phpResponse.doneTasks;
   }
 
-  async createCalendarDay(
+  async createDoneTask(
     bodyParams: any,
     calendarId: number,
     data: {
@@ -109,7 +100,7 @@ export class CalDaysService {
     }
   }
 
-  async updateCalendarDayNotes(
+  async updateTaskNotesByDate(
     bodyParams: any,
     calendarId: number,
     date: string,
