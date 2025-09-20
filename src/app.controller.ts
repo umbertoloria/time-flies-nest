@@ -30,6 +30,12 @@ import {
   TCalendarSDK,
   TDay,
 } from './remote/types';
+import {
+  areThereCalendarDaysWithNotes,
+  getCalendarDaysOnDate,
+  getFullCalendarDays,
+  getShortCalendarDays,
+} from './caldays';
 
 @Controller()
 export class AppController {
@@ -155,34 +161,24 @@ export class AppController {
         .map((todo) => todo.date),
     }));
 
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readCalendars({
+    // Calendar Days
+    const allCalendarsDays = await getShortCalendarDays(
+      this.prismaService,
+      this.configService,
+      bodyParams,
       dateFrom,
-      calendarIds: dbCalendarIds,
-    });
+      dbCalendarIds,
+    );
 
     // Response
     const response: { calendars: TCalendarPrev[] } = {
       calendars: dbCalendars.map<TCalendarPrev>((dbCalendar) => {
-        const { done_tasks } = phpResponse.api_calendars.find(
-          ({ cid }) => cid === dbCalendar.id,
-        )!;
+        const calendarDays = allCalendarsDays.filter(
+          (calendarDay) => calendarDay.calendar_id === dbCalendar.id,
+        );
         const todoDates = mapCalendar2Todos.find(
           ({ calendarId }) => calendarId === dbCalendar.id,
         )!.todoDates;
-
-        /*
-        // Validity test +
-        const phpTodosDates = phpTodos.map(({ date }) => date);
-        const jsonOracle = JSON.stringify(phpTodosDates);
-        const jsonTest = JSON.stringify(todoDates);
-        if (jsonOracle !== jsonTest) {
-          console.error('diff 1', jsonOracle, jsonTest);
-        }
-        // Validity test -
-        */
 
         return {
           id: dbCalendar.id,
@@ -190,7 +186,7 @@ export class AppController {
           color: dbCalendar.color,
           plannedColor: dbCalendar.planned_color,
           usesNotes: dbCalendar.uses_notes || undefined,
-          doneTaskDates: done_tasks.map(({ date }) => date),
+          doneTaskDates: calendarDays.map(({ date }) => date),
           todoDates,
         };
       }),
@@ -222,13 +218,12 @@ export class AppController {
       dbCalendar.id,
     ]);
 
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readCalendarByID(calendarId);
-    if (phpResponse === 'unable' || typeof phpResponse !== 'object') {
-      throw new InternalServerErrorException();
-    }
+    const calendarDays = await getFullCalendarDays(
+      this.prismaService,
+      this.configService,
+      bodyParams,
+      calendarId,
+    );
 
     // Response
     const plannedDays = dbUndoneTodos.map((todo) => ({
@@ -256,7 +251,7 @@ export class AppController {
       color: dbCalendar.color,
       plannedColor: dbCalendar.planned_color,
       usesNotes: dbCalendar.uses_notes || undefined,
-      days: phpResponse.api_calendar.done_tasks.map<TDay>((done_task) => ({
+      days: calendarDays.map<TDay>((done_task) => ({
         date: done_task.date,
         notes: done_task.notes || undefined,
       })),
@@ -303,30 +298,29 @@ export class AppController {
     const plannedColor = get_required_color(bodyParams, 'planned-color');
     const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).updateCalendar(calendarId, {
-      name,
-      color,
-      plannedColor,
-      usesNotes,
-    });
-    if (
-      !phpResponse ||
-      typeof phpResponse !== 'object' ||
-      !phpResponse?.response
-    ) {
-      throw new InternalServerErrorException('Err 1');
-    }
-    if (phpResponse.response === 'calendar-uses-notes-cannot-be-disabled') {
+    // BL
+    const there_are_some_notes_in_calendar =
+      await this.prismaService.calendar_there_are_some_notes_in_it(calendarId);
+    if (there_are_some_notes_in_calendar) {
+      // TODO: This is a leak if user is not the Calendar owner
       return 'calendar-uses-notes-cannot-be-disabled';
     }
-    if (phpResponse.response !== 'ok-update') {
-      throw new InternalServerErrorException('Err 2');
+
+    if (!usesNotes) {
+      // Calendar "Uses Notes" cannot be disabled if it contains Notes.
+      const checkCalDaysWithNotes = await areThereCalendarDaysWithNotes(
+        this.prismaService,
+        this.configService,
+        bodyParams,
+        calendarId,
+      );
+      if (checkCalDaysWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
+        return 'calendar-uses-notes-cannot-be-disabled';
+      } else if (checkCalDaysWithNotes !== 'ok') {
+        throw new InternalServerErrorException('Err 3');
+      }
     }
 
-    // BL
     const updateResponse = await this.prismaService.updateCalendar(
       calendarId,
       dbUser.id,
@@ -371,13 +365,13 @@ export class AppController {
       date,
     );
 
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readCalendarDate(calendarId, date);
-    if (!phpResponse) {
-      throw new InternalServerErrorException();
-    }
+    const doneTasks = await getCalendarDaysOnDate(
+      this.prismaService,
+      this.configService,
+      bodyParams,
+      calendarId,
+      date,
+    );
 
     // Response
     const todos = dbUndoneTodos.map((todo) => ({
@@ -408,7 +402,7 @@ export class AppController {
         usesNotes: dbCalendar.uses_notes || undefined,
       },
       date,
-      doneTasks: phpResponse.doneTasks.map((doneTask) => ({
+      doneTasks: doneTasks.map((doneTask) => ({
         id: doneTask.id,
         notes: doneTask.notes || undefined,
       })),
