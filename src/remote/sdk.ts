@@ -116,7 +116,7 @@ export const getSDKPure = (
         .then((response) => response.data as ResponseType);
     },
 
-    createCalendarDate(
+    async createCalendarDate(
       calendarId: number,
       date: string,
       notes: undefined | string,
@@ -133,7 +133,7 @@ export const getSDKPure = (
         .then((response) => response.data as object);
     },
 
-    updateCalendarDateNotes(
+    async updateCalendarDateNotes(
       calendarId: number,
       date: string,
       notes: undefined | string,

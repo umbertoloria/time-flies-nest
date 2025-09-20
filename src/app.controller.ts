@@ -8,7 +8,6 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
-import { getSDK } from './remote/sdk';
 import { ConfigService } from '@nestjs/config';
 import {
   get_optional_bool,
@@ -32,9 +31,11 @@ import {
 } from './remote/types';
 import {
   areThereCalendarDaysWithNotes,
+  createCalendarDay,
   getCalendarDaysOnDate,
   getFullCalendarDays,
   getShortCalendarDays,
+  updateCalendarDayNotes,
 } from './caldays';
 
 @Controller()
@@ -423,10 +424,20 @@ export class AppController {
     // TODO: Validate "date"
     const notes = get_optional_string(bodyParams, 'notes');
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .createCalendarDate(calendarId, date, notes)
-      .then(JSON.stringify);
+    // BL
+    await createCalendarDay(
+      this.prismaService,
+      this.configService,
+      bodyParams,
+      calendarId,
+      {
+        date,
+        notes: notes || undefined,
+      },
+    );
+
+    // Response
+    return 'ok';
   }
 
   @Post('/calendars/:cid/date-upd-notes/:date')
@@ -440,10 +451,20 @@ export class AppController {
     // TODO: Validate "date"
     const notes = get_optional_string(bodyParams, 'notes');
 
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .updateCalendarDateNotes(calendarId, date, notes)
-      .then(JSON.stringify);
+    // BL
+    await updateCalendarDayNotes(
+      this.prismaService,
+      this.configService,
+      bodyParams,
+      calendarId,
+      date,
+      {
+        notes: notes || undefined,
+      },
+    );
+
+    // Response
+    return 'ok';
   }
 
   @Post('/calendars/:cid/todo-create/:date')
@@ -469,14 +490,6 @@ export class AppController {
     });
     // TODO: Verify calendar is user's
     console.log('created', insTodo);
-
-    /*
-    // TODO: Deprecated
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .createPlannedEvent(calendarId, date, notes)
-      .then(JSON.stringify);
-    */
 
     // Response
     return 'ok';
@@ -514,14 +527,6 @@ export class AppController {
       },
     });
     console.log('updated', updTodo);
-
-    /*
-    // TODO: Deprecated
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .updatePlannedEvent(calendarId, todoId, notes)
-      .then(JSON.stringify);
-    */
 
     // Response
     return 'ok';
@@ -610,21 +615,18 @@ export class AppController {
       });
       console.log('updated', updTodo);
 
-      /*
-      // TODO: Deprecated
-      // Forward
-      return (await getSDK(this.prismaService, this.configService, bodyParams))
-        .setPlannedEventAsDone(calendarId, todoId, {
-          type: 'done',
-          notes,
-        })
-        .then(JSON.stringify);
-      */
+      await createCalendarDay(
+        this.prismaService,
+        this.configService,
+        bodyParams,
+        calendarId,
+        {
+          date: dbTodo.date,
+          notes: updTodo.notes || undefined,
+        },
+      );
 
-      // PHP API
-      return (await getSDK(this.prismaService, this.configService, bodyParams))
-        .createCalendarDate(calendarId, dbTodo.date, updTodo.notes || undefined)
-        .then(JSON.stringify);
+      return 'ok';
     } else if (mode === 'missed') {
       // FIXME: Disable this function on frontend as well
       throw new BadRequestException('Deprecated');

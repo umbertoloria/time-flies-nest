@@ -97,3 +97,42 @@ export async function getCalendarDaysOnDate(
   }
   return phpResponse.doneTasks;
 }
+
+export async function createCalendarDay(
+  prismaService: PrismaService,
+  configService: ConfigService,
+  bodyParams: any,
+  calendarId: number,
+  data: {
+    date: string;
+    notes: string | undefined;
+  },
+) {
+  // PHP API
+  const response: any = await (
+    await getSDK(prismaService, configService, bodyParams)
+  ).createCalendarDate(calendarId, data.date, data.notes);
+  if (response !== 'ok') {
+    console.error('createCalendarDay: given', response, 'expected "ok"');
+    throw new InternalServerErrorException();
+  }
+}
+
+export async function updateCalendarDayNotes(
+  prismaService: PrismaService,
+  configService: ConfigService,
+  bodyParams: any,
+  calendarId: number,
+  date: string,
+  data: {
+    notes: string | undefined;
+  },
+) {
+  const response: any = await (
+    await getSDK(prismaService, configService, bodyParams)
+  ).updateCalendarDateNotes(calendarId, date, data.notes);
+  if (response !== 'ok') {
+    console.error('createCalendarDay: given', response, 'expected "ok"');
+    throw new InternalServerErrorException();
+  }
+}
