@@ -465,7 +465,7 @@ export class AppController {
     // BL
     const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
     if (!dbTodo) {
-      throw new BadRequestException('Todo not found');
+      throw new NotFoundException('Todo not found');
     }
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -502,7 +502,7 @@ export class AppController {
     // BL
     const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
     if (!dbTodo) {
-      throw new BadRequestException('Todo not found');
+      throw new NotFoundException('Todo not found');
     }
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -554,7 +554,7 @@ export class AppController {
       // BL
       const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
       if (!dbTodo) {
-        throw new BadRequestException('Todo not found');
+        throw new NotFoundException('Todo not found');
       }
       // TODO: Verify calendar is user's
 
