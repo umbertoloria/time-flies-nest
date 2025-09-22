@@ -31,6 +31,7 @@ model Calendar {
   planned_color String   @db.VarChar(7)
   uses_notes    Boolean? @db.Boolean
   sorted_pin    Int?
+  tasks         Task[]
   todos         Todo[]
 }
 
@@ -42,4 +43,12 @@ model Todo {
   done_date   String?  @db.VarChar(10)
   notes       String?
   missed      Boolean? @db.Boolean
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  calendar    Calendar @relation(fields: [calendar_id], references: [id])
+  calendar_id Int
+  date        String   @db.VarChar(10)
+  notes       String?
 }

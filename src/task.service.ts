@@ -1,120 +1,118 @@
-import { getSDK } from './remote/sdk';
 import { PrismaService } from './prisma.service';
-import { ConfigService } from '@nestjs/config';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { isFirstOne } from './lib/list';
 
 @Injectable()
 export class TaskService {
-  constructor(
-    private configService: ConfigService,
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
-  async readTasksDatesFromCalendars(
-    bodyParams: any,
-    dateFrom: string,
-    dbCalendarIds: number[],
-  ) {
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readCalendars({
-      dateFrom,
-      calendarIds: dbCalendarIds,
+  async readTasksDatesFromCalendars(dateFrom: string, dbCalendarIds: number[]) {
+    const response = await this.prismaService.task.findMany({
+      where: {
+        calendar_id: {
+          in: dbCalendarIds,
+        },
+        date: {
+          gte: dateFrom,
+        },
+      },
+      orderBy: {
+        date: 'asc',
+      },
     });
-
-    // Mapping
-    return phpResponse.api_calendars.map((calendar) => ({
-      calendarId: calendar.cid,
-      dates: calendar.done_tasks
-        .map((doneTask) => doneTask.date)
+    return dbCalendarIds.map((calendarId) => ({
+      calendarId,
+      dates: response
+        .filter((task) => task.calendar_id === calendarId)
+        .map((task) => task.date)
         .filter(isFirstOne),
     }));
   }
 
-  async readTasksFromCalendar(bodyParams: any, calendarId: number) {
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readCalendarByID(calendarId);
-    if (phpResponse === 'unable' || typeof phpResponse !== 'object') {
-      throw new InternalServerErrorException();
-    }
-    return phpResponse.api_calendar.done_tasks;
-  }
-
-  async areThereTasksWithNotes(bodyParams: any, calendarId: number) {
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).updateCalendar(calendarId, {
-      usesNotes: false,
+  async readTasksFromCalendar(calendarId: number) {
+    const response = await this.prismaService.task.findMany({
+      where: {
+        calendar_id: calendarId,
+      },
+      orderBy: {
+        date: 'asc',
+      },
     });
-    if (
-      !phpResponse ||
-      typeof phpResponse !== 'object' ||
-      !phpResponse?.response
-    ) {
-      throw new InternalServerErrorException('Err 1');
-    }
-    if (phpResponse.response === 'calendar-uses-notes-cannot-be-disabled') {
-      return 'calendar-uses-notes-cannot-be-disabled';
-    }
-    if (phpResponse.response !== 'ok-update') {
-      throw new InternalServerErrorException('Err 2');
-    }
-    return 'ok';
+    return response.map((task) => ({
+      id: task.id,
+      calendar: task.calendar_id,
+      date: task.date,
+      notes: task.notes || null,
+    }));
   }
 
-  async readTasksFromCalendarAndDate(
-    bodyParams: any,
-    calendarId: number,
-    date: string,
-  ) {
-    // PHP API
-    const phpResponse = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).readCalendarDate(calendarId, date);
-    if (!phpResponse) {
-      throw new InternalServerErrorException();
-    }
-    return phpResponse.doneTasks;
+  async areThereTasksWithNotes(calendarId: number) {
+    const response = await this.prismaService.task.count({
+      where: {
+        calendar_id: calendarId,
+        NOT: {
+          notes: null,
+        },
+      },
+    });
+    return response > 0 ? 'calendar-uses-notes-cannot-be-disabled' : 'ok';
+  }
+
+  async readTasksFromCalendarAndDate(calendarId: number, date: string) {
+    const response = await this.prismaService.task.findMany({
+      where: {
+        calendar_id: calendarId,
+        date,
+      },
+    });
+    // TODO: Returning multiple Tasks for the same Day
+    return response.map((task) => ({
+      id: task.id,
+      notes: task.notes || null,
+    }));
   }
 
   async createDoneTask(
-    bodyParams: any,
     calendarId: number,
     data: {
       date: string;
       notes: string | undefined;
     },
   ) {
-    // PHP API
-    const response: any = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).createCalendarDate(calendarId, data.date, data.notes);
-    if (response !== 'ok') {
-      console.error('createCalendarDay: given', response, 'expected "ok"');
-      throw new InternalServerErrorException();
-    }
+    return await this.prismaService.task.create({
+      data: {
+        calendar_id: calendarId,
+        date: data.date,
+        notes: data.notes || undefined,
+      },
+    });
   }
 
   async updateTaskNotesByDate(
-    bodyParams: any,
     calendarId: number,
     date: string,
     data: {
       notes: string | undefined;
     },
   ) {
-    // PHP API
-    const response: any = await (
-      await getSDK(this.prismaService, this.configService, bodyParams)
-    ).updateCalendarDateNotes(calendarId, date, data.notes);
-    if (response !== 'ok') {
-      console.error('createCalendarDay: given', response, 'expected "ok"');
-      throw new InternalServerErrorException();
+    // FIXME: Bug if there are multiple Tasks for the same Date
+    const tasks = await this.readTasksFromCalendarAndDate(calendarId, date);
+    if (!tasks.length) {
+      throw new NotFoundException('Task not found');
     }
+    if (tasks.length > 1) {
+      throw new NotFoundException('Task not found');
+    }
+    const taskId = tasks[0].id;
+    return await this.prismaService.task.update({
+      where: {
+        id: taskId,
+        calendar_id: calendarId,
+        date,
+      },
+      data: {
+        notes: data.notes || null,
+      },
+    });
   }
 }

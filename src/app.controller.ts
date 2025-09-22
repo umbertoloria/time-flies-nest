@@ -155,7 +155,6 @@ export class AppController {
 
     const mapCalendar2DoneTasks =
       await this.taskService.readTasksDatesFromCalendars(
-        bodyParams,
         dateFrom,
         dbCalendarIds,
       );
@@ -208,10 +207,7 @@ export class AppController {
       dbCalendar.id,
     ]);
 
-    const tasks = await this.taskService.readTasksFromCalendar(
-      bodyParams,
-      calendarId,
-    );
+    const tasks = await this.taskService.readTasksFromCalendar(calendarId);
 
     // Response
     const plannedDays = dbUndoneTodos.map((todo) => ({
@@ -282,10 +278,8 @@ export class AppController {
 
     if (!usesNotes) {
       // Calendar "Uses Notes" cannot be disabled if it contains Notes.
-      const checkTasksWithNotes = await this.taskService.areThereTasksWithNotes(
-        bodyParams,
-        calendarId,
-      );
+      const checkTasksWithNotes =
+        await this.taskService.areThereTasksWithNotes(calendarId);
       if (checkTasksWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
         return 'calendar-uses-notes-cannot-be-disabled';
       } else if (checkTasksWithNotes !== 'ok') {
@@ -338,7 +332,6 @@ export class AppController {
     );
 
     const doneTasks = await this.taskService.readTasksFromCalendarAndDate(
-      bodyParams,
       calendarId,
       date,
     );
@@ -394,7 +387,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    await this.taskService.createDoneTask(bodyParams, calendarId, {
+    await this.taskService.createDoneTask(calendarId, {
       date,
       notes: notes || undefined,
     });
@@ -415,7 +408,7 @@ export class AppController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    await this.taskService.updateTaskNotesByDate(bodyParams, calendarId, date, {
+    await this.taskService.updateTaskNotesByDate(calendarId, date, {
       notes: notes || undefined,
     });
 
@@ -571,7 +564,7 @@ export class AppController {
       });
       console.log('updated', updTodo);
 
-      await this.taskService.createDoneTask(bodyParams, calendarId, {
+      await this.taskService.createDoneTask(calendarId, {
         date: dbTodo.date,
         notes: updTodo.notes || undefined,
       });

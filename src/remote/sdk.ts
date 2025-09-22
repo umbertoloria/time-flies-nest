@@ -1,8 +1,4 @@
-import axios from 'axios';
-import { ConfigService } from '@nestjs/config';
-import { getFromConfigService, requireAuth } from '../auth';
-import { PrismaService } from '../prisma.service';
-
+/*
 function makeFormData(args: Record<string, string | undefined>) {
   const formData = new FormData();
   for (const key in args) {
@@ -165,3 +161,4 @@ export async function getSDK(
   const { phpBaseUrl, phpApiKey } = getFromConfigService(configService);
   return getSDKPure(phpBaseUrl, phpApiKey, uid);
 }
+*/
