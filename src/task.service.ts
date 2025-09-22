@@ -42,7 +42,7 @@ export class TaskService {
       id: task.id,
       calendar: task.calendar_id,
       date: task.date,
-      notes: task.notes || null,
+      notes: task.notes || undefined,
     }));
   }
 
@@ -68,7 +68,7 @@ export class TaskService {
     // TODO: Returning multiple Tasks for the same Day
     return response.map((task) => ({
       id: task.id,
-      notes: task.notes || null,
+      notes: task.notes || undefined,
     }));
   }
 
