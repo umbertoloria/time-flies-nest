@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AuthController } from './auth/auth.controller';
+import { CalendarController } from './calendar/calendar.controller';
+import { TaskController } from './task/task.controller';
+import { TodoController } from './todo/todo.controller';
 import { PrismaService } from './prisma.service';
 import { TaskService } from './task.service';
-import { CalendarController } from './calendar/calendar.controller';
-import { TodoController } from './todo/todo.controller';
-import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -15,9 +16,10 @@ import { AuthController } from './auth/auth.controller';
   controllers: [
     //
     AppController,
-    CalendarController,
-    TodoController,
     AuthController,
+    CalendarController,
+    TaskController,
+    TodoController,
   ],
   providers: [
     //
