@@ -63,7 +63,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async calendar_there_are_some_notes_in_it(calendarId: number) {
+  async calendar_there_are_some_notes_in_its_todos(calendarId: number) {
     const result = await this.todo.count({
       where: {
         calendar_id: calendarId,
