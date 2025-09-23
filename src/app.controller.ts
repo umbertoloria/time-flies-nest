@@ -1,22 +1,18 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   NotFoundException,
   Param,
   Post,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   get_optional_string,
-  get_required_local_date,
-  get_required_string,
   validate_date,
   validate_int,
 } from './lib/validate';
 import { PrismaService } from './prisma.service';
 import { requireAuth } from './auth';
-import { TAuthStatus, TCalendarSDK } from './remote/types';
+import { TCalendarSDK } from './remote/types';
 import { TaskService } from './task.service';
 
 @Controller()
@@ -25,35 +21,6 @@ export class AppController {
     private prismaService: PrismaService,
     private taskService: TaskService,
   ) {}
-
-  @Post('/auth/login')
-  async authLogin(@Body() bodyParams: any): Promise<string> {
-    // Validation
-    const email = get_required_string(bodyParams, 'email');
-    const password = get_required_string(bodyParams, 'password');
-
-    // BL
-    const dbUser = await this.prismaService.userLogin(email, password);
-    if (!dbUser) {
-      throw new UnauthorizedException('No session found');
-    }
-    return 'ok-login';
-  }
-
-  @Post('/auth/status')
-  async authStatus(@Body() bodyParams: any): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
-    // Response
-    const response: TAuthStatus = {
-      user: {
-        id: dbUser.id,
-        email: dbUser.email,
-      },
-    };
-    return JSON.stringify(response);
-  }
 
   @Post('/streamline')
   async streamlineRead(@Body() bodyParams: any): Promise<string> {

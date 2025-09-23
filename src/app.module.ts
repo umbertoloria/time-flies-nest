@@ -5,6 +5,7 @@ import { PrismaService } from './prisma.service';
 import { TaskService } from './task.service';
 import { CalendarController } from './calendar/calendar.controller';
 import { TodoController } from './todo/todo.controller';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TodoController } from './todo/todo.controller';
     AppController,
     CalendarController,
     TodoController,
+    AuthController,
   ],
   providers: [
     //
