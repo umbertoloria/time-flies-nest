@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
 import { TaskService } from './task.service';
 import { CalendarController } from './calendar/calendar.controller';
+import { TodoController } from './todo/todo.controller';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CalendarController } from './calendar/calendar.controller';
     //
     AppController,
     CalendarController,
+    TodoController,
   ],
   providers: [
     //
