@@ -1,10 +1,13 @@
-import { PrismaService } from './prisma.service';
+import { PrismaService } from '../prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { isFirstOne } from './lib/list';
+import { isFirstOne } from '../lib/list';
 
 @Injectable()
 export class TaskService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    //
+    private prismaService: PrismaService,
+  ) {}
 
   async readTasksDatesFromCalendars(dateFrom: string, dbCalendarIds: number[]) {
     const response = await this.prismaService.task.findMany({

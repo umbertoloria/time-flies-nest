@@ -6,7 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { requireAuth } from '../auth';
+import { requireAuth } from '../auth/auth';
 import {
   get_optional_bool,
   get_required_bool,
@@ -17,7 +17,7 @@ import {
   validate_int,
 } from '../lib/validate';
 import { PrismaService } from '../prisma.service';
-import { TaskService } from '../task.service';
+import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../remote/types';
 
 @Controller('calendars')

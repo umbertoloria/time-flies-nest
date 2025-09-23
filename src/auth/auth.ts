@@ -1,6 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from '../prisma.service';
 
 export function getApiAuth(bodyParams: any) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
@@ -13,15 +12,6 @@ export function getApiAuth(bodyParams: any) {
   return {
     em,
     sp,
-  };
-}
-
-export function getFromConfigService(configService: ConfigService) {
-  const phpBaseUrl = configService.get<string>('PHP_BASE_URL');
-  const phpApiKey = configService.get<string>('PHP_API_KEY');
-  return {
-    phpBaseUrl,
-    phpApiKey,
   };
 }
 

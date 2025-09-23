@@ -5,8 +5,8 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { TaskService } from '../task.service';
-import { requireAuth } from '../auth';
+import { TaskService } from './task.service';
+import { requireAuth } from '../auth/auth';
 import {
   get_optional_string,
   validate_date,

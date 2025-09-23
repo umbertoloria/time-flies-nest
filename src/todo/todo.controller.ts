@@ -13,8 +13,8 @@ import {
   validate_int,
 } from '../lib/validate';
 import { PrismaService } from '../prisma.service';
-import { TaskService } from '../task.service';
-import { requireAuth } from '../auth';
+import { TaskService } from '../task/task.service';
+import { requireAuth } from '../auth/auth';
 import { TCalendarSDK } from '../remote/types';
 
 @Controller('/calendars')

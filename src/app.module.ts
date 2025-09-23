@@ -5,7 +5,7 @@ import { CalendarController } from './calendar/calendar.controller';
 import { TaskController } from './task/task.controller';
 import { TodoController } from './todo/todo.controller';
 import { PrismaService } from './prisma.service';
-import { TaskService } from './task.service';
+import { TaskService } from './task/task.service';
 
 @Module({
   imports: [

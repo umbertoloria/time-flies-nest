@@ -1,7 +1,7 @@
 import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { get_required_string } from '../lib/validate';
-import { requireAuth } from '../auth';
+import { requireAuth } from './auth';
 import { TAuthStatus } from '../remote/types';
 
 @Controller('/auth')
