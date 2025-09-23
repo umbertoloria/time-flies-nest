@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
 import { CalendarController } from './calendar/calendar.controller';
 import { TaskController } from './task/task.controller';
@@ -14,12 +13,11 @@ import { TaskService } from './task.service';
     ConfigModule.forRoot(),
   ],
   controllers: [
-    //
-    AppController,
+    // Order is important here!
     AuthController,
-    CalendarController,
     TaskController,
     TodoController,
+    CalendarController,
   ],
   providers: [
     //
