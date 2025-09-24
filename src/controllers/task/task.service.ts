@@ -1,6 +1,6 @@
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { isFirstOne } from '../lib/list';
+import { isFirstOne } from '../../lib/list';
 
 @Injectable()
 export class TaskService {

@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { get_required_string } from '../lib/validate';
-import { TAuthStatus } from '../remote/types';
-import { AuthGuard, CurrentUser } from '../guards/auth.guard';
+import { PrismaService } from '../../prisma.service';
+import { get_required_string } from '../../lib/validate';
+import { TAuthStatus } from '../../sdk/types';
+import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 
 @Controller('/auth')
 export class AuthController {

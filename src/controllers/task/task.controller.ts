@@ -11,10 +11,10 @@ import {
   get_optional_string,
   validate_date,
   validate_int,
-} from '../lib/validate';
-import { TCalendarSDK } from '../remote/types';
-import { PrismaService } from '../prisma.service';
-import { AuthGuard, CurrentUser } from '../guards/auth.guard';
+} from '../../lib/validate';
+import { TCalendarSDK } from '../../sdk/types';
+import { PrismaService } from '../../prisma.service';
+import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')

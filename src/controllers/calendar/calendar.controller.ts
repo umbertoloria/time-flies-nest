@@ -15,11 +15,11 @@ import {
   get_required_local_date,
   get_required_string,
   validate_int,
-} from '../lib/validate';
-import { PrismaService } from '../prisma.service';
+} from '../../lib/validate';
+import { PrismaService } from '../../prisma.service';
 import { TaskService } from '../task/task.service';
-import { TCalendar, TCalendarPrev, TDay } from '../remote/types';
-import { AuthGuard, CurrentUser } from '../guards/auth.guard';
+import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
+import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('calendars')
