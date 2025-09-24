@@ -4,9 +4,9 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { requireAuth } from '../auth/auth';
 import {
   get_optional_string,
   validate_date,
@@ -14,7 +14,9 @@ import {
 } from '../lib/validate';
 import { TCalendarSDK } from '../remote/types';
 import { PrismaService } from '../prisma.service';
+import { AuthGuard, CurrentUser } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('/calendars')
 export class TaskController {
   constructor(
@@ -28,17 +30,15 @@ export class TaskController {
     @Body() bodyParams: any,
     @Param('cid') urlCid: string,
     @Param('date') date: string,
+    @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
     // Validation
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // BL
     const dbCalendar = await this.prismaService.readCalendarByIDAndUser(
       calendarId,
-      dbUser.id,
+      user.id,
     );
     if (!dbCalendar) {
       throw new NotFoundException('Calendar not found');

@@ -5,8 +5,8 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { requireAuth } from '../auth/auth';
 import {
   get_optional_bool,
   get_required_bool,
@@ -19,7 +19,9 @@ import {
 import { PrismaService } from '../prisma.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../remote/types';
+import { AuthGuard, CurrentUser } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('calendars')
 export class CalendarController {
   constructor(
@@ -29,10 +31,10 @@ export class CalendarController {
   ) {}
 
   @Post('/')
-  async readCalendars(@Body() bodyParams: any): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
+  async readCalendars(
+    @Body() bodyParams: any,
+    @CurrentUser() user: ReqUser,
+  ): Promise<string> {
     // Validation
     const dateFrom = get_required_local_date(bodyParams, 'date-from');
     const showAll = get_optional_bool(bodyParams, 'show-all') || false;
@@ -40,7 +42,7 @@ export class CalendarController {
     // BL
     const dbCalendars =
       await this.prismaService.readCalendarIDsFromUserIdViaSortedPin(
-        dbUser.id,
+        user.id,
         showAll,
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
@@ -85,10 +87,10 @@ export class CalendarController {
   }
 
   @Post('/create')
-  async createCalendar(@Body() bodyParams: any): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
+  async createCalendar(
+    @Body() bodyParams: any,
+    @CurrentUser() user: ReqUser,
+  ): Promise<string> {
     // Validation
     const name = get_required_string(bodyParams, 'name');
     const color = get_required_color(bodyParams, 'color');
@@ -96,7 +98,7 @@ export class CalendarController {
     const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
     // BL
-    const createdCalendar = await this.prismaService.createCalendar(dbUser.id, {
+    const createdCalendar = await this.prismaService.createCalendar(user.id, {
       name,
       color,
       plannedColor,
@@ -110,10 +112,10 @@ export class CalendarController {
   }
 
   @Post('/update')
-  async updateCalendar(@Body() bodyParams: any): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
+  async updateCalendar(
+    @Body() bodyParams: any,
+    @CurrentUser() user: ReqUser,
+  ): Promise<string> {
     // Validation
     const calendarId = get_required_int(bodyParams, 'cid');
     // TODO: Here every field is required
@@ -148,7 +150,7 @@ export class CalendarController {
 
     const updateResponse = await this.prismaService.updateCalendar(
       calendarId,
-      dbUser.id,
+      user.id,
       {
         name,
         color,
@@ -168,17 +170,15 @@ export class CalendarController {
   async readCalendarById(
     @Body() bodyParams: any,
     @Param('cid') urlCid: string,
+    @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
     // Validation
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // BL
     const dbCalendar = await this.prismaService.readCalendarByIDAndUser(
       calendarId,
-      dbUser.id,
+      user.id,
     );
     if (!dbCalendar) {
       throw new NotFoundException('Calendar not found');

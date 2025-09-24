@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   get_optional_string,
@@ -14,9 +15,10 @@ import {
 } from '../lib/validate';
 import { PrismaService } from '../prisma.service';
 import { TaskService } from '../task/task.service';
-import { requireAuth } from '../auth/auth';
 import { TCalendarSDK } from '../remote/types';
+import { AuthGuard, CurrentUser } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('/calendars')
 export class TodoController {
   constructor(
@@ -26,14 +28,11 @@ export class TodoController {
   ) {}
 
   @Post('/streamline')
-  async streamlineRead(@Body() bodyParams: any): Promise<string> {
-    // Auth
-    const dbUser = await requireAuth(this.prismaService, bodyParams);
-
+  async streamlineRead(@CurrentUser() user: ReqUser): Promise<string> {
     // BL
     const dbCalendars =
       await this.prismaService.readCalendarIDsFromUserIdViaSortedPin(
-        dbUser.id,
+        user.id,
         true,
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
