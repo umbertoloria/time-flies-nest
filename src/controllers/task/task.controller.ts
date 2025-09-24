@@ -13,7 +13,8 @@ import {
   validate_int,
 } from '../../lib/validate';
 import { TCalendarSDK } from '../../sdk/types';
-import { PrismaService } from '../../prisma.service';
+import { CalendarService } from '../calendar/calendar.service';
+import { TodoService } from '../todo/todo.service';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 
 @UseGuards(AuthGuard)
@@ -21,7 +22,8 @@ import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 export class TaskController {
   constructor(
     //
-    private readonly prismaService: PrismaService,
+    private readonly calendarService: CalendarService,
+    private readonly todoService: TodoService,
     private readonly taskService: TaskService,
   ) {}
 
@@ -36,7 +38,7 @@ export class TaskController {
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // BL
-    const dbCalendar = await this.prismaService.readCalendarByIDAndUser(
+    const dbCalendar = await this.calendarService.readCalendarByIDAndUser(
       calendarId,
       user.id,
     );
@@ -44,7 +46,7 @@ export class TaskController {
       throw new NotFoundException('Calendar not found');
     }
 
-    const dbUndoneTodos = await this.prismaService.readUndoneTodosByCalendar(
+    const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendar(
       dbCalendar.id,
       date,
     );

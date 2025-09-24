@@ -16,7 +16,8 @@ import {
   get_required_string,
   validate_int,
 } from '../../lib/validate';
-import { PrismaService } from '../../prisma.service';
+import { CalendarService } from './calendar.service';
+import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
@@ -26,7 +27,8 @@ import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 export class CalendarController {
   constructor(
     //
-    private prismaService: PrismaService,
+    private calendarService: CalendarService,
+    private todoService: TodoService,
     private taskService: TaskService,
   ) {}
 
@@ -41,14 +43,14 @@ export class CalendarController {
 
     // BL
     const dbCalendars =
-      await this.prismaService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
         user.id,
         showAll,
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
     const dbUndoneTodos =
-      await this.prismaService.readUndoneTodosByCalendars(dbCalendarIds);
+      await this.todoService.readUndoneTodosByCalendars(dbCalendarIds);
     const mapCalendar2Todos = dbCalendarIds.map((calendarId) => ({
       calendarId,
       todoDates: dbUndoneTodos
@@ -98,7 +100,7 @@ export class CalendarController {
     const usesNotes = get_required_bool(bodyParams, 'uses-notes');
 
     // BL
-    const createdCalendar = await this.prismaService.createCalendar(user.id, {
+    const createdCalendar = await this.calendarService.createCalendar(user.id, {
       name,
       color,
       plannedColor,
@@ -130,7 +132,7 @@ export class CalendarController {
 
       // ... from Todos.
       const there_are_some_notes_in_calendar =
-        await this.prismaService.calendar_there_are_some_notes_in_its_todos(
+        await this.todoService.calendar_there_are_some_notes_in_its_todos(
           calendarId,
         );
       if (there_are_some_notes_in_calendar) {
@@ -148,7 +150,7 @@ export class CalendarController {
       }
     }
 
-    const updateResponse = await this.prismaService.updateCalendar(
+    const updateResponse = await this.calendarService.updateCalendar(
       calendarId,
       user.id,
       {
@@ -176,7 +178,7 @@ export class CalendarController {
     const calendarId = validate_int(urlCid, 'Invalid CalendarID');
 
     // BL
-    const dbCalendar = await this.prismaService.readCalendarByIDAndUser(
+    const dbCalendar = await this.calendarService.readCalendarByIDAndUser(
       calendarId,
       user.id,
     );
@@ -184,7 +186,7 @@ export class CalendarController {
       throw new NotFoundException('Calendar not found');
     }
 
-    const dbUndoneTodos = await this.prismaService.readUndoneTodosByCalendars([
+    const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendars([
       dbCalendar.id,
     ]);
 

@@ -14,6 +14,8 @@ import {
   validate_int,
 } from '../../lib/validate';
 import { PrismaService } from '../../prisma.service';
+import { CalendarService } from '../calendar/calendar.service';
+import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
@@ -24,6 +26,8 @@ export class TodoController {
   constructor(
     //
     private prismaService: PrismaService,
+    private calendarService: CalendarService,
+    private todoService: TodoService,
     private taskService: TaskService,
   ) {}
 
@@ -31,14 +35,14 @@ export class TodoController {
   async streamlineRead(@CurrentUser() user: ReqUser): Promise<string> {
     // BL
     const dbCalendars =
-      await this.prismaService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
         user.id,
         true,
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
     const dbUndoneTodos =
-      await this.prismaService.readUndoneTodosByCalendars(dbCalendarIds);
+      await this.todoService.readUndoneTodosByCalendars(dbCalendarIds);
 
     // Response
     const response: TCalendarSDK.ReadPlannedEventsResponse = {
@@ -125,7 +129,7 @@ export class TodoController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
+    const dbTodo = await this.todoService.readTodo(calendarId, todoId);
     if (!dbTodo) {
       throw new NotFoundException('Todo not found');
     }
@@ -162,7 +166,7 @@ export class TodoController {
     const date = get_required_local_date(bodyParams, 'date');
 
     // BL
-    const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
+    const dbTodo = await this.todoService.readTodo(calendarId, todoId);
     if (!dbTodo) {
       throw new NotFoundException('Todo not found');
     }
@@ -187,14 +191,6 @@ export class TodoController {
     }
     // Otherwise, pointless update...
 
-    /*
-    // TODO: Deprecated
-    // Forward
-    return (await getSDK(this.prismaService, this.configService, bodyParams))
-      .movePlannedEvent(calendarId, todoId, date)
-      .then(JSON.stringify);
-    */
-
     // Response
     return 'ok';
   }
@@ -214,7 +210,7 @@ export class TodoController {
       const notes = get_optional_string(bodyParams, 'notes');
 
       // BL
-      const dbTodo = await this.prismaService.readTodo(calendarId, todoId);
+      const dbTodo = await this.todoService.readTodo(calendarId, todoId);
       if (!dbTodo) {
         throw new NotFoundException('Todo not found');
       }
@@ -242,16 +238,6 @@ export class TodoController {
     } else if (mode === 'missed') {
       // FIXME: Disable this function on frontend as well
       throw new BadRequestException('Deprecated');
-
-      /*
-      // TODO: Deprecated
-      // Forward
-      return (await getSDK(this.prismaService, this.configService, bodyParams))
-        .setPlannedEventAsDone(calendarId, todoId, {
-          type: 'missed',
-        })
-        .then(JSON.stringify);
-      */
     } else {
       // Should never happen.
       throw new BadRequestException("Param 'mode' invalid");

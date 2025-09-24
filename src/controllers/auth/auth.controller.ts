@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { UserService } from './user.service';
 import { get_required_string } from '../../lib/validate';
 import { TAuthStatus } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
@@ -14,7 +14,7 @@ import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 export class AuthController {
   constructor(
     //
-    private prismaService: PrismaService,
+    private userService: UserService,
   ) {}
 
   @Post('/login')
@@ -24,7 +24,7 @@ export class AuthController {
     const password = get_required_string(bodyParams, 'password');
 
     // BL
-    const dbUser = await this.prismaService.userLogin(email, password);
+    const dbUser = await this.userService.userLogin(email, password);
     if (!dbUser) {
       throw new UnauthorizedException('No session found');
     }

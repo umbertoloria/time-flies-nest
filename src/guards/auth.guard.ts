@@ -5,7 +5,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { UserService } from '../controllers/auth/user.service';
 
 export const CurrentUser = createParamDecorator<unknown, ReqUser>(
   (_, context) => {
@@ -28,7 +28,7 @@ export type ReqUserParam<
 export class AuthGuard implements CanActivate {
   constructor(
     //
-    private readonly prismaService: PrismaService,
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate {
     const { em, sp } = apiAuth;
 
     // User Auth verification
-    const dbUser = await this.prismaService.userLogin(em, sp);
+    const dbUser = await this.userService.userLogin(em, sp);
     if (!dbUser) {
       return false;
     }
