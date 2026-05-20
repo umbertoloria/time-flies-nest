@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: umbertoloria/time-flies-nest:latest
+    container_name: time-flies-nest
+    ports:
+      - "8663:8663"
+    network_mode: "host"
+    restart: unless-stopped
+    env_file:
+      - .env

@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-const APP_PORT = 8443 as const;
+const APP_PORT = 8663 as const;
 const ORIGINS_WHITELIST = [
   'http://localhost:3000',
   // 'http://umbertoloria.com',
