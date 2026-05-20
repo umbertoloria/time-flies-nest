@@ -6,7 +6,7 @@ import { TaskController } from './modules/task/task.controller';
 import { TodoController } from './modules/todo/todo.controller';
 import { PrismaRepository } from './prisma.repository';
 import { TaskService } from './modules/task/task.service';
-import { UserService } from './modules/auth/user.service';
+import { AuthService } from './modules/auth/auth.service';
 import { CalendarService } from './modules/calendar/calendar.service';
 import { TodoService } from './modules/todo/todo.service';
 
@@ -26,7 +26,7 @@ import { TodoService } from './modules/todo/todo.service';
     //
     PrismaRepository,
     TaskService,
-    UserService,
+    AuthService,
     CalendarService,
     TodoService,
   ],

@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
+import { AuthService } from './auth.service';
 import { TAuthStatus } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../lib/guards/auth.guard';
 import { ReadUserStatusDto, UserLoginDto } from './dto';
@@ -8,7 +8,7 @@ import { ReadUserStatusDto, UserLoginDto } from './dto';
 export class AuthController {
   constructor(
     //
-    private service: UserService,
+    private service: AuthService,
   ) {}
 
   @Post('/login')

@@ -5,7 +5,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { UserService } from '../../modules/auth/user.service';
+import { AuthService } from '../../modules/auth/auth.service';
 import { UserLoginDto } from '../../modules/auth/dto';
 
 export const CurrentUser = createParamDecorator<unknown, ReqUser>(
@@ -29,7 +29,7 @@ export type ReqUserParam<
 export class AuthGuard implements CanActivate {
   constructor(
     //
-    private readonly userService: UserService,
+    private readonly userService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext) {

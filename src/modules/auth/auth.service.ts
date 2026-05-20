@@ -3,7 +3,7 @@ import { PrismaRepository } from '../../prisma.repository';
 import { UserLoginDto } from './dto';
 
 @Injectable()
-export class UserService {
+export class AuthService {
   constructor(private readonly repo: PrismaRepository) {}
 
   tryUserLogin(dto: UserLoginDto) {
