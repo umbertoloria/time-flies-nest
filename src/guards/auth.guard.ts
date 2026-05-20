@@ -5,8 +5,8 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { UserService } from '../controllers/auth/user.service';
-import { UserLoginDto } from '../auth/dto';
+import { UserService } from '../modules/auth/user.service';
+import { UserLoginDto } from '../modules/auth/dto';
 
 export const CurrentUser = createParamDecorator<unknown, ReqUser>(
   (_, context) => {

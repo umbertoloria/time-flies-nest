@@ -1,4 +1,4 @@
-import { get_required_string } from '../../lib/validate';
+import { get_required_string } from '../../../lib/validate';
 
 export class UserLoginDto {
   constructor(

@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { TAuthStatus } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { ReadUserStatusDto, UserLoginDto } from '../../auth/dto';
+import { ReadUserStatusDto, UserLoginDto } from './dto';
 
 @Controller('/auth')
 export class AuthController {
