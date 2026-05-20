@@ -19,7 +19,7 @@ import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { ReadCalendarsDto } from '../../calendar/dto';
+import { CreateCalendarDto, ReadCalendarsDto } from '../../calendar/dto';
 
 @UseGuards(AuthGuard)
 @Controller('calendars')
@@ -87,22 +87,13 @@ export class CalendarController {
 
   @Post('/create')
   async createCalendar(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const name = get_required_string(bodyParams, 'name');
-    const color = get_required_color(bodyParams, 'color');
-    const plannedColor = get_required_color(bodyParams, 'planned-color');
-    const usesNotes = get_required_bool(bodyParams, 'uses-notes');
+    const dto = CreateCalendarDto.fromBody(body, user);
 
     // BL
-    const createdCalendar = await this.calendarService.createCalendar(user.id, {
-      name,
-      color,
-      plannedColor,
-      usesNotes,
-    });
+    const createdCalendar = await this.calendarService.createCalendar(dto);
 
     // Response
     return JSON.stringify({
