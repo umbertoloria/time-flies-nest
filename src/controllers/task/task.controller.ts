@@ -9,6 +9,7 @@ import { TCalendarSDK } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
+import { ReadCalendarDateDto } from '../../task/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
@@ -22,28 +23,27 @@ export class TaskController {
 
   @Post('/:cid/date/:date')
   async readCalendarDate(
-    @Body() bodyParams: any,
+    // @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('date') date: string,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const dto = ReadCalendarDateDto.fromBody(urlCid, date, user);
 
     // BL
     const dbCalendar = await this.calendarService.readCalendarByIDAndUser(
-      calendarId,
-      user.id,
+      dto.calendarId,
+      dto.user.id,
     );
 
     const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendar(
       dbCalendar.id,
-      date,
+      dto.date,
     );
 
     const doneTasks = await this.taskService.readTasksFromCalendarAndDate(
-      calendarId,
-      date,
+      dto.calendarId,
+      dto.date,
     );
 
     // Response
@@ -74,7 +74,7 @@ export class TaskController {
         plannedColor: dbCalendar.planned_color,
         usesNotes: dbCalendar.uses_notes || undefined,
       },
-      date,
+      date: dto.date,
       doneTasks: doneTasks.map((doneTask) => ({
         id: doneTask.id,
         notes: doneTask.notes || undefined,
