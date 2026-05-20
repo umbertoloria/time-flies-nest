@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as fs from 'fs';
 
 const APP_PORT = 8443 as const;
 const ORIGINS_WHITELIST = [
@@ -12,10 +11,10 @@ const ORIGINS_WHITELIST = [
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    httpsOptions: {
+    /*httpsOptions: {
       key: fs.readFileSync('./secrets/server.key'),
       cert: fs.readFileSync('./secrets/server.cert'),
-    },
+    },*/
   });
 
   app.enableCors({
