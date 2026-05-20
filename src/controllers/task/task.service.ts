@@ -1,6 +1,7 @@
 import { PrismaService } from '../../prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { isFirstOne } from '../../lib/list';
+import { UpdateCalendarDateDto } from '../../task/dto';
 
 @Injectable()
 export class TaskService {
@@ -91,30 +92,30 @@ export class TaskService {
     });
   }
 
-  async updateTaskNotesByDate(
-    calendarId: number,
-    date: string,
-    data: {
-      notes: string | undefined;
-    },
-  ) {
+  async updateTaskNotesByDate(dto: UpdateCalendarDateDto) {
     // FIXME: Bug if there are multiple Tasks for the same Date
-    const tasks = await this.readTasksFromCalendarAndDate(calendarId, date);
+    const tasks = await this.readTasksFromCalendarAndDate(
+      dto.calendarId,
+      dto.date,
+    );
+
     if (!tasks.length) {
       throw new NotFoundException('Task not found');
     }
     if (tasks.length > 1) {
       throw new NotFoundException('Task not found');
     }
+
     const taskId = tasks[0].id;
+
     return await this.prismaService.task.update({
       where: {
         id: taskId,
-        calendar_id: calendarId,
-        date,
+        calendar_id: dto.calendarId,
+        date: dto.date,
       },
       data: {
-        notes: data.notes || null,
+        notes: dto.notes || null,
       },
     });
   }

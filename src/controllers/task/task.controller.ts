@@ -1,11 +1,14 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { get_optional_string, validate_int } from '../../lib/validate';
 import { TCalendarSDK } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { CreateCalendarDateDto, ReadCalendarDateDto } from '../../task/dto';
+import {
+  CreateCalendarDateDto,
+  ReadCalendarDateDto,
+  UpdateCalendarDateDto,
+} from '../../task/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
@@ -104,15 +107,10 @@ export class TaskController {
     @Param('cid') urlCid: string,
     @Param('date') date: string,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    // TODO: Validate "date"
-    const notes = get_optional_string(bodyParams, 'notes');
+    const dto = UpdateCalendarDateDto.fromBody(urlCid, date, date);
 
     // BL
-    await this.taskService.updateTaskNotesByDate(calendarId, date, {
-      notes: notes || undefined,
-    });
+    await this.taskService.updateTaskNotesByDate(dto);
 
     // Response
     return 'ok';
