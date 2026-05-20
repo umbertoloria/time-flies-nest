@@ -10,7 +10,7 @@ import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
-import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
+import { AuthGuard, CurrentUser } from '../../lib/guards/auth.guard';
 import {
   CreateCalendarDto,
   ReadCalendarDto,

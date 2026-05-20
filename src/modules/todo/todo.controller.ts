@@ -11,7 +11,7 @@ import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';
-import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
+import { AuthGuard, CurrentUser } from '../../lib/guards/auth.guard';
 import {
   CreateTodoDto,
   MoveTodoDto,

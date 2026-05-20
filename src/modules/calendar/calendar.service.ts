@@ -1,16 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { PrismaRepository } from '../../prisma.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 
 @Injectable()
 export class CalendarService {
-  constructor(
-    //
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private repo: PrismaRepository) {}
 
   readCalendarIDsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
-    return this.prismaService.calendar.findMany({
+    return this.repo.calendar.findMany({
       where: {
         user_id: userId,
         ...(showAll
@@ -28,7 +25,7 @@ export class CalendarService {
   }
 
   async readCalendarByIDAndUser(calendarId: number, userId: number) {
-    const dbCalendar = await this.prismaService.calendar.findUnique({
+    const dbCalendar = await this.repo.calendar.findUnique({
       where: {
         id: calendarId,
         user_id: userId,
@@ -43,7 +40,7 @@ export class CalendarService {
   }
 
   createCalendar(dto: CreateCalendarDto) {
-    return this.prismaService.calendar.create({
+    return this.repo.calendar.create({
       data: {
         name: dto.name,
         color: dto.color,
@@ -60,7 +57,7 @@ export class CalendarService {
       dto.user.id,
     );
 
-    const upd = await this.prismaService.calendar.update({
+    const upd = await this.repo.calendar.update({
       where: {
         id: dbCalendar.id,
         user_id: dbCalendar.user_id,

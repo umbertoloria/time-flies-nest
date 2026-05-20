@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma.service';
+import { PrismaRepository } from '../../prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -9,13 +9,10 @@ import {
 
 @Injectable()
 export class TodoService {
-  constructor(
-    //
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly repo: PrismaRepository) {}
 
   readUndoneTodosByCalendars(calendarIds: number[]) {
-    return this.prismaService.todo.findMany({
+    return this.repo.todo.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -29,7 +26,7 @@ export class TodoService {
   }
 
   readUndoneTodosByCalendar(calendarId: number, filterDate: string) {
-    return this.prismaService.todo.findMany({
+    return this.repo.todo.findMany({
       where: {
         calendar_id: calendarId,
         date: filterDate,
@@ -39,7 +36,7 @@ export class TodoService {
   }
 
   async readTodo(calendarId: number, todoId: number) {
-    const todo = await this.prismaService.todo.findUnique({
+    const todo = await this.repo.todo.findUnique({
       where: {
         calendar_id: calendarId,
         id: todoId,
@@ -54,7 +51,7 @@ export class TodoService {
   }
 
   async areThereTodosWithNotes(calendarId: number) {
-    const result = await this.prismaService.todo.count({
+    const result = await this.repo.todo.count({
       where: {
         calendar_id: calendarId,
         NOT: {
@@ -67,7 +64,7 @@ export class TodoService {
 
   async createTodo(dto: CreateTodoDto) {
     // TODO: Verify calendar is user's
-    return await this.prismaService.todo.create({
+    return await this.repo.todo.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
@@ -79,7 +76,7 @@ export class TodoService {
   }
 
   async updateTodoNotes(dto: UpdateTodoDto) {
-    const upd = await this.prismaService.todo.update({
+    const upd = await this.repo.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -97,7 +94,7 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto) {
-    const upd = await this.prismaService.todo.update({
+    const upd = await this.repo.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -120,7 +117,7 @@ export class TodoService {
 
     const doneDate = dbTodo.date; // Always using the To-do Date as "default".
 
-    const upd = await this.prismaService.todo.update({
+    const upd = await this.repo.todo.update({
       where: {
         id: dbTodo.id,
       },

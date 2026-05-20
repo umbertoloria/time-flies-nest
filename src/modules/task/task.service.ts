@@ -1,17 +1,14 @@
-import { PrismaService } from '../../prisma.service';
+import { PrismaRepository } from '../../prisma.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { isFirstOne } from '../../lib/list';
 import { UpdateCalendarDateDto } from './dto';
 
 @Injectable()
 export class TaskService {
-  constructor(
-    //
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private repo: PrismaRepository) {}
 
   async readTasksDatesFromCalendars(dateFrom: string, dbCalendarIds: number[]) {
-    const response = await this.prismaService.task.findMany({
+    const response = await this.repo.task.findMany({
       where: {
         calendar_id: {
           in: dbCalendarIds,
@@ -34,7 +31,7 @@ export class TaskService {
   }
 
   async readTasksFromCalendar(calendarId: number) {
-    const response = await this.prismaService.task.findMany({
+    const response = await this.repo.task.findMany({
       where: {
         calendar_id: calendarId,
       },
@@ -51,7 +48,7 @@ export class TaskService {
   }
 
   async areThereTasksWithNotes(calendarId: number) {
-    const response = await this.prismaService.task.count({
+    const response = await this.repo.task.count({
       where: {
         calendar_id: calendarId,
         NOT: {
@@ -63,7 +60,7 @@ export class TaskService {
   }
 
   async readTasksFromCalendarAndDate(calendarId: number, date: string) {
-    const response = await this.prismaService.task.findMany({
+    const response = await this.repo.task.findMany({
       where: {
         calendar_id: calendarId,
         date,
@@ -83,7 +80,7 @@ export class TaskService {
       notes: string | undefined;
     },
   ) {
-    return await this.prismaService.task.create({
+    return await this.repo.task.create({
       data: {
         calendar_id: calendarId,
         date: data.date,
@@ -108,7 +105,7 @@ export class TaskService {
 
     const taskId = tasks[0].id;
 
-    return await this.prismaService.task.update({
+    return await this.repo.task.update({
       where: {
         id: taskId,
         calendar_id: dto.calendarId,
