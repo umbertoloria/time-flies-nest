@@ -18,7 +18,11 @@ import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { CreateTodoDto, ReadStreamlineDto } from '../../todo/dto';
+import {
+  CreateTodoDto,
+  ReadStreamlineDto,
+  UpdateTodoDto,
+} from '../../todo/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
@@ -109,31 +113,26 @@ export class TodoController {
 
   @Post('/:cid/todo-upd/:tid')
   async updateTodoNotes(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
+    @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    const todoId = validate_int(urlTid, 'Invalid TodoID');
-    const notes = get_optional_string(bodyParams, 'notes');
+    const dto = UpdateTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.todoService.readTodo(calendarId, todoId);
+    const dbTodo = await this.todoService.readTodo(dto.calendarId, dto.todoId);
     if (!dbTodo) {
       throw new NotFoundException('Todo not found');
     }
+
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
       // To-do Notes can't be updated after it's Done.
       throw new BadRequestException('Todo already done');
     }
 
-    const updTodo = await this.todoService.updateTodoNotes(
-      todoId,
-      calendarId,
-      notes || null,
-    );
+    const updTodo = await this.todoService.updateTodoNotes(dto);
     console.log('updated', updTodo);
 
     // Response

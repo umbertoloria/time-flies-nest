@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { CreateTodoDto } from '../../todo/dto';
+import { CreateTodoDto, UpdateTodoDto } from '../../todo/dto';
 
 @Injectable()
 export class TodoService {
@@ -67,20 +67,22 @@ export class TodoService {
     });
   }
 
-  async updateTodoNotes(
-    todoId: number,
-    calendarId: number,
-    notes: string | null,
-  ) {
-    return await this.prismaService.todo.update({
+  async updateTodoNotes(dto: UpdateTodoDto) {
+    const upd = await this.prismaService.todo.update({
       where: {
-        id: todoId,
-        calendar_id: calendarId,
+        id: dto.todoId,
+        calendar_id: dto.calendarId,
       },
       data: {
-        notes: notes || null,
+        notes: dto.notes || null,
       },
     });
+
+    if (typeof upd !== 'object') {
+      throw new NotFoundException('Todo not found');
+    }
+
+    return upd;
   }
 
   async moveTodo(todoId: number, calendarId: number, date: string) {
