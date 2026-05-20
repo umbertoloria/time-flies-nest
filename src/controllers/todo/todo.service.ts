@@ -33,13 +33,19 @@ export class TodoService {
     });
   }
 
-  readTodo(calendarId: number, todoId: number) {
-    return this.prismaService.todo.findUnique({
+  async readTodo(calendarId: number, todoId: number) {
+    const todo = await this.prismaService.todo.findUnique({
       where: {
         calendar_id: calendarId,
         id: todoId,
       },
     });
+
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
+
+    return todo;
   }
 
   async areThereTodosWithNotes(calendarId: number) {

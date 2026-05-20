@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  NotFoundException,
   Param,
   Post,
   UseGuards,
@@ -122,9 +121,6 @@ export class TodoController {
 
     // BL
     const dbTodo = await this.todoService.readTodo(dto.calendarId, dto.todoId);
-    if (!dbTodo) {
-      throw new NotFoundException('Todo not found');
-    }
 
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -152,9 +148,7 @@ export class TodoController {
 
     // BL
     const dbTodo = await this.todoService.readTodo(calendarId, todoId);
-    if (!dbTodo) {
-      throw new NotFoundException('Todo not found');
-    }
+
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
       // To-do can't be MOVED after it's Done.
@@ -188,9 +182,6 @@ export class TodoController {
 
       // BL
       const dbTodo = await this.todoService.readTodo(calendarId, todoId);
-      if (!dbTodo) {
-        throw new NotFoundException('Todo not found');
-      }
       // TODO: Verify calendar is user's
 
       const todayDate = dbTodo.date; // Always using the To-do Date as "default".
