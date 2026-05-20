@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { get_required_string } from '../../lib/validate';
-import { CalendarService } from '../calendar/calendar.service';
+import { CalendarService } from '../../modules/calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';

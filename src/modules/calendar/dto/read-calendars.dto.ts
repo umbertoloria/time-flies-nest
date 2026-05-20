@@ -1,4 +1,7 @@
-import { get_optional_bool, get_required_local_date } from '../../lib/validate';
+import {
+  get_optional_bool,
+  get_required_local_date,
+} from '../../../lib/validate';
 
 export class ReadCalendarsDto {
   constructor(
