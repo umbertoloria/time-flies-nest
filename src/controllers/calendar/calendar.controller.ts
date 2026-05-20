@@ -7,19 +7,17 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import {
-  get_required_bool,
-  get_required_color,
-  get_required_int,
-  get_required_string,
-  validate_int,
-} from '../../lib/validate';
+import { validate_int } from '../../lib/validate';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { CreateCalendarDto, ReadCalendarsDto } from '../../calendar/dto';
+import {
+  CreateCalendarDto,
+  ReadCalendarsDto,
+  UpdateCalendarDto,
+} from '../../calendar/dto';
 
 @UseGuards(AuthGuard)
 @Controller('calendars')
@@ -106,29 +104,24 @@ export class CalendarController {
     @Body() bodyParams: any,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = get_required_int(bodyParams, 'cid');
-    // TODO: Here every field is required
-    const name = get_required_string(bodyParams, 'name');
-    const color = get_required_color(bodyParams, 'color');
-    const plannedColor = get_required_color(bodyParams, 'planned-color');
-    const usesNotes = get_required_bool(bodyParams, 'uses-notes');
+    const dto = UpdateCalendarDto.fromBody(bodyParams, user);
 
     // BL
-    if (!usesNotes) {
+    if (!dto.usesNotes) {
       // Calendar "Uses Notes" cannot be disabled if it contains Notes...
 
       // ... from Todos.
       const there_are_some_notes_in_calendar =
-        await this.todoService.areThereTodosWithNotes(calendarId);
+        await this.todoService.areThereTodosWithNotes(dto.calendarId);
       if (there_are_some_notes_in_calendar) {
         // TODO: This is a leak if user is not the Calendar owner
         return 'calendar-uses-notes-cannot-be-disabled';
       }
 
       // ... from (Done) Tasks.
-      const checkTasksWithNotes =
-        await this.taskService.areThereTasksWithNotes(calendarId);
+      const checkTasksWithNotes = await this.taskService.areThereTasksWithNotes(
+        dto.calendarId,
+      );
       if (checkTasksWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
         return 'calendar-uses-notes-cannot-be-disabled';
       } else if (checkTasksWithNotes !== 'ok') {
@@ -136,19 +129,7 @@ export class CalendarController {
       }
     }
 
-    const updateResponse = await this.calendarService.updateCalendar(
-      calendarId,
-      user.id,
-      {
-        name,
-        color,
-        plannedColor,
-        usesNotes,
-      },
-    );
-    if (updateResponse === 'not-found' || typeof updateResponse !== 'object') {
-      throw new NotFoundException('Calendar not found');
-    }
+    await this.calendarService.updateCalendar(dto);
 
     // Response
     return 'ok-updated';

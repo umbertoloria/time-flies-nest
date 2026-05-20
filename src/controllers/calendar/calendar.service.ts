@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { CreateCalendarDto } from '../../calendar/dto';
+import { CreateCalendarDto, UpdateCalendarDto } from '../../calendar/dto';
 
 @Injectable()
 export class CalendarService {
@@ -48,31 +48,32 @@ export class CalendarService {
     });
   }
 
-  async updateCalendar(
-    calendarId: number,
-    userId: number,
-    data: {
-      name: string;
-      color: string; // Es. "#115599"
-      plannedColor: string; // Es. "#115599"
-      usesNotes: boolean;
-    },
-  ) {
-    const dbCalendar = await this.readCalendarByIDAndUser(calendarId, userId);
+  async updateCalendar(dto: UpdateCalendarDto) {
+    const dbCalendar = await this.readCalendarByIDAndUser(
+      dto.calendarId,
+      dto.user.id,
+    );
     if (!dbCalendar) {
-      return 'not-found';
+      throw new NotFoundException('Calendar not found');
     }
-    return await this.prismaService.calendar.update({
+
+    const upd = await this.prismaService.calendar.update({
       where: {
-        id: calendarId,
-        user_id: userId,
+        id: dto.calendarId,
+        user_id: dto.user.id,
       },
       data: {
-        name: data.name,
-        color: data.color,
-        planned_color: data.plannedColor,
-        uses_notes: data.usesNotes,
+        name: dto.name,
+        color: dto.color,
+        planned_color: dto.plannedColor,
+        uses_notes: dto.usesNotes,
       },
     });
+
+    if (typeof upd !== 'object') {
+      throw new NotFoundException('Calendar not found');
+    }
+
+    return upd;
   }
 }
