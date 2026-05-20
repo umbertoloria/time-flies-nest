@@ -13,19 +13,18 @@ import {
   get_required_string,
   validate_int,
 } from '../../lib/validate';
-import { PrismaService } from '../../prisma.service';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
+import { ReadStreamlineDto } from '../../todo/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
 export class TodoController {
   constructor(
     //
-    private prismaService: PrismaService,
     private calendarService: CalendarService,
     private todoService: TodoService,
     private taskService: TaskService,
@@ -33,10 +32,12 @@ export class TodoController {
 
   @Post('/streamline')
   async streamlineRead(@CurrentUser() user: ReqUser): Promise<string> {
+    const dto = ReadStreamlineDto.fromBody(user);
+
     // BL
     const dbCalendars =
       await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
-        user.id,
+        dto.user.id,
         true,
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);

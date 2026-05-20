@@ -9,10 +9,10 @@ export class CalendarService {
     private prismaService: PrismaService,
   ) {}
 
-  readCalendarIDsFromUserIdViaSortedPin(user_id: number, showAll: boolean) {
+  readCalendarIDsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
     return this.prismaService.calendar.findMany({
       where: {
-        user_id,
+        user_id: userId,
         ...(showAll
           ? {}
           : {
