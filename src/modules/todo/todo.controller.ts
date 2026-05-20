@@ -6,7 +6,6 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { get_required_string } from '../../lib/validate';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
@@ -16,9 +15,10 @@ import {
   CreateTodoDto,
   MoveTodoDto,
   ReadStreamlineDto,
-  UpdateDoneOrMissedTodoDto,
+  UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
+import { CreateTaskDto } from '../task/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
@@ -159,29 +159,19 @@ export class TodoController {
   }
 
   @Post('/:cid/todo-done/:tid')
-  async doneOrMissedTodo(
+  async updateTodoSetAsDone(
     @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // TODO: Clean this exclusive support to "done"
-    const mode = get_required_string(body, 'mode');
-    if (mode !== 'done') {
-      // Should never happen.
-      throw new BadRequestException("Param 'mode' invalid");
-    }
-
-    const dto = UpdateDoneOrMissedTodoDto.fromBody(urlCid, urlTid, body, user);
+    const dto = UpdateDoneTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const updTodo = await this.service.updateTaskSetAsDone(dto);
-    console.log('updated', updTodo);
+    const updTodo = await this.service.updateTodoSetAsDone(dto);
 
-    await this.taskService.createDoneTask(updTodo.calendar_id, {
-      date: updTodo.date,
-      notes: updTodo.notes || undefined,
-    });
+    const createTaskDto = CreateTaskDto.fromTodoSetAsDone(updTodo);
+    await this.taskService.createDoneTask(createTaskDto);
 
     return 'ok';
   }

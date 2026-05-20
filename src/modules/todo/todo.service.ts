@@ -3,7 +3,7 @@ import { PrismaRepository } from '../../prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
-  UpdateDoneOrMissedTodoDto,
+  UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
 
@@ -111,7 +111,7 @@ export class TodoService {
     return upd;
   }
 
-  async updateTaskSetAsDone(dto: UpdateDoneOrMissedTodoDto) {
+  async updateTodoSetAsDone(dto: UpdateDoneTodoDto) {
     const dbTodo = await this.readTodo(dto.calendarId, dto.todoId);
     // TODO: Verify calendar is user's
 

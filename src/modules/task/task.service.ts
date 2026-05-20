@@ -1,7 +1,7 @@
 import { PrismaRepository } from '../../prisma.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { isFirstOne } from '../../lib/list';
-import { UpdateCalendarDateDto } from './dto';
+import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
 
 @Injectable()
 export class TaskService {
@@ -73,18 +73,12 @@ export class TaskService {
     }));
   }
 
-  async createDoneTask(
-    calendarId: number,
-    data: {
-      date: string;
-      notes: string | undefined;
-    },
-  ) {
+  async createDoneTask(dto: CreateTaskDto) {
     return await this.repo.task.create({
       data: {
-        calendar_id: calendarId,
-        date: data.date,
-        notes: data.notes || undefined,
+        calendar_id: dto.calendarId,
+        date: dto.date,
+        notes: dto.notes || undefined,
       },
     });
   }

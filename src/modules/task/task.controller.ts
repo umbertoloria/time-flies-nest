@@ -5,7 +5,7 @@ import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { AuthGuard, CurrentUser } from '../../lib/guards/auth.guard';
 import {
-  CreateCalendarDateDto,
+  CreateTaskDto,
   ReadCalendarDateDto,
   UpdateCalendarDateDto,
 } from './dto';
@@ -86,14 +86,10 @@ export class TaskController {
   async createCalendarDate(
     @Body() body: any,
     @Param('cid') urlCid: string,
-    @Param('date') urlDate: string,
   ): Promise<string> {
-    const dto = CreateCalendarDateDto.fromBody(urlCid, urlDate, body);
+    const dto = CreateTaskDto.fromBody(urlCid, body);
 
-    await this.service.createDoneTask(dto.calendarId, {
-      date: dto.date,
-      notes: dto.notes || undefined,
-    });
+    await this.service.createDoneTask(dto);
 
     return 'ok';
   }

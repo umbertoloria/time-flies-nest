@@ -1,6 +1,6 @@
 import { get_optional_string, validate_int } from '../../../lib/validate';
 
-export class UpdateDoneOrMissedTodoDto {
+export class UpdateDoneTodoDto {
   // TODO: Unify with "UpdateTodoDto" and "MoveTodoDto"
   constructor(
     //
@@ -16,7 +16,7 @@ export class UpdateDoneOrMissedTodoDto {
     const todoId = validate_int(urlTid, 'Invalid TodoID');
     const notes = get_optional_string(body, 'notes');
 
-    return new UpdateDoneOrMissedTodoDto(
+    return new UpdateDoneTodoDto(
       //
       calendarId,
       todoId,
