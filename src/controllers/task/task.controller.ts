@@ -103,11 +103,11 @@ export class TaskController {
 
   @Post('/:cid/date-upd-notes/:date')
   async updateCalendarDate(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('date') date: string,
   ): Promise<string> {
-    const dto = UpdateCalendarDateDto.fromBody(urlCid, date, date);
+    const dto = UpdateCalendarDateDto.fromBody(urlCid, date, body);
 
     // BL
     await this.taskService.updateTaskNotesByDate(dto);
