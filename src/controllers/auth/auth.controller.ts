@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { TAuthStatus } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { UserLoginDto } from '../../auth/dto';
+import { ReadUserStatusDto, UserLoginDto } from '../../auth/dto';
 
 @Controller('/auth')
 export class AuthController {
@@ -21,11 +21,13 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('/status')
   authStatus(@CurrentUser() user: ReqUser) {
+    const dto = ReadUserStatusDto.fromBody(user);
+
     // Response
     const response: TAuthStatus = {
       user: {
-        id: user.id,
-        email: user.email,
+        id: dto.user.id,
+        email: dto.user.email,
       },
     };
     return JSON.stringify(response);
