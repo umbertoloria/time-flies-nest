@@ -43,7 +43,7 @@ export class AuthGuard implements CanActivate {
     const dto = UserLoginDto.fromApiAuth(apiAuth);
 
     // User Auth verification
-    const dbUser = await this.userService.userLogin(dto);
+    const dbUser = await this.userService.tryUserLogin(dto);
     if (!dbUser) {
       return false;
     }

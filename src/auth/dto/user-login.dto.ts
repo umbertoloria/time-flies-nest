@@ -17,6 +17,7 @@ export class UserLoginDto {
       password,
     );
   }
+
   static fromApiAuth(apiAuth: { em: string; sp: string }) {
     const { em, sp } = apiAuth;
 

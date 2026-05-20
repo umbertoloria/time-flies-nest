@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { TAuthStatus } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
@@ -12,20 +6,15 @@ import { UserLoginDto } from '../../auth/dto';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(
-    //
-    private service: UserService,
-  ) {}
+  constructor(private service: UserService) {}
 
   @Post('/login')
-  async authLogin(@Body() bodyParams: any): Promise<'ok-login'> {
-    const dto = UserLoginDto.fromBody(bodyParams);
+  async authLogin(@Body() body: any): Promise<'ok-login'> {
+    const dto = UserLoginDto.fromBody(body);
 
     // BL
-    const dbUser = await this.service.userLogin(dto);
-    if (!dbUser) {
-      throw new UnauthorizedException('No session found');
-    }
+    await this.service.userLogin(dto);
+
     return 'ok-login';
   }
 
