@@ -18,7 +18,7 @@ import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { ReadStreamlineDto } from '../../todo/dto';
+import { CreateTodoDto, ReadStreamlineDto } from '../../todo/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
@@ -92,20 +92,15 @@ export class TodoController {
 
   @Post('/:cid/todo-create/:date')
   async createTodo(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('date') date: string,
+    @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    // TODO: Validate "date"
-    const notes = get_optional_string(bodyParams, 'notes');
+    const dto = CreateTodoDto.fromBody(urlCid, date, body, user);
 
     // BL
-    const insTodo = await this.todoService.createTodo(calendarId, date, {
-      notes: notes || null,
-    });
-    // TODO: Verify calendar is user's
+    const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
 
     // Response

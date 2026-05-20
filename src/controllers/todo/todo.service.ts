@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
+import { CreateTodoDto } from '../../todo/dto';
 
 @Injectable()
 export class TodoService {
@@ -53,19 +54,14 @@ export class TodoService {
     return result > 0;
   }
 
-  async createTodo(
-    calendarId: number,
-    date: string,
-    data: {
-      notes: string | null;
-    },
-  ) {
+  async createTodo(dto: CreateTodoDto) {
+    // TODO: Verify calendar is user's
     return await this.prismaService.todo.create({
       data: {
-        calendar_id: calendarId,
-        date: date,
+        calendar_id: dto.calendarId,
+        date: dto.date,
         done_date: null,
-        notes: data.notes || undefined,
+        notes: dto.notes || undefined,
         // missed: undefined, // TODO: Deal with Legacy "missed" flag
       },
     });
