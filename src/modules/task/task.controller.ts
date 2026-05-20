@@ -1,14 +1,14 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK } from '../../sdk/types';
-import { CalendarService } from '../../modules/calendar/calendar.service';
-import { TodoService } from '../todo/todo.service';
+import { CalendarService } from '../calendar/calendar.service';
+import { TodoService } from '../../controllers/todo/todo.service';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 import {
   CreateCalendarDateDto,
   ReadCalendarDateDto,
   UpdateCalendarDateDto,
-} from '../../task/dto';
+} from './dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')

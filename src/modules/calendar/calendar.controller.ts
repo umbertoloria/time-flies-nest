@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../../controllers/todo/todo.service';
-import { TaskService } from '../../controllers/task/task.service';
+import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 import {

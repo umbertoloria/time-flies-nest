@@ -1,4 +1,4 @@
-import { validate_int } from '../../lib/validate';
+import { validate_int } from '../../../lib/validate';
 
 export class ReadCalendarDateDto {
   constructor(
