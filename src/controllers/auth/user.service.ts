@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
+import { UserLoginDto } from '../../auth/dto';
 
 @Injectable()
 export class UserService {
@@ -8,11 +9,11 @@ export class UserService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  userLogin(email: string, password: string) {
+  userLogin(dto: UserLoginDto) {
     return this.prismaService.user.findFirst({
       where: {
-        email,
-        password,
+        email: dto.email,
+        password: dto.password,
       },
     });
   }

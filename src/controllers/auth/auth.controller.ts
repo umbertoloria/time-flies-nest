@@ -6,25 +6,23 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { get_required_string } from '../../lib/validate';
 import { TAuthStatus } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
+import { UserLoginDto } from '../../auth/dto';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     //
-    private userService: UserService,
+    private service: UserService,
   ) {}
 
   @Post('/login')
   async authLogin(@Body() bodyParams: any): Promise<'ok-login'> {
-    // Validation
-    const email = get_required_string(bodyParams, 'email');
-    const password = get_required_string(bodyParams, 'password');
+    const dto = UserLoginDto.fromBody(bodyParams);
 
     // BL
-    const dbUser = await this.userService.userLogin(email, password);
+    const dbUser = await this.service.userLogin(dto);
     if (!dbUser) {
       throw new UnauthorizedException('No session found');
     }

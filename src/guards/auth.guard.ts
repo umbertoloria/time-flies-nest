@@ -6,6 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { UserService } from '../controllers/auth/user.service';
+import { UserLoginDto } from '../auth/dto';
 
 export const CurrentUser = createParamDecorator<unknown, ReqUser>(
   (_, context) => {
@@ -39,10 +40,10 @@ export class AuthGuard implements CanActivate {
     if (!apiAuth) {
       return false;
     }
-    const { em, sp } = apiAuth;
+    const dto = UserLoginDto.fromApiAuth(apiAuth);
 
     // User Auth verification
-    const dbUser = await this.userService.userLogin(em, sp);
+    const dbUser = await this.userService.userLogin(dto);
     if (!dbUser) {
       return false;
     }
