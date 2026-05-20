@@ -8,11 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
-  get_optional_bool,
   get_required_bool,
   get_required_color,
   get_required_int,
-  get_required_local_date,
   get_required_string,
   validate_int,
 } from '../../lib/validate';
@@ -21,6 +19,7 @@ import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
+import { ReadCalendarsDto } from '../../calendar/dto';
 
 @UseGuards(AuthGuard)
 @Controller('calendars')
@@ -34,18 +33,16 @@ export class CalendarController {
 
   @Post('/')
   async readCalendars(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const dateFrom = get_required_local_date(bodyParams, 'date-from');
-    const showAll = get_optional_bool(bodyParams, 'show-all') || false;
+    const dto = ReadCalendarsDto.fromBody(body, user);
 
     // BL
     const dbCalendars =
       await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
-        user.id,
-        showAll,
+        dto.user.id,
+        dto.showAll,
       );
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
@@ -60,7 +57,7 @@ export class CalendarController {
 
     const mapCalendar2DoneTasks =
       await this.taskService.readTasksDatesFromCalendars(
-        dateFrom,
+        dto.dateFrom,
         dbCalendarIds,
       );
 
