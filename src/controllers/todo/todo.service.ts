@@ -8,18 +8,6 @@ export class TodoService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async calendar_there_are_some_notes_in_its_todos(calendarId: number) {
-    const result = await this.prismaService.todo.count({
-      where: {
-        calendar_id: calendarId,
-        NOT: {
-          notes: null,
-        },
-      },
-    });
-    return result > 0;
-  }
-
   readUndoneTodosByCalendars(calendarIds: number[]) {
     return this.prismaService.todo.findMany({
       where: {
@@ -49,6 +37,81 @@ export class TodoService {
       where: {
         calendar_id: calendarId,
         id: todoId,
+      },
+    });
+  }
+
+  async areThereTodosWithNotes(calendarId: number) {
+    const result = await this.prismaService.todo.count({
+      where: {
+        calendar_id: calendarId,
+        NOT: {
+          notes: null,
+        },
+      },
+    });
+    return result > 0;
+  }
+
+  async createTodo(
+    calendarId: number,
+    date: string,
+    data: {
+      notes: string | null;
+    },
+  ) {
+    return await this.prismaService.todo.create({
+      data: {
+        calendar_id: calendarId,
+        date: date,
+        done_date: null,
+        notes: data.notes || undefined,
+        // missed: undefined, // TODO: Deal with Legacy "missed" flag
+      },
+    });
+  }
+
+  async updateTodoNotes(
+    todoId: number,
+    calendarId: number,
+    notes: string | null,
+  ) {
+    return await this.prismaService.todo.update({
+      where: {
+        id: todoId,
+        calendar_id: calendarId,
+      },
+      data: {
+        notes: notes || null,
+      },
+    });
+  }
+
+  async moveTodo(todoId: number, calendarId: number, date: string) {
+    return await this.prismaService.todo.update({
+      where: {
+        id: todoId,
+        calendar_id: calendarId,
+      },
+      data: {
+        date,
+      },
+    });
+  }
+
+  async updateTaskSetAsDone(
+    todoId: number,
+    doneDate: string,
+    notes: string | null,
+  ) {
+    return await this.prismaService.todo.update({
+      where: {
+        id: todoId,
+      },
+      data: {
+        done_date: doneDate,
+        // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
+        notes: notes || undefined,
       },
     });
   }

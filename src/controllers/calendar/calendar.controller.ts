@@ -132,9 +132,7 @@ export class CalendarController {
 
       // ... from Todos.
       const there_are_some_notes_in_calendar =
-        await this.todoService.calendar_there_are_some_notes_in_its_todos(
-          calendarId,
-        );
+        await this.todoService.areThereTodosWithNotes(calendarId);
       if (there_are_some_notes_in_calendar) {
         // TODO: This is a leak if user is not the Calendar owner
         return 'calendar-uses-notes-cannot-be-disabled';

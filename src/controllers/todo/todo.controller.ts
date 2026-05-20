@@ -101,14 +101,8 @@ export class TodoController {
     const notes = get_optional_string(bodyParams, 'notes');
 
     // BL
-    const insTodo = await this.prismaService.todo.create({
-      data: {
-        calendar_id: calendarId,
-        date: date,
-        done_date: null,
-        notes: notes || undefined,
-        // missed: undefined,
-      },
+    const insTodo = await this.todoService.createTodo(calendarId, date, {
+      notes: notes || null,
     });
     // TODO: Verify calendar is user's
     console.log('created', insTodo);
@@ -139,15 +133,11 @@ export class TodoController {
       throw new BadRequestException('Todo already done');
     }
 
-    const updTodo = await this.prismaService.todo.update({
-      where: {
-        id: todoId,
-        calendar_id: calendarId,
-      },
-      data: {
-        notes: notes || null,
-      },
-    });
+    const updTodo = await this.todoService.updateTodoNotes(
+      todoId,
+      calendarId,
+      notes || null,
+    );
     console.log('updated', updTodo);
 
     // Response
@@ -177,15 +167,7 @@ export class TodoController {
     }
 
     if (dbTodo.date !== date) {
-      const updTodo = await this.prismaService.todo.update({
-        where: {
-          id: todoId,
-          calendar_id: calendarId,
-        },
-        data: {
-          date,
-        },
-      });
+      const updTodo = await this.todoService.moveTodo(todoId, calendarId, date);
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
     }
@@ -217,16 +199,11 @@ export class TodoController {
       // TODO: Verify calendar is user's
 
       const todayDate = dbTodo.date; // Always using the To-do Date as "default".
-      const updTodo = await this.prismaService.todo.update({
-        where: {
-          id: dbTodo.id,
-        },
-        data: {
-          done_date: todayDate,
-          // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
-          notes: notes || undefined,
-        },
-      });
+      const updTodo = await this.todoService.updateTaskSetAsDone(
+        dbTodo.id,
+        todayDate,
+        notes || null,
+      );
       console.log('updated', updTodo);
 
       await this.taskService.createDoneTask(calendarId, {
