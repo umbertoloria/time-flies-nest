@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { CreateTodoDto, MoveTodoDto, UpdateTodoDto } from '../../todo/dto';
+import {
+  CreateTodoDto,
+  MoveTodoDto,
+  UpdateDoneOrMissedTodoDto,
+  UpdateTodoDto,
+} from '../../todo/dto';
 
 @Injectable()
 export class TodoService {
@@ -109,20 +114,27 @@ export class TodoService {
     return upd;
   }
 
-  async updateTaskSetAsDone(
-    todoId: number,
-    doneDate: string,
-    notes: string | null,
-  ) {
-    return await this.prismaService.todo.update({
+  async updateTaskSetAsDone(dto: UpdateDoneOrMissedTodoDto) {
+    const dbTodo = await this.readTodo(dto.calendarId, dto.todoId);
+    // TODO: Verify calendar is user's
+
+    const doneDate = dbTodo.date; // Always using the To-do Date as "default".
+
+    const upd = await this.prismaService.todo.update({
       where: {
-        id: todoId,
+        id: dbTodo.id,
       },
       data: {
         done_date: doneDate,
         // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
-        notes: notes || undefined,
+        notes: dto.notes || undefined,
       },
     });
+
+    if (typeof upd !== 'object') {
+      throw new NotFoundException('Todo not found');
+    }
+
+    return upd;
   }
 }

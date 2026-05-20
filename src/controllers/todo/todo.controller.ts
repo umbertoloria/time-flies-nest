@@ -6,11 +6,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import {
-  get_optional_string,
-  get_required_string,
-  validate_int,
-} from '../../lib/validate';
+import { get_required_string } from '../../lib/validate';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
@@ -20,6 +16,7 @@ import {
   CreateTodoDto,
   MoveTodoDto,
   ReadStreamlineDto,
+  UpdateDoneOrMissedTodoDto,
   UpdateTodoDto,
 } from '../../todo/dto';
 
@@ -166,42 +163,28 @@ export class TodoController {
 
   @Post('/:cid/todo-done/:tid')
   async doneOrMissedTodo(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
+    @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    const todoId = validate_int(urlTid, 'Invalid TodoID');
-    const mode = get_required_string(bodyParams, 'mode');
-    if (mode === 'done') {
-      // Validation
-      const notes = get_optional_string(bodyParams, 'notes');
-
-      // BL
-      const dbTodo = await this.todoService.readTodo(calendarId, todoId);
-      // TODO: Verify calendar is user's
-
-      const todayDate = dbTodo.date; // Always using the To-do Date as "default".
-      const updTodo = await this.todoService.updateTaskSetAsDone(
-        dbTodo.id,
-        todayDate,
-        notes || null,
-      );
-      console.log('updated', updTodo);
-
-      await this.taskService.createDoneTask(calendarId, {
-        date: dbTodo.date,
-        notes: updTodo.notes || undefined,
-      });
-
-      return 'ok';
-    } else if (mode === 'missed') {
-      // FIXME: Disable this function on frontend as well
-      throw new BadRequestException('Deprecated');
-    } else {
+    const mode = get_required_string(body, 'mode');
+    if (mode !== 'done') {
       // Should never happen.
       throw new BadRequestException("Param 'mode' invalid");
     }
+
+    const dto = UpdateDoneOrMissedTodoDto.fromBody(urlCid, urlTid, body, user);
+
+    // BL
+    const updTodo = await this.todoService.updateTaskSetAsDone(dto);
+    console.log('updated', updTodo);
+
+    await this.taskService.createDoneTask(updTodo.calendar_id, {
+      date: updTodo.date,
+      notes: updTodo.notes || undefined,
+    });
+
+    return 'ok';
   }
 }
