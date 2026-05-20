@@ -2,12 +2,10 @@ import {
   Body,
   Controller,
   InternalServerErrorException,
-  NotFoundException,
   Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { validate_int } from '../../lib/validate';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
@@ -15,6 +13,7 @@ import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 import {
   CreateCalendarDto,
+  ReadCalendarDto,
   ReadCalendarsDto,
   UpdateCalendarDto,
 } from '../../calendar/dto';
@@ -137,27 +136,23 @@ export class CalendarController {
 
   @Post('/:cid')
   async readCalendarById(
-    @Body() bodyParams: any,
+    // @Body() body: any,
     @Param('cid') urlCid: string,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const dto = ReadCalendarDto.fromBody(urlCid, user);
 
     // BL
     const dbCalendar = await this.calendarService.readCalendarByIDAndUser(
-      calendarId,
-      user.id,
+      dto.calendarId,
+      dto.user.id,
     );
-    if (!dbCalendar) {
-      throw new NotFoundException('Calendar not found');
-    }
 
     const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendars([
       dbCalendar.id,
     ]);
 
-    const tasks = await this.taskService.readTasksFromCalendar(calendarId);
+    const tasks = await this.taskService.readTasksFromCalendar(dto.calendarId);
 
     // Response
     const plannedDays = dbUndoneTodos.map((todo) => ({

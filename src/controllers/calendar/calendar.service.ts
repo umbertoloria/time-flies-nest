@@ -27,13 +27,19 @@ export class CalendarService {
     });
   }
 
-  readCalendarByIDAndUser(calendar_id: number, user_id: number) {
-    return this.prismaService.calendar.findUnique({
+  async readCalendarByIDAndUser(calendarId: number, userId: number) {
+    const dbCalendar = await this.prismaService.calendar.findUnique({
       where: {
-        id: calendar_id,
-        user_id,
+        id: calendarId,
+        user_id: userId,
       },
     });
+
+    if (!dbCalendar) {
+      throw new NotFoundException('Calendar not found');
+    }
+
+    return dbCalendar;
   }
 
   createCalendar(dto: CreateCalendarDto) {
@@ -53,14 +59,11 @@ export class CalendarService {
       dto.calendarId,
       dto.user.id,
     );
-    if (!dbCalendar) {
-      throw new NotFoundException('Calendar not found');
-    }
 
     const upd = await this.prismaService.calendar.update({
       where: {
-        id: dto.calendarId,
-        user_id: dto.user.id,
+        id: dbCalendar.id,
+        user_id: dbCalendar.user_id,
       },
       data: {
         name: dto.name,

@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  NotFoundException,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import {
   get_optional_string,
@@ -42,9 +35,6 @@ export class TaskController {
       calendarId,
       user.id,
     );
-    if (!dbCalendar) {
-      throw new NotFoundException('Calendar not found');
-    }
 
     const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendar(
       dbCalendar.id,
