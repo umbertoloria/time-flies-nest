@@ -1,15 +1,11 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
-import {
-  get_optional_string,
-  validate_date,
-  validate_int,
-} from '../../lib/validate';
+import { get_optional_string, validate_int } from '../../lib/validate';
 import { TCalendarSDK } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
-import { ReadCalendarDateDto } from '../../task/dto';
+import { CreateCalendarDateDto, ReadCalendarDateDto } from '../../task/dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')
@@ -86,20 +82,16 @@ export class TaskController {
 
   @Post('/:cid/date-create/:date')
   async createCalendarDate(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('date') urlDate: string,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    const date = validate_date(urlDate, 'Invalid Date');
-    // TODO: Validate "date"
-    const notes = get_optional_string(bodyParams, 'notes');
+    const dto = CreateCalendarDateDto.fromBody(urlCid, urlDate, body);
 
     // BL
-    await this.taskService.createDoneTask(calendarId, {
-      date,
-      notes: notes || undefined,
+    await this.taskService.createDoneTask(dto.calendarId, {
+      date: dto.date,
+      notes: dto.notes || undefined,
     });
 
     // Response
