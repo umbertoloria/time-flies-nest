@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import {
   get_optional_string,
-  get_required_local_date,
   get_required_string,
   validate_int,
 } from '../../lib/validate';
@@ -19,6 +18,7 @@ import { TCalendarSDK } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 import {
   CreateTodoDto,
+  MoveTodoDto,
   ReadStreamlineDto,
   UpdateTodoDto,
 } from '../../todo/dto';
@@ -137,17 +137,15 @@ export class TodoController {
 
   @Post('/:cid/todo-move/:tid')
   async moveTodo(
-    @Body() bodyParams: any,
+    @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
+    @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    const todoId = validate_int(urlTid, 'Invalid TodoID');
-    const date = get_required_local_date(bodyParams, 'date');
+    const dto = MoveTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.todoService.readTodo(calendarId, todoId);
+    const dbTodo = await this.todoService.readTodo(dto.calendarId, dto.todoId);
 
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -155,8 +153,8 @@ export class TodoController {
       throw new BadRequestException('Todo already done');
     }
 
-    if (dbTodo.date !== date) {
-      const updTodo = await this.todoService.moveTodo(todoId, calendarId, date);
+    if (dbTodo.date !== dto.date) {
+      const updTodo = await this.todoService.moveTodo(dto);
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
     }
