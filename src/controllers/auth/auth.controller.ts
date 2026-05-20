@@ -6,13 +6,15 @@ import { ReadUserStatusDto, UserLoginDto } from '../../auth/dto';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(private service: UserService) {}
+  constructor(
+    //
+    private service: UserService,
+  ) {}
 
   @Post('/login')
   async authLogin(@Body() body: any): Promise<'ok-login'> {
     const dto = UserLoginDto.fromBody(body);
 
-    // BL
     await this.service.userLogin(dto);
 
     return 'ok-login';

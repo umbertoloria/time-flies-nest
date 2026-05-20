@@ -22,8 +22,7 @@ import {
 @Controller('calendars')
 export class CalendarController {
   constructor(
-    //
-    private calendarService: CalendarService,
+    private service: CalendarService,
     private todoService: TodoService,
     private taskService: TaskService,
   ) {}
@@ -37,7 +36,7 @@ export class CalendarController {
 
     // BL
     const dbCalendars =
-      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.service.readCalendarIDsFromUserIdViaSortedPin(
         dto.user.id,
         dto.showAll,
       );
@@ -89,8 +88,7 @@ export class CalendarController {
   ): Promise<string> {
     const dto = CreateCalendarDto.fromBody(body, user);
 
-    // BL
-    const createdCalendar = await this.calendarService.createCalendar(dto);
+    const createdCalendar = await this.service.createCalendar(dto);
 
     // Response
     return JSON.stringify({
@@ -128,7 +126,7 @@ export class CalendarController {
       }
     }
 
-    await this.calendarService.updateCalendar(dto);
+    await this.service.updateCalendar(dto);
 
     // Response
     return 'ok-updated';
@@ -143,7 +141,7 @@ export class CalendarController {
     const dto = ReadCalendarDto.fromBody(urlCid, user);
 
     // BL
-    const dbCalendar = await this.calendarService.readCalendarByIDAndUser(
+    const dbCalendar = await this.service.readCalendarByIDAndUser(
       dto.calendarId,
       dto.user.id,
     );

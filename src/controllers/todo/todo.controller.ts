@@ -24,9 +24,8 @@ import {
 @Controller('/calendars')
 export class TodoController {
   constructor(
-    //
+    private service: TodoService,
     private calendarService: CalendarService,
-    private todoService: TodoService,
     private taskService: TaskService,
   ) {}
 
@@ -43,7 +42,7 @@ export class TodoController {
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
     const dbUndoneTodos =
-      await this.todoService.readUndoneTodosByCalendars(dbCalendarIds);
+      await this.service.readUndoneTodosByCalendars(dbCalendarIds);
 
     // Response
     const response: TCalendarSDK.ReadPlannedEventsResponse = {
@@ -99,11 +98,9 @@ export class TodoController {
   ): Promise<string> {
     const dto = CreateTodoDto.fromBody(urlCid, date, body, user);
 
-    // BL
-    const insTodo = await this.todoService.createTodo(dto);
+    const insTodo = await this.service.createTodo(dto);
     console.log('created', insTodo);
 
-    // Response
     return 'ok';
   }
 
@@ -117,7 +114,7 @@ export class TodoController {
     const dto = UpdateTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.todoService.readTodo(dto.calendarId, dto.todoId);
+    const dbTodo = await this.service.readTodo(dto.calendarId, dto.todoId);
 
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -125,7 +122,7 @@ export class TodoController {
       throw new BadRequestException('Todo already done');
     }
 
-    const updTodo = await this.todoService.updateTodoNotes(dto);
+    const updTodo = await this.service.updateTodoNotes(dto);
     console.log('updated', updTodo);
 
     // Response
@@ -142,7 +139,7 @@ export class TodoController {
     const dto = MoveTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.todoService.readTodo(dto.calendarId, dto.todoId);
+    const dbTodo = await this.service.readTodo(dto.calendarId, dto.todoId);
 
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -151,7 +148,7 @@ export class TodoController {
     }
 
     if (dbTodo.date !== dto.date) {
-      const updTodo = await this.todoService.moveTodo(dto);
+      const updTodo = await this.service.moveTodo(dto);
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
     }
@@ -168,6 +165,7 @@ export class TodoController {
     @Param('tid') urlTid: string,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
+    // TODO: Clean this exclusive support to "done"
     const mode = get_required_string(body, 'mode');
     if (mode !== 'done') {
       // Should never happen.
@@ -177,7 +175,7 @@ export class TodoController {
     const dto = UpdateDoneOrMissedTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const updTodo = await this.todoService.updateTaskSetAsDone(dto);
+    const updTodo = await this.service.updateTaskSetAsDone(dto);
     console.log('updated', updTodo);
 
     await this.taskService.createDoneTask(updTodo.calendar_id, {

@@ -14,10 +14,9 @@ import {
 @Controller('/calendars')
 export class TaskController {
   constructor(
-    //
+    private readonly service: TaskService,
     private readonly calendarService: CalendarService,
     private readonly todoService: TodoService,
-    private readonly taskService: TaskService,
   ) {}
 
   @Post('/:cid/date/:date')
@@ -40,7 +39,7 @@ export class TaskController {
       dto.date,
     );
 
-    const doneTasks = await this.taskService.readTasksFromCalendarAndDate(
+    const doneTasks = await this.service.readTasksFromCalendarAndDate(
       dto.calendarId,
       dto.date,
     );
@@ -91,13 +90,11 @@ export class TaskController {
   ): Promise<string> {
     const dto = CreateCalendarDateDto.fromBody(urlCid, urlDate, body);
 
-    // BL
-    await this.taskService.createDoneTask(dto.calendarId, {
+    await this.service.createDoneTask(dto.calendarId, {
       date: dto.date,
       notes: dto.notes || undefined,
     });
 
-    // Response
     return 'ok';
   }
 
@@ -109,10 +106,8 @@ export class TaskController {
   ): Promise<string> {
     const dto = UpdateCalendarDateDto.fromBody(urlCid, date, body);
 
-    // BL
-    await this.taskService.updateTaskNotesByDate(dto);
+    await this.service.updateTaskNotesByDate(dto);
 
-    // Response
     return 'ok';
   }
 }
