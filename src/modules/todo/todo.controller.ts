@@ -7,9 +7,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { get_required_string } from '../../lib/validate';
-import { CalendarService } from '../../modules/calendar/calendar.service';
+import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
-import { TaskService } from '../../modules/task/task.service';
+import { TaskService } from '../task/task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { AuthGuard, CurrentUser } from '../../guards/auth.guard';
 import {
@@ -18,7 +18,7 @@ import {
   ReadStreamlineDto,
   UpdateDoneOrMissedTodoDto,
   UpdateTodoDto,
-} from '../../todo/dto';
+} from './dto';
 
 @UseGuards(AuthGuard)
 @Controller('/calendars')

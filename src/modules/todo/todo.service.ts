@@ -5,7 +5,7 @@ import {
   MoveTodoDto,
   UpdateDoneOrMissedTodoDto,
   UpdateTodoDto,
-} from '../../todo/dto';
+} from './dto';
 
 @Injectable()
 export class TodoService {

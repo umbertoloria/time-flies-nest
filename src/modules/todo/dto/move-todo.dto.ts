@@ -1,4 +1,4 @@
-import { get_required_local_date, validate_int } from '../../lib/validate';
+import { get_required_local_date, validate_int } from '../../../lib/validate';
 
 export class MoveTodoDto {
   constructor(

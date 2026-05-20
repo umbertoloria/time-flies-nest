@@ -1,4 +1,4 @@
-import { get_optional_string, validate_int } from '../../lib/validate';
+import { get_optional_string, validate_int } from '../../../lib/validate';
 
 export class CreateTodoDto {
   constructor(
