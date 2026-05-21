@@ -9,6 +9,7 @@
     "build:prisma": "npx prisma generate",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
+    "format:biome": "npx @biomejs/biome format --write src/",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -32,6 +33,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.15",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
