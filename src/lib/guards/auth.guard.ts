@@ -57,11 +57,9 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-function getApiAuth(bodyParams: any) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-  const em = bodyParams?.em;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-  const sp = bodyParams?.sp;
+function getApiAuth(body: any) {
+  const em = body?.em;
+  const sp = body?.sp;
   if (!(typeof em === 'string' && !!em && typeof sp === 'string' && !!sp)) {
     return null;
   }

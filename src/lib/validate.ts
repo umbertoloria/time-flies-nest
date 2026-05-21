@@ -5,7 +5,6 @@ export function get_optional_string(
   bodyParams: any,
   paramName: string,
 ): string | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
   const value = bodyParams[paramName];
   if (typeof value !== 'string' || !value) {
     return undefined;
@@ -132,7 +131,6 @@ export function get_optional_bool(
   bodyParams: any,
   paramName: string,
 ): undefined | boolean {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
   const value = bodyParams[paramName];
   if (value === 'true') {
     return true;

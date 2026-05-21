@@ -21,10 +21,8 @@ async function bootstrap() {
     origin: (origin: any, callback: any) => {
       // console.log('request from origin', origin);
       if (!origin || ORIGINS_WHITELIST.indexOf(origin) !== -1) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         callback(null, true);
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         callback(new Error('Not allowed by CORS'));
       }
     },
