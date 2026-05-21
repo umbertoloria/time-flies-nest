@@ -10,4 +10,4 @@ RUN npm run build
 
 ENV NODE_ENV=production
 EXPOSE 8663
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:prod"]
