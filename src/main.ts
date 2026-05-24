@@ -1,12 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-const APP_PORT = 8663 as const;
+const APP_PORT = parseInt('' + process.env.APP_PORT || '8663', 10);
+const APP_ADDRESS = process.env.APP_ADDRESS || '0.0.0.0';
+
 const ORIGINS_WHITELIST = [
   'http://localhost:3000',
   // 'http://umbertoloria.com',
   'https://umbertoloria.com',
   'https://www.umbertoloria.com',
+  'https://tfapi.umbertoloria.com',
 ] as const;
 
 async function bootstrap() {
@@ -31,7 +34,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(APP_PORT);
+  await app.listen(APP_PORT, APP_ADDRESS);
 }
 
-bootstrap();
+bootstrap().catch(console.error);
