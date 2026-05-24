@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 const APP_PORT = parseInt('' + process.env.APP_PORT || '8663', 10);
@@ -35,6 +36,15 @@ async function bootstrap() {
   });
 
   await app.listen(APP_PORT, APP_ADDRESS);
+
+  const logger = new Logger('Bootstrap');
+  const server = app.getHttpServer();
+  const addressInfo = server.address();
+  if (typeof addressInfo === 'object' && addressInfo !== null) {
+    logger.log(`Application is running on: http://${addressInfo.address}:${addressInfo.port}`);
+  } else {
+    logger.log(`Application is running on: ${addressInfo}`);
+  }
 }
 
 bootstrap().catch(console.error);
