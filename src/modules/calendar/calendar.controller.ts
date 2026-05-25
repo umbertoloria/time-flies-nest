@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  InternalServerErrorException,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
@@ -35,18 +28,17 @@ export class CalendarController {
     const dto = ReadCalendarsDto.fromBody(body, user);
 
     // BL
-    const dbCalendars =
-      await this.service.readCalendarIDsFromUserIdViaSortedPin(
-        dto.user.id,
-        dto.showAll,
-      );
-    const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
+    const calendars = await this.service.readCalendarIDsFromUserIdViaSortedPin(
+      dto.user.id,
+      dto.showAll,
+    );
+    const calendarIds = calendars.map((calendar) => calendar.id);
 
-    const dbUndoneTodos =
-      await this.todoService.readUndoneTodosByCalendars(dbCalendarIds);
-    const mapCalendar2Todos = dbCalendarIds.map((calendarId) => ({
+    const undoneTodos =
+      await this.todoService.findUndoneTodosByCalendars(calendarIds);
+    const mapCalendar2Todos = calendarIds.map((calendarId) => ({
       calendarId,
-      todoDates: dbUndoneTodos
+      todoDates: undoneTodos
         .filter((todo) => todo.calendar_id === calendarId)
         .map((todo) => todo.date),
     }));
@@ -54,12 +46,12 @@ export class CalendarController {
     const mapCalendar2DoneTasks =
       await this.taskService.findTasksDatesFromCalendars(
         dto.dateFrom,
-        dbCalendarIds,
+        calendarIds,
       );
 
     // Response
     const response: { calendars: TCalendarPrev[] } = {
-      calendars: dbCalendars.map<TCalendarPrev>((dbCalendar) => {
+      calendars: calendars.map<TCalendarPrev>((dbCalendar) => {
         const doneTaskDates = mapCalendar2DoneTasks.find(
           ({ calendarId }) => calendarId === dbCalendar.id,
         )!.dates;
@@ -108,9 +100,9 @@ export class CalendarController {
       // Calendar "Uses Notes" cannot be disabled if it contains Notes...
 
       // ... from Todos.
-      const there_are_some_notes_in_calendar =
+      const areThereTodosWithNotesInCalendar =
         await this.todoService.areThereTodosWithNotes(dto.calendarId);
-      if (there_are_some_notes_in_calendar) {
+      if (areThereTodosWithNotesInCalendar) {
         // TODO: This is a leak if user is not the Calendar owner
         return 'calendar-uses-notes-cannot-be-disabled';
       }
@@ -138,29 +130,29 @@ export class CalendarController {
     const dto = ReadCalendarDto.fromBody(urlCid, user);
 
     // BL
-    const dbCalendar = await this.service.findCalendarFromUser(
+    const calendar = await this.service.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
 
-    const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendars([
-      dbCalendar.id,
+    const undoneTodos = await this.todoService.findUndoneTodosByCalendars([
+      calendar.id,
     ]);
 
     const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
 
     // Response
-    const plannedDays = dbUndoneTodos.map((todo) => ({
+    const plannedDays = undoneTodos.map((todo) => ({
       date: todo.date,
       notes: todo.notes || undefined,
     }));
 
     const response: TCalendar = {
-      id: dbCalendar.id,
-      name: dbCalendar.name,
-      color: dbCalendar.color,
-      plannedColor: dbCalendar.planned_color,
-      usesNotes: dbCalendar.uses_notes || undefined,
+      id: calendar.id,
+      name: calendar.name,
+      color: calendar.color,
+      plannedColor: calendar.planned_color,
+      usesNotes: calendar.uses_notes || undefined,
       days: tasks.map<TDay>((task) => ({
         date: task.date,
         notes: task.notes || undefined,

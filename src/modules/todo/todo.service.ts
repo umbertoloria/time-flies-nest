@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CalendarService } from '../calendar/calendar.service';
 import { TodoRepository } from './todo.repository';
 import {
   CreateTodoDto,
@@ -9,20 +10,23 @@ import {
 
 @Injectable()
 export class TodoService {
-  constructor(private repository: TodoRepository) {}
+  constructor(
+    private repository: TodoRepository,
+    private calendarService: CalendarService,
+  ) {}
 
-  readUndoneTodosByCalendars(calendarIds: number[]) {
+  findUndoneTodosByCalendars(calendarIds: number[]) {
     return this.repository.findTodosFromCalendars(calendarIds);
   }
 
-  readUndoneTodosByCalendar(calendarId: number, filterDate: string) {
-    return this.repository.readUndoneTodosByCalendar(calendarId, filterDate);
+  findUndoneTodosByCalendar(calendarId: number, filterDate: string) {
+    return this.repository.findUndoneTodosByCalendar(calendarId, filterDate);
   }
 
-  async readTodo(calendarId: number, todoId: number) {
-    const todo = await this.repository.findTodo(calendarId, todoId);
+  async findTodoFromCalendar(calendarId: number, todoId: number) {
+    const todo = await this.repository.findById(todoId);
 
-    if (!todo) {
+    if (!todo || todo.calendar_id !== calendarId) {
       throw new NotFoundException('Todo not found');
     }
 
@@ -30,12 +34,18 @@ export class TodoService {
   }
 
   async areThereTodosWithNotes(calendarId: number) {
-    const result = await this.repository.countTodosFromCalendar(calendarId);
-    return result > 0;
+    const count =
+      await this.repository.countTodosWithNotesFromCalendar(calendarId);
+
+    return count > 0;
   }
 
   async createTodo(dto: CreateTodoDto) {
-    // TODO: Verify calendar is user's
+    await this.calendarService.findCalendarFromUser(
+      dto.calendarId,
+      dto.user.id,
+    );
+
     return this.repository.create(dto);
   }
 
@@ -60,13 +70,17 @@ export class TodoService {
   }
 
   async updateTodoSetAsDone(dto: UpdateDoneTodoDto) {
-    const dbTodo = await this.readTodo(dto.calendarId, dto.todoId);
-    // TODO: Verify calendar is user's
+    await this.calendarService.findCalendarFromUser(
+      dto.calendarId,
+      dto.user.id,
+    );
 
-    const doneDate = dbTodo.date; // Always using the To-do Date as "default".
+    const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
+
+    const doneDate = todo.date; // Always using the To-do Date as "default".
 
     const upd = await this.repository.updateTodoDoneDate(
-      dbTodo.id,
+      todo.id,
       doneDate,
       dto,
     );

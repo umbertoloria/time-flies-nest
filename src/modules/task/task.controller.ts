@@ -29,13 +29,13 @@ export class TaskController {
     const dto = ReadCalendarDateDto.fromBody(urlCid, date, user);
 
     // BL
-    const dbCalendar = await this.calendarService.findCalendarFromUser(
+    const calendar = await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
 
-    const dbUndoneTodos = await this.todoService.readUndoneTodosByCalendar(
-      dbCalendar.id,
+    const undoneTodos = await this.todoService.findUndoneTodosByCalendar(
+      calendar.id,
       dto.date,
     );
 
@@ -45,7 +45,7 @@ export class TaskController {
     );
 
     // Response
-    const todos = dbUndoneTodos.map((todo) => ({
+    const todos = undoneTodos.map((todo) => ({
       id: todo.id,
       notes: todo.notes || undefined,
     }));
@@ -66,11 +66,11 @@ export class TaskController {
 
     const response: TCalendarSDK.ReadDateResponse = {
       calendar: {
-        id: dbCalendar.id,
-        name: dbCalendar.name,
-        color: dbCalendar.color,
-        plannedColor: dbCalendar.planned_color,
-        usesNotes: dbCalendar.uses_notes || undefined,
+        id: calendar.id,
+        name: calendar.name,
+        color: calendar.color,
+        plannedColor: calendar.planned_color,
+        usesNotes: calendar.uses_notes || undefined,
       },
       date: dto.date,
       doneTasks: doneTasks.map((doneTask) => ({

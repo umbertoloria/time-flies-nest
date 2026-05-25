@@ -42,7 +42,7 @@ export class TodoController {
     const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
 
     const dbUndoneTodos =
-      await this.service.readUndoneTodosByCalendars(dbCalendarIds);
+      await this.service.findUndoneTodosByCalendars(dbCalendarIds);
 
     // Response
     const response: TCalendarSDK.ReadPlannedEventsResponse = {
@@ -114,7 +114,10 @@ export class TodoController {
     const dto = UpdateTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.service.readTodo(dto.calendarId, dto.todoId);
+    const dbTodo = await this.service.findTodoFromCalendar(
+      dto.calendarId,
+      dto.todoId,
+    );
 
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {
@@ -139,7 +142,10 @@ export class TodoController {
     const dto = MoveTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.service.readTodo(dto.calendarId, dto.todoId);
+    const dbTodo = await this.service.findTodoFromCalendar(
+      dto.calendarId,
+      dto.todoId,
+    );
 
     // TODO: Verify calendar is user's
     if (dbTodo.done_date) {

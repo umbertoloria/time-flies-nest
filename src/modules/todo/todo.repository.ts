@@ -25,7 +25,7 @@ export class TodoRepository {
     });
   }
 
-  public readUndoneTodosByCalendar(calendarId: number, filterDate: string) {
+  public findUndoneTodosByCalendar(calendarId: number, filterDate: string) {
     return this.repo.todo.findMany({
       where: {
         calendar_id: calendarId,
@@ -35,16 +35,15 @@ export class TodoRepository {
     });
   }
 
-  public findTodo(calendarId: number, todoId: number) {
+  public findById(todoId: number) {
     return this.repo.todo.findUnique({
       where: {
-        calendar_id: calendarId,
         id: todoId,
       },
     });
   }
 
-  public countTodosFromCalendar(calendarId: number) {
+  public countTodosWithNotesFromCalendar(calendarId: number) {
     return this.repo.todo.count({
       where: {
         calendar_id: calendarId,
