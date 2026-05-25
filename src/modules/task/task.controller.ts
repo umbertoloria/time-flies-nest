@@ -39,7 +39,7 @@ export class TaskController {
       dto.date,
     );
 
-    const doneTasks = await this.service.readTasksFromCalendarAndDate(
+    const doneTasks = await this.service.findTasksFromCalendarAndDate(
       dto.calendarId,
       dto.date,
     );

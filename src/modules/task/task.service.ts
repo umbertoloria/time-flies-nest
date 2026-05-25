@@ -7,23 +7,26 @@ import { isFirstOne } from '../../lib/list';
 export class TaskService {
   constructor(private readonly repository: TaskRepository) {}
 
-  async readTasksDatesFromCalendars(dateFrom: string, dbCalendarIds: number[]) {
-    const result = await this.repository.findTasksFromCalendarsAndDate(
-      dbCalendarIds,
+  async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
+    const allTasks = await this.repository.findTasksFromCalendarsAndDate(
+      calendarIds,
       dateFrom,
     );
-    return dbCalendarIds.map((calendarId) => ({
+
+    // TODO: Index tasks
+    return calendarIds.map((calendarId) => ({
       calendarId,
-      dates: result
+      dates: allTasks
         .filter((task) => task.calendar_id === calendarId)
         .map((task) => task.date)
         .filter(isFirstOne),
     }));
   }
 
-  async readTasksFromCalendar(calendarId: number) {
-    const result = await this.repository.findTasksFromCalendar(calendarId);
-    return result.map((task) => ({
+  async findTasksFromCalendar(calendarId: number) {
+    const tasks = await this.repository.findTasksFromCalendar(calendarId);
+
+    return tasks.map((task) => ({
       id: task.id,
       calendar: task.calendar_id,
       date: task.date,
@@ -32,17 +35,21 @@ export class TaskService {
   }
 
   async areThereTasksWithNotes(calendarId: number) {
-    const result = await this.repository.countTasksFromCalendar(calendarId);
-    return result > 0 ? 'calendar-uses-notes-cannot-be-disabled' : 'ok';
+    const count =
+      await this.repository.countTasksWithNotesFromCalendar(calendarId);
+
+    return count > 0;
   }
 
-  async readTasksFromCalendarAndDate(calendarId: number, date: string) {
-    const result = await this.repository.findTaskFromCalendarAndDate(
+  async findTasksFromCalendarAndDate(calendarId: number, date: string) {
+    const tasks = await this.repository.findTaskFromCalendarAndDate(
       calendarId,
       date,
     );
-    // TODO: Returning multiple Tasks for the same Day
-    return result.map((task) => ({
+
+    // TODO: This may return multiple Tasks for the same Date
+
+    return tasks.map((task) => ({
       id: task.id,
       notes: task.notes || undefined,
     }));
@@ -54,7 +61,7 @@ export class TaskService {
 
   async updateTaskNotesByDate(dto: UpdateCalendarDateDto) {
     // FIXME: Bug if there are multiple Tasks for the same Date
-    const tasks = await this.readTasksFromCalendarAndDate(
+    const tasks = await this.findTasksFromCalendarAndDate(
       dto.calendarId,
       dto.date,
     );

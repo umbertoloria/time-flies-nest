@@ -7,13 +7,13 @@ export class TaskRepository {
   constructor(private readonly repo: PrismaRepository) {}
 
   public findTasksFromCalendarsAndDate(
-    dbCalendarIds: number[],
+    calendarIds: number[],
     dateFrom: string,
   ) {
     return this.repo.task.findMany({
       where: {
         calendar_id: {
-          in: dbCalendarIds,
+          in: calendarIds,
         },
         date: {
           gte: dateFrom,
@@ -36,7 +36,7 @@ export class TaskRepository {
     });
   }
 
-  public countTasksFromCalendar(calendarId: number) {
+  public countTasksWithNotesFromCalendar(calendarId: number) {
     return this.repo.task.count({
       where: {
         calendar_id: calendarId,

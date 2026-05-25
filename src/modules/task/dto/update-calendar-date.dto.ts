@@ -2,6 +2,7 @@ import { get_optional_string, validate_int } from '../../../lib/validate';
 
 export class UpdateCalendarDateDto {
   constructor(
+    // TODO: Use TaskID instead of (calendarId, date)
     public readonly calendarId: number,
     public readonly date: string,
     public readonly notes: string | undefined,

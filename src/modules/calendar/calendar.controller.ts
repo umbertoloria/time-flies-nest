@@ -52,7 +52,7 @@ export class CalendarController {
     }));
 
     const mapCalendar2DoneTasks =
-      await this.taskService.readTasksDatesFromCalendars(
+      await this.taskService.findTasksDatesFromCalendars(
         dto.dateFrom,
         dbCalendarIds,
       );
@@ -116,13 +116,10 @@ export class CalendarController {
       }
 
       // ... from (Done) Tasks.
-      const checkTasksWithNotes = await this.taskService.areThereTasksWithNotes(
-        dto.calendarId,
-      );
-      if (checkTasksWithNotes === 'calendar-uses-notes-cannot-be-disabled') {
+      const areThereTasksWithNotesInCalendar =
+        await this.taskService.areThereTasksWithNotes(dto.calendarId);
+      if (areThereTasksWithNotesInCalendar) {
         return 'calendar-uses-notes-cannot-be-disabled';
-      } else if (checkTasksWithNotes !== 'ok') {
-        throw new InternalServerErrorException('Err 3');
       }
     }
 
@@ -150,7 +147,7 @@ export class CalendarController {
       dbCalendar.id,
     ]);
 
-    const tasks = await this.taskService.readTasksFromCalendar(dto.calendarId);
+    const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
 
     // Response
     const plannedDays = dbUndoneTodos.map((todo) => ({
