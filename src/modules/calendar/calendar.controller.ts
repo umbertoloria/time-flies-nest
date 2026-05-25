@@ -141,7 +141,7 @@ export class CalendarController {
     const dto = ReadCalendarDto.fromBody(urlCid, user);
 
     // BL
-    const dbCalendar = await this.service.readCalendarByIDAndUser(
+    const dbCalendar = await this.service.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );

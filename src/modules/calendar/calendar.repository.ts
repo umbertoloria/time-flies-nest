@@ -6,10 +6,7 @@ import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 export class CalendarRepository {
   constructor(private readonly repo: PrismaRepository) {}
 
-  public readCalendarIDsFromUserIdViaSortedPin(
-    userId: number,
-    showAll: boolean,
-  ) {
+  public findCalendarsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
     return this.repo.calendar.findMany({
       where: {
         user_id: userId,
@@ -27,11 +24,10 @@ export class CalendarRepository {
     });
   }
 
-  public findCalendarByIDAndUser(calendarId: number, userId: number) {
+  public findById(calendarId: number) {
     return this.repo.calendar.findUnique({
       where: {
         id: calendarId,
-        user_id: userId,
       },
     });
   }
@@ -48,14 +44,10 @@ export class CalendarRepository {
     });
   }
 
-  public update(
-    dbCalendar: { id: number; user_id: number },
-    dto: UpdateCalendarDto,
-  ) {
+  public update(dto: UpdateCalendarDto) {
     return this.repo.calendar.update({
       where: {
-        id: dbCalendar.id,
-        user_id: dbCalendar.user_id,
+        id: dto.calendarId,
       },
       data: {
         name: dto.name,

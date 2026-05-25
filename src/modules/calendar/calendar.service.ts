@@ -7,23 +7,17 @@ export class CalendarService {
   constructor(private repository: CalendarRepository) {}
 
   readCalendarIDsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
-    return this.repository.readCalendarIDsFromUserIdViaSortedPin(
-      userId,
-      showAll,
-    );
+    return this.repository.findCalendarsFromUserIdViaSortedPin(userId, showAll);
   }
 
-  async readCalendarByIDAndUser(calendarId: number, userId: number) {
-    const dbCalendar = await this.repository.findCalendarByIDAndUser(
-      calendarId,
-      userId,
-    );
+  async findCalendarFromUser(calendarId: number, userId: number) {
+    const calendar = await this.repository.findById(calendarId);
 
-    if (!dbCalendar) {
+    if (!calendar || calendar.user_id !== userId) {
       throw new NotFoundException('Calendar not found');
     }
 
-    return dbCalendar;
+    return calendar;
   }
 
   createCalendar(dto: CreateCalendarDto) {
@@ -31,12 +25,9 @@ export class CalendarService {
   }
 
   async updateCalendar(dto: UpdateCalendarDto) {
-    const dbCalendar = await this.readCalendarByIDAndUser(
-      dto.calendarId,
-      dto.user.id,
-    );
+    await this.findCalendarFromUser(dto.calendarId, dto.user.id);
 
-    const upd = await this.repository.update(dbCalendar, dto);
+    const upd = await this.repository.update(dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Calendar not found');

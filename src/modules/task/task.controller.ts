@@ -29,7 +29,7 @@ export class TaskController {
     const dto = ReadCalendarDateDto.fromBody(urlCid, date, user);
 
     // BL
-    const dbCalendar = await this.calendarService.readCalendarByIDAndUser(
+    const dbCalendar = await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
