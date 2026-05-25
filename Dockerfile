@@ -5,9 +5,8 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build:prisma
 RUN npm run build
 
 ENV NODE_ENV=production
 EXPOSE 8663
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start"]
