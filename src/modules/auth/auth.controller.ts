@@ -6,10 +6,7 @@ import { ReadUserStatusDto, UserLoginDto } from './dto';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(
-    //
-    private service: AuthService,
-  ) {}
+  constructor(private service: AuthService) {}
 
   @Post('/login')
   async authLogin(@Body() body: any): Promise<'ok-login'> {

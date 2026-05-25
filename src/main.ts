@@ -41,7 +41,9 @@ async function bootstrap() {
   const server = app.getHttpServer();
   const addressInfo = server.address();
   if (typeof addressInfo === 'object' && addressInfo !== null) {
-    logger.log(`Application is running on: http://${addressInfo.address}:${addressInfo.port}`);
+    logger.log(
+      `Application is running on: http://${addressInfo.address}:${addressInfo.port}`,
+    );
   } else {
     logger.log(`Application is running on: ${addressInfo}`);
   }

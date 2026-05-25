@@ -5,7 +5,7 @@ import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
 
 @Injectable()
 export class TaskService {
-  constructor(private repo: PrismaRepository) {}
+  constructor(private readonly repo: PrismaRepository) {}
 
   async readTasksDatesFromCalendars(dateFrom: string, dbCalendarIds: number[]) {
     const response = await this.repo.task.findMany({

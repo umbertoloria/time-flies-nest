@@ -4,7 +4,7 @@ import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 
 @Injectable()
 export class CalendarService {
-  constructor(private repo: PrismaRepository) {}
+  constructor(private readonly repo: PrismaRepository) {}
 
   readCalendarIDsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
     return this.repo.calendar.findMany({

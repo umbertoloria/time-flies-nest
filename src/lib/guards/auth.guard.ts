@@ -27,10 +27,7 @@ export type ReqUserParam<
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    //
-    private readonly userService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
@@ -43,7 +40,7 @@ export class AuthGuard implements CanActivate {
     const dto = UserLoginDto.fromApiAuth(apiAuth);
 
     // User Auth verification
-    const dbUser = await this.userService.tryUserLogin(dto);
+    const dbUser = await this.authService.tryUserLogin(dto);
     if (!dbUser) {
       return false;
     }
