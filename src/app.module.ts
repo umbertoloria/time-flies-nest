@@ -9,6 +9,10 @@ import { TaskService } from './modules/task/task.service';
 import { AuthService } from './modules/auth/auth.service';
 import { CalendarService } from './modules/calendar/calendar.service';
 import { TodoService } from './modules/todo/todo.service';
+import { AuthRepository } from './modules/auth/auth.repository';
+import { CalendarRepository } from './modules/calendar/calendar.repository';
+import { TodoRepository } from './modules/todo/todo.repository';
+import { TaskRepository } from './modules/task/task.repository';
 
 @Module({
   imports: [
@@ -24,9 +28,13 @@ import { TodoService } from './modules/todo/todo.service';
   ],
   providers: [
     PrismaRepository,
+    TaskRepository,
     TaskService,
+    AuthRepository,
     AuthService,
+    CalendarRepository,
     CalendarService,
+    TodoRepository,
     TodoService,
   ],
 })

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaRepository } from '../../prisma.repository';
+import { TodoRepository } from './todo.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -9,39 +9,18 @@ import {
 
 @Injectable()
 export class TodoService {
-  constructor(private readonly repo: PrismaRepository) {}
+  constructor(private repository: TodoRepository) {}
 
   readUndoneTodosByCalendars(calendarIds: number[]) {
-    return this.repo.todo.findMany({
-      where: {
-        calendar_id: {
-          in: calendarIds,
-        },
-        done_date: null,
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
+    return this.repository.findTodosFromCalendars(calendarIds);
   }
 
   readUndoneTodosByCalendar(calendarId: number, filterDate: string) {
-    return this.repo.todo.findMany({
-      where: {
-        calendar_id: calendarId,
-        date: filterDate,
-        done_date: null,
-      },
-    });
+    return this.repository.readUndoneTodosByCalendar(calendarId, filterDate);
   }
 
   async readTodo(calendarId: number, todoId: number) {
-    const todo = await this.repo.todo.findUnique({
-      where: {
-        calendar_id: calendarId,
-        id: todoId,
-      },
-    });
+    const todo = await this.repository.findTodo(calendarId, todoId);
 
     if (!todo) {
       throw new NotFoundException('Todo not found');
@@ -51,40 +30,17 @@ export class TodoService {
   }
 
   async areThereTodosWithNotes(calendarId: number) {
-    const result = await this.repo.todo.count({
-      where: {
-        calendar_id: calendarId,
-        NOT: {
-          notes: null,
-        },
-      },
-    });
+    const result = await this.repository.countTodosFromCalendar(calendarId);
     return result > 0;
   }
 
   async createTodo(dto: CreateTodoDto) {
     // TODO: Verify calendar is user's
-    return await this.repo.todo.create({
-      data: {
-        calendar_id: dto.calendarId,
-        date: dto.date,
-        done_date: null,
-        notes: dto.notes || undefined,
-        // missed: undefined, // TODO: Deal with Legacy "missed" flag
-      },
-    });
+    return this.repository.create(dto);
   }
 
   async updateTodoNotes(dto: UpdateTodoDto) {
-    const upd = await this.repo.todo.update({
-      where: {
-        id: dto.todoId,
-        calendar_id: dto.calendarId,
-      },
-      data: {
-        notes: dto.notes || null,
-      },
-    });
+    const upd = await this.repository.updateNotes(dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Todo not found');
@@ -94,15 +50,7 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto) {
-    const upd = await this.repo.todo.update({
-      where: {
-        id: dto.todoId,
-        calendar_id: dto.calendarId,
-      },
-      data: {
-        date: dto.date,
-      },
-    });
+    const upd = await this.repository.updateDate(dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Todo not found');
@@ -117,16 +65,11 @@ export class TodoService {
 
     const doneDate = dbTodo.date; // Always using the To-do Date as "default".
 
-    const upd = await this.repo.todo.update({
-      where: {
-        id: dbTodo.id,
-      },
-      data: {
-        done_date: doneDate,
-        // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
-        notes: dto.notes || undefined,
-      },
-    });
+    const upd = await this.repository.updateTodoDoneDate(
+      dbTodo.id,
+      doneDate,
+      dto,
+    );
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Todo not found');

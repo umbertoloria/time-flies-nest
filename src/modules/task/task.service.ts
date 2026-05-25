@@ -1,29 +1,20 @@
-import { PrismaRepository } from '../../prisma.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { isFirstOne } from '../../lib/list';
+import { TaskRepository } from './task.repository';
 import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
+import { isFirstOne } from '../../lib/list';
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly repo: PrismaRepository) {}
+  constructor(private readonly repository: TaskRepository) {}
 
   async readTasksDatesFromCalendars(dateFrom: string, dbCalendarIds: number[]) {
-    const response = await this.repo.task.findMany({
-      where: {
-        calendar_id: {
-          in: dbCalendarIds,
-        },
-        date: {
-          gte: dateFrom,
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
+    const result = await this.repository.findTasksFromCalendarsAndDate(
+      dbCalendarIds,
+      dateFrom,
+    );
     return dbCalendarIds.map((calendarId) => ({
       calendarId,
-      dates: response
+      dates: result
         .filter((task) => task.calendar_id === calendarId)
         .map((task) => task.date)
         .filter(isFirstOne),
@@ -31,15 +22,8 @@ export class TaskService {
   }
 
   async readTasksFromCalendar(calendarId: number) {
-    const response = await this.repo.task.findMany({
-      where: {
-        calendar_id: calendarId,
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
-    return response.map((task) => ({
+    const result = await this.repository.findTasksFromCalendar(calendarId);
+    return result.map((task) => ({
       id: task.id,
       calendar: task.calendar_id,
       date: task.date,
@@ -48,39 +32,24 @@ export class TaskService {
   }
 
   async areThereTasksWithNotes(calendarId: number) {
-    const response = await this.repo.task.count({
-      where: {
-        calendar_id: calendarId,
-        NOT: {
-          notes: null,
-        },
-      },
-    });
-    return response > 0 ? 'calendar-uses-notes-cannot-be-disabled' : 'ok';
+    const result = await this.repository.countTasksFromCalendar(calendarId);
+    return result > 0 ? 'calendar-uses-notes-cannot-be-disabled' : 'ok';
   }
 
   async readTasksFromCalendarAndDate(calendarId: number, date: string) {
-    const response = await this.repo.task.findMany({
-      where: {
-        calendar_id: calendarId,
-        date,
-      },
-    });
+    const result = await this.repository.findTaskFromCalendarAndDate(
+      calendarId,
+      date,
+    );
     // TODO: Returning multiple Tasks for the same Day
-    return response.map((task) => ({
+    return result.map((task) => ({
       id: task.id,
       notes: task.notes || undefined,
     }));
   }
 
-  async createDoneTask(dto: CreateTaskDto) {
-    return await this.repo.task.create({
-      data: {
-        calendar_id: dto.calendarId,
-        date: dto.date,
-        notes: dto.notes || undefined,
-      },
-    });
+  createDoneTask(dto: CreateTaskDto) {
+    return this.repository.create(dto);
   }
 
   async updateTaskNotesByDate(dto: UpdateCalendarDateDto) {
@@ -99,15 +68,6 @@ export class TaskService {
 
     const taskId = tasks[0].id;
 
-    return await this.repo.task.update({
-      where: {
-        id: taskId,
-        calendar_id: dto.calendarId,
-        date: dto.date,
-      },
-      data: {
-        notes: dto.notes || null,
-      },
-    });
+    return await this.repository.update(taskId, dto);
   }
 }

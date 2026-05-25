@@ -1,18 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaRepository } from '../../prisma.repository';
+import { AuthRepository } from './auth.repository';
 import { UserLoginDto } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly repo: PrismaRepository) {}
+  constructor(private readonly repo: AuthRepository) {}
 
   tryUserLogin(dto: UserLoginDto) {
-    return this.repo.user.findFirst({
-      where: {
-        email: dto.email,
-        password: dto.password,
-      },
-    });
+    return this.repo.readUserFromCredentials(dto);
   }
 
   async userLogin(dto: UserLoginDto) {

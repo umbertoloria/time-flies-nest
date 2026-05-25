@@ -1,36 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaRepository } from '../../prisma.repository';
+import { CalendarRepository } from './calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 
 @Injectable()
 export class CalendarService {
-  constructor(private readonly repo: PrismaRepository) {}
+  constructor(private repository: CalendarRepository) {}
 
   readCalendarIDsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
-    return this.repo.calendar.findMany({
-      where: {
-        user_id: userId,
-        ...(showAll
-          ? {}
-          : {
-              sorted_pin: {
-                not: null,
-              },
-            }),
-      },
-      orderBy: {
-        sorted_pin: 'asc',
-      },
-    });
+    return this.repository.readCalendarIDsFromUserIdViaSortedPin(
+      userId,
+      showAll,
+    );
   }
 
   async readCalendarByIDAndUser(calendarId: number, userId: number) {
-    const dbCalendar = await this.repo.calendar.findUnique({
-      where: {
-        id: calendarId,
-        user_id: userId,
-      },
-    });
+    const dbCalendar = await this.repository.findCalendarByIDAndUser(
+      calendarId,
+      userId,
+    );
 
     if (!dbCalendar) {
       throw new NotFoundException('Calendar not found');
@@ -40,15 +27,7 @@ export class CalendarService {
   }
 
   createCalendar(dto: CreateCalendarDto) {
-    return this.repo.calendar.create({
-      data: {
-        name: dto.name,
-        color: dto.color,
-        planned_color: dto.plannedColor,
-        uses_notes: dto.usesNotes,
-        user_id: dto.user.id,
-      },
-    });
+    return this.repository.create(dto);
   }
 
   async updateCalendar(dto: UpdateCalendarDto) {
@@ -57,18 +36,7 @@ export class CalendarService {
       dto.user.id,
     );
 
-    const upd = await this.repo.calendar.update({
-      where: {
-        id: dbCalendar.id,
-        user_id: dbCalendar.user_id,
-      },
-      data: {
-        name: dto.name,
-        color: dto.color,
-        planned_color: dto.plannedColor,
-        uses_notes: dto.usesNotes,
-      },
-    });
+    const upd = await this.repository.update(dbCalendar, dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Calendar not found');
