@@ -82,7 +82,7 @@ export class TaskController {
     return JSON.stringify(response);
   }
 
-  @Post('/:cid/date-create/:date')
+  @Post('/:cid/date-create')
   async createCalendarDate(
     @Body() body: any,
     @Param('cid') urlCid: string,
