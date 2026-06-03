@@ -3,14 +3,17 @@ import { TaskService } from './task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from '../todo/todo.service';
-import { AuthGuard, CurrentUser } from '../../lib/guards/auth.guard';
+import {
+  AccessTokenGuard,
+  CurrentUser,
+} from '../../lib/guards/access-token.guard';
 import {
   CreateTaskDto,
   ReadCalendarDateDto,
   UpdateCalendarDateDto,
 } from './dto';
 
-@UseGuards(AuthGuard)
+@UseGuards(AccessTokenGuard)
 @Controller('/calendars')
 export class TaskController {
   constructor(

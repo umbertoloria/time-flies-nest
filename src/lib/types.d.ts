@@ -4,5 +4,9 @@ interface Request {
 
 interface ReqUser {
   id: string;
-  email: string;
+  sub: string;
+  clientId?: string;
+  organizationId?: string;
+  scopes: string[];
+  audience: string[];
 }

@@ -31,7 +31,8 @@ async function bootstrap() {
       }
     },
     methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: ['Content-Type'], // Specify allowed headers
+    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
     credentials: true,
   });
 

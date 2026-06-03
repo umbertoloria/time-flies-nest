@@ -3,7 +3,10 @@ import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
-import { AuthGuard, CurrentUser } from '../../lib/guards/auth.guard';
+import {
+  AccessTokenGuard,
+  CurrentUser,
+} from '../../lib/guards/access-token.guard';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
@@ -11,7 +14,7 @@ import {
   UpdateCalendarDto,
 } from './dto';
 
-@UseGuards(AuthGuard)
+@UseGuards(AccessTokenGuard)
 @Controller('calendars')
 export class CalendarController {
   constructor(

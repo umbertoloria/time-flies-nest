@@ -26,6 +26,7 @@
     "@prisma/adapter-pg": "^6.16.1",
     "@prisma/client": "^6.16.1",
     "axios": "^1.16.1",
+    "jose": "^6.2.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
