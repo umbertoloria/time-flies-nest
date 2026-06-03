@@ -3,6 +3,6 @@ interface Request {
 }
 
 interface ReqUser {
-  id: number;
+  id: string;
   email: string;
 }

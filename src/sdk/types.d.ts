@@ -1,6 +1,6 @@
 // Types
-// 2025-09-14T17:28:30Z
-// v3.6
+// 2026-06-03T16:48:25Z
+// v3.7
 
 // Calendar
 export type TCalendarPrev = TCalendarRcd & {
@@ -69,7 +69,7 @@ export type TAuthStatus = {
   user: TAuthUser;
 };
 export type TAuthUser = {
-  id: number;
+  id: string;
   email: string;
 };
 

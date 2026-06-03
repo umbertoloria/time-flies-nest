@@ -6,11 +6,11 @@ import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 export class CalendarService {
   constructor(private repository: CalendarRepository) {}
 
-  readCalendarIDsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
+  readCalendarIDsFromUserIdViaSortedPin(userId: string, showAll: boolean) {
     return this.repository.findCalendarsFromUserIdViaSortedPin(userId, showAll);
   }
 
-  async findCalendarFromUser(calendarId: number, userId: number) {
+  async findCalendarFromUser(calendarId: number, userId: string) {
     const calendar = await this.repository.findById(calendarId);
 
     if (!calendar || calendar.user_id !== userId) {

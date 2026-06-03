@@ -6,7 +6,7 @@ import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 export class CalendarRepository {
   constructor(private readonly repo: PrismaRepository) {}
 
-  public findCalendarsFromUserIdViaSortedPin(userId: number, showAll: boolean) {
+  public findCalendarsFromUserIdViaSortedPin(userId: string, showAll: boolean) {
     return this.repo.calendar.findMany({
       where: {
         user_id: userId,
