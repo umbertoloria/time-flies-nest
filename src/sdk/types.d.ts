@@ -1,6 +1,6 @@
 // Types
-// 2026-06-03T16:48:25Z
-// v3.7
+// 2026-06-03T18:22:49Z
+// v3.8
 
 // Calendar
 export type TCalendarPrev = TCalendarRcd & {
@@ -62,15 +62,6 @@ export type TExerciseRecord = {
   bars_num?: number;
   ts_above?: number;
   ts_below?: number;
-};
-
-// Auth
-export type TAuthStatus = {
-  user: TAuthUser;
-};
-export type TAuthUser = {
-  id: string;
-  email: string;
 };
 
 // SDK: Schedule
