@@ -130,9 +130,8 @@ export class CalendarController {
     return 'ok-updated';
   }
 
-  @Post('/:cid')
+  @Get('/:cid')
   async readCalendarById(
-    // @Body() body: any,
     @Param('cid') urlCid: string,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
