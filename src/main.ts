@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 const APP_PORT = parseInt('' + process.env.APP_PORT || '8663', 10);
@@ -35,6 +35,14 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
     credentials: true,
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   await app.listen(APP_PORT, APP_ADDRESS);
 

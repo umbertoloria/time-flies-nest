@@ -1,7 +1,5 @@
-import {
-  fromBodyGetOptionalBool,
-  fromBodyGetRequiredLocalDate,
-} from '../../../lib/validate';
+import { validateDate } from '../../../lib/validate';
+import { ReadCalendarsGdto } from '../gdto';
 
 export class ReadCalendarsDto {
   constructor(
@@ -10,16 +8,13 @@ export class ReadCalendarsDto {
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(body: any, user: ReqUser) {
-    // Validation
-    const dateFrom = fromBodyGetRequiredLocalDate(body, 'date-from');
-    const showAll = fromBodyGetOptionalBool(body, 'show-all') || false;
-
-    return new ReadCalendarsDto(
-      //
-      dateFrom,
-      showAll,
-      user,
+  static fromGateway(gdto: ReadCalendarsGdto, user: ReqUser) {
+    const dateFrom = validateDate(
+      gdto.dateFrom,
+      'Param "dateFrom" invalid: must be a date',
     );
+    const showAll = gdto.showAll || false;
+
+    return new ReadCalendarsDto(dateFrom, showAll, user);
   }
 }

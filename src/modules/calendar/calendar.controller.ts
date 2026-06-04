@@ -1,4 +1,12 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
@@ -7,6 +15,7 @@ import {
   AccessTokenGuard,
   CurrentUser,
 } from '../../lib/guards/access-token.guard';
+import { ReadCalendarsGdto } from './gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
@@ -23,12 +32,12 @@ export class CalendarController {
     private taskService: TaskService,
   ) {}
 
-  @Post('/')
+  @Get()
   async readCalendars(
-    @Body() body: any,
+    @Query() gdto: ReadCalendarsGdto,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
-    const dto = ReadCalendarsDto.fromBody(body, user);
+  ): Promise<TCalendarPrev[]> {
+    const dto = ReadCalendarsDto.fromGateway(gdto, user);
 
     // BL
     const calendars = await this.service.readCalendarIDsFromUserIdViaSortedPin(
@@ -53,27 +62,24 @@ export class CalendarController {
       );
 
     // Response
-    const response: { calendars: TCalendarPrev[] } = {
-      calendars: calendars.map<TCalendarPrev>((dbCalendar) => {
-        const doneTaskDates = mapCalendar2DoneTasks.find(
-          ({ calendarId }) => calendarId === dbCalendar.id,
-        )!.dates;
-        const todoDates = mapCalendar2Todos.find(
-          ({ calendarId }) => calendarId === dbCalendar.id,
-        )!.todoDates;
+    return calendars.map<TCalendarPrev>((dbCalendar) => {
+      const doneTaskDates = mapCalendar2DoneTasks.find(
+        ({ calendarId }) => calendarId === dbCalendar.id,
+      )!.dates;
+      const todoDates = mapCalendar2Todos.find(
+        ({ calendarId }) => calendarId === dbCalendar.id,
+      )!.todoDates;
 
-        return {
-          id: dbCalendar.id,
-          name: dbCalendar.name,
-          color: dbCalendar.color,
-          plannedColor: dbCalendar.planned_color,
-          usesNotes: dbCalendar.uses_notes || undefined,
-          doneTaskDates,
-          todoDates,
-        };
-      }),
-    };
-    return JSON.stringify(response);
+      return {
+        id: dbCalendar.id,
+        name: dbCalendar.name,
+        color: dbCalendar.color,
+        plannedColor: dbCalendar.planned_color,
+        usesNotes: dbCalendar.uses_notes || undefined,
+        doneTaskDates,
+        todoDates,
+      };
+    });
   }
 
   @Post('/create')
