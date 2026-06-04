@@ -15,7 +15,7 @@ import {
   AccessTokenGuard,
   CurrentUser,
 } from '../../lib/guards/access-token.guard';
-import { ReadCalendarsGdto } from './gdto';
+import { ReadCalendarsGdto, UpdateCalendarGdto } from './gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
@@ -33,7 +33,7 @@ export class CalendarController {
   ) {}
 
   @Get()
-  async readCalendars(
+  async readAll(
     @Query() gdto: ReadCalendarsGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarPrev[]> {
@@ -82,27 +82,28 @@ export class CalendarController {
     });
   }
 
-  @Post('/create')
-  async createCalendar(
+  @Post()
+  async create(
     @Body() body: any,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
+  ): Promise<{ id: number }> {
     const dto = CreateCalendarDto.fromBody(body, user);
 
     const createdCalendar = await this.service.createCalendar(dto);
 
     // Response
-    return JSON.stringify({
+    return {
       id: createdCalendar.id,
-    });
+    };
   }
 
-  @Post('/update')
-  async updateCalendar(
-    @Body() bodyParams: any,
+  @Post('/:id')
+  async update(
+    @Param('id') paramCalendarId: string,
+    @Body() gdto: UpdateCalendarGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<string> {
-    const dto = UpdateCalendarDto.fromBody(bodyParams, user);
+    const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);
 
     // BL
     if (!dto.usesNotes) {
@@ -130,12 +131,12 @@ export class CalendarController {
     return 'ok-updated';
   }
 
-  @Get('/:cid')
-  async readCalendarById(
-    @Param('cid') urlCid: string,
+  @Get('/:id')
+  async read(
+    @Param('id') paramCalendarId: string,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
-    const dto = ReadCalendarDto.fromBody(urlCid, user);
+  ): Promise<TCalendar> {
+    const dto = ReadCalendarDto.fromParam(paramCalendarId, user);
 
     // BL
     const calendar = await this.service.findCalendarFromUser(
@@ -155,7 +156,7 @@ export class CalendarController {
       notes: todo.notes || undefined,
     }));
 
-    const response: TCalendar = {
+    return {
       id: calendar.id,
       name: calendar.name,
       color: calendar.color,
@@ -167,6 +168,5 @@ export class CalendarController {
       })),
       plannedDays,
     };
-    return JSON.stringify(response);
   }
 }

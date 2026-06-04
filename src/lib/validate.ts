@@ -26,6 +26,14 @@ export function fromBodyGetRequiredString(
 // COLOR
 const REG_EXP_HEX_COLOR = new RegExp('^#[A-Fa-f0-9]{6}$');
 
+export function validateColor(value: string, errorMsg: string): string {
+  const ex = REG_EXP_HEX_COLOR.exec(value);
+  if (!ex) {
+    throw new BadRequestException(errorMsg);
+  }
+  return value;
+}
+
 export function fromBodyGetOptionalColor(
   bodyParams: any,
   paramName: string,

@@ -1,9 +1,5 @@
-import {
-  fromBodyGetRequiredBool,
-  fromBodyGetRequiredColor,
-  fromBodyGetRequiredInt,
-  fromBodyGetRequiredString,
-} from '../../../lib/validate';
+import { fromBodyValidateInt, validateColor } from '../../../lib/validate';
+import { UpdateCalendarGdto } from '../gdto';
 
 export class UpdateCalendarDto {
   constructor(
@@ -15,14 +11,27 @@ export class UpdateCalendarDto {
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(body: any, user: ReqUser) {
+  static fromParam(
+    paramCalendarId: string,
+    gdto: UpdateCalendarGdto,
+    user: ReqUser,
+  ) {
     // Validation
-    const calendarId = fromBodyGetRequiredInt(body, 'cid');
+    const calendarId = fromBodyValidateInt(
+      paramCalendarId,
+      'Invalid CalendarID',
+    );
     // TODO: Here every field is required
-    const name = fromBodyGetRequiredString(body, 'name');
-    const color = fromBodyGetRequiredColor(body, 'color');
-    const plannedColor = fromBodyGetRequiredColor(body, 'planned-color');
-    const usesNotes = fromBodyGetRequiredBool(body, 'uses-notes');
+    const name = gdto.name;
+    const color = validateColor(
+      gdto.color,
+      'Param "color" invalid: must be a color',
+    );
+    const plannedColor = validateColor(
+      gdto.plannedColor,
+      'Param "plannedColor" invalid: must be a color',
+    );
+    const usesNotes = gdto.usesNotes;
 
     return new UpdateCalendarDto(
       //
