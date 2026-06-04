@@ -1,4 +1,7 @@
-import { get_optional_string, validate_int } from '../../../lib/validate';
+import {
+  fromBodyGetOptionalString,
+  fromBodyValidateInt,
+} from '../../../lib/validate';
 
 export class UpdateTodoDto {
   constructor(
@@ -11,9 +14,9 @@ export class UpdateTodoDto {
 
   static fromBody(urlCid: string, urlTid: string, body: any, user: ReqUser) {
     // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    const todoId = validate_int(urlTid, 'Invalid TodoID');
-    const notes = get_optional_string(body, 'notes');
+    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const todoId = fromBodyValidateInt(urlTid, 'Invalid TodoID');
+    const notes = fromBodyGetOptionalString(body, 'notes');
 
     return new UpdateTodoDto(
       //

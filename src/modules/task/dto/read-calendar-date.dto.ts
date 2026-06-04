@@ -1,4 +1,4 @@
-import { validate_int } from '../../../lib/validate';
+import { fromBodyValidateInt } from '../../../lib/validate';
 
 export class ReadCalendarDateDto {
   constructor(
@@ -9,7 +9,7 @@ export class ReadCalendarDateDto {
 
   static fromBody(urlCid: string, date: string, user: ReqUser) {
     // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
+    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
 
     return new ReadCalendarDateDto(
       //

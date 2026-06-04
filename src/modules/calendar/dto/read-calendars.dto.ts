@@ -1,6 +1,6 @@
 import {
-  get_optional_bool,
-  get_required_local_date,
+  fromBodyGetOptionalBool,
+  fromBodyGetRequiredLocalDate,
 } from '../../../lib/validate';
 
 export class ReadCalendarsDto {
@@ -12,8 +12,8 @@ export class ReadCalendarsDto {
 
   static fromBody(body: any, user: ReqUser) {
     // Validation
-    const dateFrom = get_required_local_date(body, 'date-from');
-    const showAll = get_optional_bool(body, 'show-all') || false;
+    const dateFrom = fromBodyGetRequiredLocalDate(body, 'date-from');
+    const showAll = fromBodyGetOptionalBool(body, 'show-all') || false;
 
     return new ReadCalendarsDto(
       //

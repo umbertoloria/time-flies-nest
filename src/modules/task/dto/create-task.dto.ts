@@ -1,7 +1,7 @@
 import {
-  get_optional_string,
-  get_required_local_date,
-  validate_int,
+  fromBodyGetOptionalString,
+  fromBodyGetRequiredLocalDate,
+  fromBodyValidateInt,
 } from '../../../lib/validate';
 
 export class CreateTaskDto {
@@ -13,9 +13,9 @@ export class CreateTaskDto {
 
   static fromBody(urlCid: string, body: any) {
     // Validation
-    const calendarId = validate_int(urlCid, 'Invalid CalendarID');
-    const date = get_required_local_date(body, 'date');
-    const notes = get_optional_string(body, 'notes');
+    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const date = fromBodyGetRequiredLocalDate(body, 'date');
+    const notes = fromBodyGetOptionalString(body, 'notes');
 
     return new CreateTaskDto(
       //
