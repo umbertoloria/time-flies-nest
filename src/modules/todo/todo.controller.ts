@@ -59,23 +59,21 @@ export class TodoController {
     let currDateI: null | number = null;
     for (let i = 0; i < undoneTodos.length; ++i) {
       const todo = undoneTodos[i];
-      const todoDate = todo['date'];
-      if (currDateI === null || response.dates[currDateI].date !== todoDate) {
+      if (currDateI === null || response.dates[currDateI].date !== todo.date) {
         currDateI = response.dates.length;
         response.dates.push({
-          date: todoDate,
+          date: todo.date,
           calendars: [],
         });
       }
+      // TODO: Todos are ordered by Date not by Calendar SortedPin. Calendars
+      //  should be sorted (Date ASC -> Calendar SortedPin ASC) before response
+      //  is sent
       const todoCalendar = idxCalendars[todo.calendarId]!;
-      let currDateCalendarI: null | number = null;
-      for (let j = 0; j < response.dates[currDateI].calendars.length; j++) {
-        const v = response.dates[currDateI].calendars[j];
-        if (v.id === todoCalendar.id) {
-          currDateCalendarI = j;
-        }
-      }
-      if (currDateCalendarI === null) {
+      let currDateCalendarI = response.dates[currDateI].calendars.findIndex(
+        (v) => v.id === todoCalendar.id,
+      );
+      if (currDateCalendarI < 0) {
         currDateCalendarI = response.dates[currDateI].calendars.length;
         response.dates[currDateI].calendars.push({
           id: todoCalendar.id,
