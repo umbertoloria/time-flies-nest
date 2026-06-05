@@ -47,7 +47,10 @@ export class TaskRepository {
     });
   }
 
-  public findTaskFromCalendarAndDate(calendarId: number, date: string) {
+  public findTaskFromCalendarAndDate(
+    calendarId: number,
+    date: string,
+  ): Promise<Task[]> {
     return this.repo.task.findMany({
       where: {
         calendar_id: calendarId,

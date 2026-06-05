@@ -42,7 +42,10 @@ export class TaskService {
     return count > 0;
   }
 
-  async findTasksFromCalendarAndDate(calendarId: number, date: string) {
+  async findTasksFromCalendarAndDate(
+    calendarId: number,
+    date: string,
+  ): Promise<TaskRto[]> {
     const tasks = await this.repository.findTaskFromCalendarAndDate(
       calendarId,
       date,
@@ -50,10 +53,7 @@ export class TaskService {
 
     // TODO: This may return multiple Tasks for the same Date
 
-    return tasks.map((task) => ({
-      id: task.id,
-      notes: task.notes || undefined,
-    }));
+    return tasks.map(TaskRto.fromEntity);
   }
 
   async createDoneTask(dto: CreateTaskDto) {

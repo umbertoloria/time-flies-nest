@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
+import { CalendarRto } from '../calendar/rto';
 import { TodoService } from '../todo/todo.service';
 import {
   AccessTokenGuard,
@@ -33,10 +34,11 @@ export class TaskController {
     const dto = ReadCalendarDateDto.fromBody(paramCalendarId, date, user);
 
     // BL
-    const calendar = await this.calendarService.findCalendarFromUser(
+    const calendarEntity = await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
+    const calendar = CalendarRto.fromEntity(calendarEntity);
 
     const undoneTodos = await this.todoService.findUndoneTodosByCalendar(
       calendar.id,
@@ -48,26 +50,11 @@ export class TaskController {
       dto.date,
     );
 
-    // Response
-    const todos = undoneTodos.map((todo) => ({
-      id: todo.id,
-      notes: todo.notes || undefined,
-    }));
-
     return {
-      calendar: {
-        id: calendar.id,
-        name: calendar.name,
-        color: calendar.color,
-        plannedColor: calendar.planned_color,
-        usesNotes: calendar.uses_notes || undefined,
-      },
+      calendar: calendar.toTCalendarRcd(),
       date: dto.date,
-      doneTasks: doneTasks.map((doneTask) => ({
-        id: doneTask.id,
-        notes: doneTask.notes || undefined,
-      })),
-      todos,
+      doneTasks: doneTasks.map((doneTask) => doneTask.toTNewDoneTask()),
+      todos: undoneTodos.map((todo) => todo.toTNewTodo()),
     };
   }
 
