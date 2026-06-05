@@ -89,12 +89,12 @@ export class TaskController {
   async create(
     @Body() body: any,
     @Param('cid') paramCalendarId: string,
-  ): Promise<string> {
+  ): Promise<TNewDoneTask> {
     const dto = CreateTaskDto.fromBody(paramCalendarId, body);
 
-    await this.service.createDoneTask(dto);
+    const createdTask = await this.service.createDoneTask(dto);
 
-    return 'ok';
+    return createdTask.toTNewDoneTask();
   }
 
   @Post(':date')

@@ -56,8 +56,10 @@ export class TaskService {
     }));
   }
 
-  createDoneTask(dto: CreateTaskDto) {
-    return this.repository.create(dto);
+  async createDoneTask(dto: CreateTaskDto) {
+    const task = await this.repository.create(dto);
+
+    return TaskRto.fromEntity(task);
   }
 
   async updateTaskNotesByDate(dto: UpdateCalendarDateDto) {

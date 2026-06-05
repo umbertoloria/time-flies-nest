@@ -56,7 +56,7 @@ export class TaskRepository {
     });
   }
 
-  public create(dto: CreateTaskDto) {
+  public create(dto: CreateTaskDto): Promise<Task> {
     return this.repo.task.create({
       data: {
         calendar_id: dto.calendarId,
