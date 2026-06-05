@@ -3,7 +3,6 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 const PORT = parseInt('' + process.env.PORT, 10);
-// const ADDRESS = process.env.ADDRESS;
 
 const originWhitelist = (process.env.CORS_ORIGINS_WHITELIST || '').split(',');
 
