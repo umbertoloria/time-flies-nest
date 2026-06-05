@@ -66,9 +66,6 @@ export class TodoController {
           calendars: [],
         });
       }
-      // TODO: Todos are ordered by Date not by Calendar SortedPin. Calendars
-      //  should be sorted (Date ASC -> Calendar SortedPin ASC) before response
-      //  is sent
       const todoCalendar = idxCalendars[todo.calendarId]!;
       let currDateCalendarI = response.dates[currDateI].calendars.findIndex(
         (v) => v.id === todoCalendar.id,
@@ -82,6 +79,7 @@ export class TodoController {
           plannedColor: todoCalendar.planned_color,
           usesNotes: todoCalendar.uses_notes || undefined,
           todos: [],
+          sortedPin: todoCalendar.sorted_pin ?? undefined,
         });
       }
       response.dates[currDateI].calendars[currDateCalendarI].todos.push({
@@ -90,6 +88,12 @@ export class TodoController {
         notes: todo.notes || undefined,
       });
     }
+    response.dates.forEach((date) => {
+      date.calendars.sort(
+        (a, b) =>
+          (a.sortedPin ?? Number.MAX_VALUE) - (b.sortedPin ?? Number.MAX_VALUE),
+      );
+    });
     return response;
   }
 

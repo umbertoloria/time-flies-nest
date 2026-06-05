@@ -84,6 +84,7 @@ export namespace TCalendarSDK {
   };
   export type ReadPlannedEventsResponseCalendar = TCalendarRcd & {
     todos: TNewTodo[];
+    sortedPin?: number;
   };
   // Read Date Response
   export type ReadDateResponse = {
