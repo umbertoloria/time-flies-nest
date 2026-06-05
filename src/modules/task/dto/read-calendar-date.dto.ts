@@ -7,9 +7,12 @@ export class ReadCalendarDateDto {
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(urlCid: string, date: string, user: ReqUser) {
+  static fromBody(paramCalendarId: string, date: string, user: ReqUser) {
     // Validation
-    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const calendarId = fromBodyValidateInt(
+      paramCalendarId,
+      'Invalid CalendarID',
+    );
 
     return new ReadCalendarDateDto(
       //

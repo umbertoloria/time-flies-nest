@@ -11,9 +11,12 @@ export class CreateTaskDto {
     public readonly notes: string | undefined,
   ) {}
 
-  static fromBody(urlCid: string, body: any) {
+  static fromBody(paramCalendarId: string, body: any) {
     // Validation
-    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const calendarId = fromBodyValidateInt(
+      paramCalendarId,
+      'Invalid CalendarID',
+    );
     const date = fromBodyGetRequiredLocalDate(body, 'date');
     const notes = fromBodyGetOptionalString(body, 'notes');
 

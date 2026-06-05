@@ -11,9 +11,12 @@ export class UpdateCalendarDateDto {
     public readonly notes: string | undefined,
   ) {}
 
-  static fromBody(urlCid: string, date: string, body: any) {
+  static fromBody(paramCalendarId: string, date: string, body: any) {
     // Validation
-    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const calendarId = fromBodyValidateInt(
+      paramCalendarId,
+      'Invalid CalendarID',
+    );
     // TODO: Validate "date"
     const notes = fromBodyGetOptionalString(body, 'notes');
 

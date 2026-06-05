@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
@@ -14,7 +14,7 @@ import {
 } from './dto';
 
 @UseGuards(AccessTokenGuard)
-@Controller('/calendars')
+@Controller('/calendars/:cid/date')
 export class TaskController {
   constructor(
     private readonly service: TaskService,
@@ -22,14 +22,15 @@ export class TaskController {
     private readonly todoService: TodoService,
   ) {}
 
-  @Post('/:cid/date/:date')
-  async readCalendarDate(
+  @Get(':date')
+  async read(
     // @Body() body: any,
-    @Param('cid') urlCid: string,
+    @Param('cid') paramCalendarId: string,
     @Param('date') date: string,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
-    const dto = ReadCalendarDateDto.fromBody(urlCid, date, user);
+  ): Promise<TCalendarSDK.ReadDateResponse> {
+    // TODO: Responds with both Tasks and Todos...
+    const dto = ReadCalendarDateDto.fromBody(paramCalendarId, date, user);
 
     // BL
     const calendar = await this.calendarService.findCalendarFromUser(
@@ -67,7 +68,7 @@ export class TaskController {
     // Validity test -
     */
 
-    const response: TCalendarSDK.ReadDateResponse = {
+    return {
       calendar: {
         id: calendar.id,
         name: calendar.name,
@@ -82,28 +83,27 @@ export class TaskController {
       })),
       todos,
     };
-    return JSON.stringify(response);
   }
 
-  @Post('/:cid/date-create')
-  async createCalendarDate(
+  @Post()
+  async create(
     @Body() body: any,
-    @Param('cid') urlCid: string,
+    @Param('cid') paramCalendarId: string,
   ): Promise<string> {
-    const dto = CreateTaskDto.fromBody(urlCid, body);
+    const dto = CreateTaskDto.fromBody(paramCalendarId, body);
 
     await this.service.createDoneTask(dto);
 
     return 'ok';
   }
 
-  @Post('/:cid/date-upd-notes/:date')
-  async updateCalendarDate(
+  @Post(':date')
+  async update(
     @Body() body: any,
-    @Param('cid') urlCid: string,
+    @Param('cid') paramCalendarId: string,
     @Param('date') date: string,
   ): Promise<string> {
-    const dto = UpdateCalendarDateDto.fromBody(urlCid, date, body);
+    const dto = UpdateCalendarDateDto.fromBody(paramCalendarId, date, body);
 
     await this.service.updateTaskNotesByDate(dto);
 
