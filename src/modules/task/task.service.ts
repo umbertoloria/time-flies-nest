@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskRepository } from './task.repository';
-import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
+import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { isFirstOne } from '../../lib/list';
 import { TaskRto } from './rto';
 
@@ -62,23 +62,14 @@ export class TaskService {
     return TaskRto.fromEntity(task);
   }
 
-  async updateTaskNotesByDate(dto: UpdateCalendarDateDto) {
-    // FIXME: Bug if there are multiple Tasks for the same Date
-    const tasks = await this.findTasksFromCalendarAndDate(
-      dto.calendarId,
-      dto.date,
-    );
+  async updateTaskNotesByDate(dto: UpdateTaskDto) {
+    const task = await this.repository.findTask(dto.calendarId, dto.taskId);
 
-    if (!tasks.length) {
-      throw new NotFoundException('Task not found');
-    }
-    if (tasks.length > 1) {
+    if (!task) {
       throw new NotFoundException('Task not found');
     }
 
-    const taskId = tasks[0].id;
-
-    const upd = await this.repository.update(taskId, dto);
+    const upd = await this.repository.update(dto);
 
     return TaskRto.fromEntity(upd);
   }

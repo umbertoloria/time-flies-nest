@@ -3,27 +3,26 @@ import {
   fromBodyValidateInt,
 } from '../../../lib/validate';
 
-export class UpdateCalendarDateDto {
+export class UpdateTaskDto {
   constructor(
-    // TODO: Use TaskID instead of (calendarId, date)
     public readonly calendarId: number,
-    public readonly date: string,
+    public readonly taskId: number,
     public readonly notes: string | undefined,
   ) {}
 
-  static fromBody(paramCalendarId: string, date: string, body: any) {
+  static fromBody(paramCalendarId: string, paramTaskId: string, body: any) {
     // Validation
     const calendarId = fromBodyValidateInt(
       paramCalendarId,
       'Invalid CalendarID',
     );
-    // TODO: Validate "date"
+    const taskId = fromBodyValidateInt(paramTaskId, 'Invalid TaskID');
     const notes = fromBodyGetOptionalString(body, 'notes');
 
-    return new UpdateCalendarDateDto(
+    return new UpdateTaskDto(
       //
       calendarId,
-      date,
+      taskId,
       notes,
     );
   }

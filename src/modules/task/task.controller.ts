@@ -7,11 +7,7 @@ import {
   AccessTokenGuard,
   CurrentUser,
 } from '../../lib/guards/access-token.guard';
-import {
-  CreateTaskDto,
-  ReadCalendarDateDto,
-  UpdateCalendarDateDto,
-} from './dto';
+import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars/:cid/date')
@@ -68,13 +64,13 @@ export class TaskController {
     };
   }
 
-  @Post(':date')
+  @Post(':tid')
   async update(
     @Body() body: any,
     @Param('cid') paramCalendarId: string,
-    @Param('date') date: string,
+    @Param('tid') paramTaskId: string,
   ): Promise<TNewDoneTask> {
-    const dto = UpdateCalendarDateDto.fromBody(paramCalendarId, date, body);
+    const dto = UpdateTaskDto.fromBody(paramCalendarId, paramTaskId, body);
 
     const updatedTask = await this.service.updateTaskNotesByDate(dto);
 

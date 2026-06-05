@@ -1,10 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaRepository, Task } from '../../prisma.repository';
-import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
+import { CreateTaskDto, UpdateTaskDto } from './dto';
 
 @Injectable()
 export class TaskRepository {
   constructor(private readonly repo: PrismaRepository) {}
+
+  public findTask(calendarId: number, taskId: number): Promise<Task | null> {
+    return this.repo.task.findUnique({
+      where: {
+        id: taskId,
+        calendar_id: calendarId,
+      },
+    });
+  }
 
   public findTasksFromCalendarsAndDate(
     calendarIds: number[],
@@ -69,12 +78,11 @@ export class TaskRepository {
     });
   }
 
-  public update(taskId: number, dto: UpdateCalendarDateDto): Promise<Task> {
+  public update(dto: UpdateTaskDto): Promise<Task> {
     return this.repo.task.update({
       where: {
-        id: taskId,
+        id: dto.taskId,
         calendar_id: dto.calendarId,
-        date: dto.date,
       },
       data: {
         notes: dto.notes || null,
