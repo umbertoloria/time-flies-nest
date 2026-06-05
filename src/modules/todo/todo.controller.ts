@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -9,7 +10,7 @@ import {
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
-import { TCalendarSDK } from '../../sdk/types';
+import { TCalendarSDK, TNewTodo } from '../../sdk/types';
 import {
   AccessTokenGuard,
   CurrentUser,
@@ -32,8 +33,10 @@ export class TodoController {
     private taskService: TaskService,
   ) {}
 
-  @Post('/streamline')
-  async streamlineRead(@CurrentUser() user: ReqUser): Promise<string> {
+  @Get('streamline')
+  async readStreamline(
+    @CurrentUser() user: ReqUser,
+  ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
     const dto = ReadStreamlineDto.fromBody(user);
 
     // BL
@@ -89,22 +92,21 @@ export class TodoController {
         notes: todo.notes || undefined,
       });
     }
-    return JSON.stringify(response);
+    return response;
   }
 
-  @Post('/:cid/todo-create/:date')
-  async createTodo(
+  @Post(':cid/todo')
+  async create(
     @Body() body: any,
     @Param('cid') urlCid: string,
-    @Param('date') date: string,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
-    const dto = CreateTodoDto.fromBody(urlCid, date, body, user);
+  ): Promise<TNewTodo> {
+    const dto = CreateTodoDto.fromBody(urlCid, body, user);
 
     const insTodo = await this.service.createTodo(dto);
     console.log('created', insTodo);
 
-    return 'ok';
+    return insTodo.toTNewTodo();
   }
 
   @Post('/:cid/todo-upd/:tid')

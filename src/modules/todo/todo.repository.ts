@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository } from '../../prisma.repository';
+import { PrismaRepository, Todo } from '../../prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -11,7 +11,7 @@ import {
 export class TodoRepository {
   constructor(private readonly repo: PrismaRepository) {}
 
-  public findTodosFromCalendars(calendarIds: number[]) {
+  public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {
     return this.repo.todo.findMany({
       where: {
         calendar_id: {
@@ -25,7 +25,10 @@ export class TodoRepository {
     });
   }
 
-  public findUndoneTodosByCalendar(calendarId: number, filterDate: string) {
+  public findUndoneTodosByCalendar(
+    calendarId: number,
+    filterDate: string,
+  ): Promise<Todo[]> {
     return this.repo.todo.findMany({
       where: {
         calendar_id: calendarId,
@@ -35,7 +38,7 @@ export class TodoRepository {
     });
   }
 
-  public findById(todoId: number) {
+  public findById(todoId: number): Promise<Todo | null> {
     return this.repo.todo.findUnique({
       where: {
         id: todoId,
@@ -54,7 +57,7 @@ export class TodoRepository {
     });
   }
 
-  public create(dto: CreateTodoDto) {
+  public create(dto: CreateTodoDto): Promise<Todo> {
     return this.repo.todo.create({
       data: {
         calendar_id: dto.calendarId,

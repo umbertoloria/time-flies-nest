@@ -7,6 +7,7 @@ import {
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
+import { TodoRto } from './rto';
 
 @Injectable()
 export class TodoService {
@@ -46,7 +47,9 @@ export class TodoService {
       dto.user.id,
     );
 
-    return this.repository.create(dto);
+    const created = await this.repository.create(dto);
+
+    return TodoRto.fromEntity(created);
   }
 
   async updateTodoNotes(dto: UpdateTodoDto) {

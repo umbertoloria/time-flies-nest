@@ -1,5 +1,6 @@
 import {
   fromBodyGetOptionalString,
+  fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '../../../lib/validate';
 
@@ -12,9 +13,10 @@ export class CreateTodoDto {
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(urlCid: string, date: string, body: any, user: ReqUser) {
+  static fromBody(urlCid: string, body: any, user: ReqUser) {
     // Validation
     const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const date = fromBodyGetRequiredLocalDate(body, 'date');
     // TODO: Validate "date"
     const notes = fromBodyGetOptionalString(body, 'notes');
 
