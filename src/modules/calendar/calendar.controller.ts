@@ -95,39 +95,6 @@ export class CalendarController {
     return createdCalendar.toTCalendarRcd();
   }
 
-  @Post('/:id')
-  async update(
-    @Param('id') paramCalendarId: string,
-    @Body() gdto: UpdateCalendarGdto,
-    @CurrentUser() user: ReqUser,
-  ): Promise<TCalendarRcd> {
-    const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);
-
-    // BL
-    if (!dto.usesNotes) {
-      // Calendar "Uses Notes" cannot be disabled if it contains Notes...
-
-      // ... from Todos.
-      const areThereTodosWithNotesInCalendar =
-        await this.todoService.areThereTodosWithNotes(dto.calendarId);
-      if (areThereTodosWithNotesInCalendar) {
-        // TODO: This is a leak if user is not the Calendar owner
-        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
-      }
-
-      // ... from (Done) Tasks.
-      const areThereTasksWithNotesInCalendar =
-        await this.taskService.areThereTasksWithNotes(dto.calendarId);
-      if (areThereTasksWithNotesInCalendar) {
-        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
-      }
-    }
-
-    const updatedCalendar = await this.service.updateCalendar(dto);
-
-    return updatedCalendar.toTCalendarRcd();
-  }
-
   @Get('/:id')
   async read(
     @Param('id') paramCalendarId: string,
@@ -165,5 +132,38 @@ export class CalendarController {
       })),
       plannedDays,
     };
+  }
+
+  @Post('/:id')
+  async update(
+    @Param('id') paramCalendarId: string,
+    @Body() gdto: UpdateCalendarGdto,
+    @CurrentUser() user: ReqUser,
+  ): Promise<TCalendarRcd> {
+    const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);
+
+    // BL
+    if (!dto.usesNotes) {
+      // Calendar "Uses Notes" cannot be disabled if it contains Notes...
+
+      // ... from Todos.
+      const areThereTodosWithNotesInCalendar =
+        await this.todoService.areThereTodosWithNotes(dto.calendarId);
+      if (areThereTodosWithNotesInCalendar) {
+        // TODO: This is a leak if user is not the Calendar owner
+        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
+      }
+
+      // ... from (Done) Tasks.
+      const areThereTasksWithNotesInCalendar =
+        await this.taskService.areThereTasksWithNotes(dto.calendarId);
+      if (areThereTasksWithNotesInCalendar) {
+        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
+      }
+    }
+
+    const updatedCalendar = await this.service.updateCalendar(dto);
+
+    return updatedCalendar.toTCalendarRcd();
   }
 }
