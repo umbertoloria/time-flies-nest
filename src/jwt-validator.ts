@@ -1,7 +1,7 @@
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
 import {
-  JWT_AUDIENCE,
   AuthorizationError,
+  JWT_AUDIENCE,
   JWT_ISSUER,
   JWT_JWKS_URI,
 } from './auth-middleware.js';

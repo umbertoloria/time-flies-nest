@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
-import { CalendarRto } from '../calendar/rto';
 import { TodoService } from '../todo/todo.service';
 import {
   AccessTokenGuard,
@@ -34,11 +33,10 @@ export class TaskController {
     const dto = ReadCalendarDateDto.fromBody(paramCalendarId, date, user);
 
     // BL
-    const calendarEntity = await this.calendarService.findCalendarFromUser(
+    const calendar = await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
-    const calendar = CalendarRto.fromEntity(calendarEntity);
 
     const undoneTodos = await this.todoService.findUndoneTodosByCalendar(
       calendar.id,

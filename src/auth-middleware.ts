@@ -6,6 +6,7 @@ export const JWT_AUDIENCE = process.env.JWT_AUDIENCE!;
 
 export class AuthorizationError extends Error {
   name = 'AuthorizationError';
+
   constructor(
     message: string,
     public status = 403,

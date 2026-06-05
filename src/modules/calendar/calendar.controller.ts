@@ -121,11 +121,7 @@ export class CalendarController {
     }));
 
     return {
-      id: calendar.id,
-      name: calendar.name,
-      color: calendar.color,
-      plannedColor: calendar.planned_color,
-      usesNotes: calendar.uses_notes || undefined,
+      ...calendar,
       days: tasks.map<TDay>((task) => ({
         date: task.date,
         notes: task.notes || undefined,

@@ -18,7 +18,7 @@ export class CalendarService {
       throw new NotFoundException('Calendar not found');
     }
 
-    return calendar;
+    return CalendarRto.fromEntity(calendar);
   }
 
   async createCalendar(dto: CreateCalendarDto) {
