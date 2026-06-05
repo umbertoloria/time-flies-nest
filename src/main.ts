@@ -17,10 +17,16 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin: any, callback: any) => {
+      /*
       console.debug('originWhitelist');
       console.debug(originWhitelist);
       console.debug('request from origin', origin);
-      if (!origin || originWhitelist.indexOf(origin) !== -1) {
+      console.debug('NODE_ENV:', process.env.NODE_ENV);
+      if (process.env.NODE_ENV === 'development' && !origin) {
+        callback(null, true);
+      }
+      */
+      if (originWhitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
