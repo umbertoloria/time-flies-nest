@@ -54,20 +54,6 @@ export class TaskController {
       notes: todo.notes || undefined,
     }));
 
-    /*
-    // Validity test +
-    const phpTodos = phpResponse.todos.map((todx) => ({
-      id: todx.id,
-      notes: todx.notes || undefined,
-    }));
-    const jsonOracle = JSON.stringify(phpTodos);
-    const jsonTest = JSON.stringify(todos);
-    if (jsonOracle !== jsonTest) {
-      console.error('diff 3', jsonOracle, jsonTest);
-    }
-    // Validity test -
-    */
-
     return {
       calendar: {
         id: calendar.id,
