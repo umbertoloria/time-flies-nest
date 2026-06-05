@@ -10,7 +10,7 @@ import {
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
-import { TCalendarSDK, TNewTodo } from '../../sdk/types';
+import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../sdk/types';
 import {
   AccessTokenGuard,
   CurrentUser,
@@ -109,23 +109,23 @@ export class TodoController {
     return insTodo.toTNewTodo();
   }
 
-  @Post('/:cid/todo-upd/:tid')
+  @Post('/:cid/todo/:tid/update-notes')
   async updateTodoNotes(
     @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
+  ): Promise<TNewTodo> {
     const dto = UpdateTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.service.findTodoFromCalendar(
+    const todo = await this.service.findTodoFromCalendar(
       dto.calendarId,
       dto.todoId,
     );
 
     // TODO: Verify calendar is user's
-    if (dbTodo.done_date) {
+    if (todo.done_date) {
       // To-do Notes can't be updated after it's Done.
       throw new BadRequestException('Todo already done');
     }
@@ -134,56 +134,59 @@ export class TodoController {
     console.log('updated', updTodo);
 
     // Response
-    return 'ok';
+    return updTodo.toTNewTodo();
   }
 
-  @Post('/:cid/todo-move/:tid')
+  @Post('/:cid/todo/:tid/move')
   async moveTodo(
     @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
+  ): Promise<TNewTodo> {
     const dto = MoveTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const dbTodo = await this.service.findTodoFromCalendar(
+    const todo = await this.service.findTodoFromCalendar(
       dto.calendarId,
       dto.todoId,
     );
 
     // TODO: Verify calendar is user's
-    if (dbTodo.done_date) {
+    if (todo.done_date) {
       // To-do can't be MOVED after it's Done.
       throw new BadRequestException('Todo already done');
     }
 
-    if (dbTodo.date !== dto.date) {
+    if (todo.date !== dto.date) {
       const updTodo = await this.service.moveTodo(dto);
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
+
+      return updTodo.toTNewTodo();
     }
     // Otherwise, pointless update...
 
     // Response
-    return 'ok';
+    return todo.toTNewTodo();
   }
 
-  @Post('/:cid/todo-done/:tid')
+  @Post('/:cid/todo/:tid/set-as-done')
   async updateTodoSetAsDone(
     @Body() body: any,
     @Param('cid') urlCid: string,
     @Param('tid') urlTid: string,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
+  ): Promise<TNewDoneTask> {
     const dto = UpdateDoneTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
     const updTodo = await this.service.updateTodoSetAsDone(dto);
 
     const createTaskDto = CreateTaskDto.fromTodoSetAsDone(updTodo);
-    await this.taskService.createDoneTask(createTaskDto);
+    const createdDoneTask =
+      await this.taskService.createDoneTask(createTaskDto);
 
-    return 'ok';
+    return createdDoneTask.toTNewDoneTask();
   }
 }

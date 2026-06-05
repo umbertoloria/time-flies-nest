@@ -69,7 +69,7 @@ export class TodoRepository {
     });
   }
 
-  public updateNotes(dto: UpdateTodoDto) {
+  public updateNotes(dto: UpdateTodoDto): Promise<Todo> {
     return this.repo.todo.update({
       where: {
         id: dto.todoId,
@@ -81,7 +81,8 @@ export class TodoRepository {
     });
   }
 
-  public updateDate(dto: MoveTodoDto) {
+  public updateDate(dto: MoveTodoDto): Promise<Todo> {
+    // FIXME: Returns also nulls or not?
     return this.repo.todo.update({
       where: {
         id: dto.todoId,
@@ -97,7 +98,7 @@ export class TodoRepository {
     todoId: number,
     doneDate: string,
     dto: UpdateDoneTodoDto,
-  ) {
+  ): Promise<Todo> {
     return this.repo.todo.update({
       where: {
         id: todoId,

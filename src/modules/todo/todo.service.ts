@@ -31,7 +31,7 @@ export class TodoService {
       throw new NotFoundException('Todo not found');
     }
 
-    return todo;
+    return TodoRto.fromEntity(todo);
   }
 
   async areThereTodosWithNotes(calendarId: number) {
@@ -59,7 +59,7 @@ export class TodoService {
       throw new NotFoundException('Todo not found');
     }
 
-    return upd;
+    return TodoRto.fromEntity(upd);
   }
 
   async moveTodo(dto: MoveTodoDto) {
@@ -69,7 +69,7 @@ export class TodoService {
       throw new NotFoundException('Todo not found');
     }
 
-    return upd;
+    return TodoRto.fromEntity(upd);
   }
 
   async updateTodoSetAsDone(dto: UpdateDoneTodoDto) {
@@ -92,6 +92,6 @@ export class TodoService {
       throw new NotFoundException('Todo not found');
     }
 
-    return upd;
+    return TodoRto.fromEntity(upd);
   }
 }

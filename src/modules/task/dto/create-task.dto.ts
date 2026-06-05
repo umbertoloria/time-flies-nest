@@ -3,6 +3,7 @@ import {
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '../../../lib/validate';
+import { TodoRto } from '../../todo/rto';
 
 export class CreateTaskDto {
   constructor(
@@ -28,14 +29,10 @@ export class CreateTaskDto {
     );
   }
 
-  static fromTodoSetAsDone(updTodo: {
-    calendar_id: number;
-    date: string;
-    notes: string | null;
-  }) {
+  static fromTodoSetAsDone(updTodo: TodoRto) {
     return new CreateTaskDto(
       //
-      updTodo.calendar_id,
+      updTodo.calendarId,
       updTodo.date,
       updTodo.notes || undefined,
     );
