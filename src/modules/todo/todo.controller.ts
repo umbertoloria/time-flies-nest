@@ -15,6 +15,7 @@ import {
   AccessTokenGuard,
   CurrentUser,
 } from '../../lib/guards/access-token.guard';
+import { createIdxItemsAndIds } from '../../lib/idx';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -40,23 +41,24 @@ export class TodoController {
     const dto = ReadStreamlineDto.fromBody(user);
 
     // BL
-    const dbCalendars =
+    const calendars =
       await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
         dto.user.id,
         true,
       );
-    const dbCalendarIds = dbCalendars.map((calendar) => calendar.id);
+    const { idx: idxCalendars, ids: calendarIds } =
+      createIdxItemsAndIds(calendars);
 
-    const dbUndoneTodos =
-      await this.service.findUndoneTodosByCalendars(dbCalendarIds);
+    const undoneTodos =
+      await this.service.findUndoneTodosByCalendars(calendarIds);
 
     // Response
     const response: TCalendarSDK.ReadPlannedEventsResponse = {
       dates: [],
     };
     let currDateI: null | number = null;
-    for (let i = 0; i < dbUndoneTodos.length; ++i) {
-      const todo = dbUndoneTodos[i];
+    for (let i = 0; i < undoneTodos.length; ++i) {
+      const todo = undoneTodos[i];
       const todoDate = todo['date'];
       if (currDateI === null || response.dates[currDateI].date !== todoDate) {
         currDateI = response.dates.length;
@@ -65,9 +67,7 @@ export class TodoController {
           calendars: [],
         });
       }
-      const todoCalendar = dbCalendars.find(
-        (dbCalendar) => dbCalendar.id === todo.calendar_id,
-      )!;
+      const todoCalendar = idxCalendars[todo.calendar_id]!;
       let currDateCalendarI: null | number = null;
       for (let j = 0; j < response.dates[currDateI].calendars.length; j++) {
         const v = response.dates[currDateI].calendars[j];
