@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 
 const PORT = parseInt('' + process.env.PORT, 10);
 
-const originWhitelist = (process.env.CORS_ORIGINS_WHITELIST || '').split(',');
+const corsAllowedOrigins = process.env.CORS_ORIGINS_WHITELIST?.split(',') || [];
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -16,24 +16,18 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin: any, callback: any) => {
-      /*
-      console.debug('originWhitelist');
-      console.debug(originWhitelist);
-      console.debug('request from origin', origin);
-      console.debug('NODE_ENV:', process.env.NODE_ENV);
-      if (process.env.NODE_ENV === 'development' && !origin) {
-        callback(null, true);
-      }
-      */
-      if (originWhitelist.indexOf(origin) !== -1) {
+      // console.debug('corsAllowedOrigins');
+      // console.debug(corsAllowedOrigins);
+      if (corsAllowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.error('CORS filter blocked request from origin:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     },
     methods: 'GET,POST,PUT,DELETE',
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
 
