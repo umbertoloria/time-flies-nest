@@ -35,6 +35,9 @@ export class TodoRepository {
         date: filterDate,
         done_date: null,
       },
+      orderBy: {
+        date: 'asc',
+      },
     });
   }
 
