@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskRepository } from './task.repository';
 import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
 import { isFirstOne } from '../../lib/list';
+import { TaskRto } from './rto';
 
 @Injectable()
 export class TaskService {
@@ -75,6 +76,8 @@ export class TaskService {
 
     const taskId = tasks[0].id;
 
-    return await this.repository.update(taskId, dto);
+    const upd = await this.repository.update(taskId, dto);
+
+    return TaskRto.fromEntity(upd);
   }
 }

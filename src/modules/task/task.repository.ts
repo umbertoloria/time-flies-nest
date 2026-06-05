@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository } from '../../prisma.repository';
+import { PrismaRepository, Task } from '../../prisma.repository';
 import { CreateTaskDto, UpdateCalendarDateDto } from './dto';
 
 @Injectable()
@@ -66,7 +66,7 @@ export class TaskRepository {
     });
   }
 
-  public update(taskId: number, dto: UpdateCalendarDateDto) {
+  public update(taskId: number, dto: UpdateCalendarDateDto): Promise<Task> {
     return this.repo.task.update({
       where: {
         id: taskId,

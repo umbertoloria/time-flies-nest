@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { TCalendarSDK } from '../../sdk/types';
+import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import {
@@ -102,11 +102,11 @@ export class TaskController {
     @Body() body: any,
     @Param('cid') paramCalendarId: string,
     @Param('date') date: string,
-  ): Promise<string> {
+  ): Promise<TNewDoneTask> {
     const dto = UpdateCalendarDateDto.fromBody(paramCalendarId, date, body);
 
-    await this.service.updateTaskNotesByDate(dto);
+    const updatedTask = await this.service.updateTaskNotesByDate(dto);
 
-    return 'ok';
+    return updatedTask.toTNewDoneTask();
   }
 }
