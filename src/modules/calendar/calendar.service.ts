@@ -36,6 +36,6 @@ export class CalendarService {
       throw new NotFoundException('Calendar not found');
     }
 
-    return upd;
+    return CalendarRto.fromEntity(upd);
   }
 }

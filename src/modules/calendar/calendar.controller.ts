@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -99,7 +100,7 @@ export class CalendarController {
     @Param('id') paramCalendarId: string,
     @Body() gdto: UpdateCalendarGdto,
     @CurrentUser() user: ReqUser,
-  ): Promise<string> {
+  ): Promise<TCalendarRcd> {
     const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);
 
     // BL
@@ -111,21 +112,20 @@ export class CalendarController {
         await this.todoService.areThereTodosWithNotes(dto.calendarId);
       if (areThereTodosWithNotesInCalendar) {
         // TODO: This is a leak if user is not the Calendar owner
-        return 'calendar-uses-notes-cannot-be-disabled';
+        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
       }
 
       // ... from (Done) Tasks.
       const areThereTasksWithNotesInCalendar =
         await this.taskService.areThereTasksWithNotes(dto.calendarId);
       if (areThereTasksWithNotesInCalendar) {
-        return 'calendar-uses-notes-cannot-be-disabled';
+        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
       }
     }
 
-    await this.service.updateCalendar(dto);
+    const updatedCalendar = await this.service.updateCalendar(dto);
 
-    // Response
-    return 'ok-updated';
+    return updatedCalendar.toTCalendarRcd();
   }
 
   @Get('/:id')
