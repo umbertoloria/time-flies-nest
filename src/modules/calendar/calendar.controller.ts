@@ -10,7 +10,7 @@ import {
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
-import { TCalendar, TCalendarPrev, TDay } from '../../sdk/types';
+import { TCalendar, TCalendarPrev, TCalendarRcd, TDay } from '../../sdk/types';
 import {
   AccessTokenGuard,
   CurrentUser,
@@ -86,15 +86,12 @@ export class CalendarController {
   async create(
     @Body() body: any,
     @CurrentUser() user: ReqUser,
-  ): Promise<{ id: number }> {
+  ): Promise<TCalendarRcd> {
     const dto = CreateCalendarDto.fromBody(body, user);
 
     const createdCalendar = await this.service.createCalendar(dto);
 
-    // Response
-    return {
-      id: createdCalendar.id,
-    };
+    return createdCalendar.toTCalendarRcd();
   }
 
   @Post('/:id')

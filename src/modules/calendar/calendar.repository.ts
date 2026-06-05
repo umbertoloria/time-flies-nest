@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaRepository } from '../../prisma.repository';
+import { Calendar, PrismaRepository } from '../../prisma.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 
 @Injectable()
 export class CalendarRepository {
   constructor(private readonly repo: PrismaRepository) {}
 
-  public findCalendarsFromUserIdViaSortedPin(userId: string, showAll: boolean) {
+  public findCalendarsFromUserIdViaSortedPin(
+    userId: string,
+    showAll: boolean,
+  ): Promise<Calendar[]> {
     return this.repo.calendar.findMany({
       where: {
         user_id: userId,
@@ -24,7 +27,7 @@ export class CalendarRepository {
     });
   }
 
-  public findById(calendarId: number) {
+  public findById(calendarId: number): Promise<Calendar | null> {
     return this.repo.calendar.findUnique({
       where: {
         id: calendarId,
@@ -32,7 +35,7 @@ export class CalendarRepository {
     });
   }
 
-  public create(dto: CreateCalendarDto) {
+  public create(dto: CreateCalendarDto): Promise<Calendar> {
     return this.repo.calendar.create({
       data: {
         name: dto.name,
@@ -44,7 +47,7 @@ export class CalendarRepository {
     });
   }
 
-  public update(dto: UpdateCalendarDto) {
+  public update(dto: UpdateCalendarDto): Promise<Calendar> {
     return this.repo.calendar.update({
       where: {
         id: dto.calendarId,

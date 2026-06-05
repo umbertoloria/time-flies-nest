@@ -11,7 +11,7 @@ export type TCalendar = TCalendarRcd & {
   days: TDay[];
   plannedDays?: TDay[];
 };
-type TCalendarRcd = {
+export type TCalendarRcd = {
   id: number;
   name: string;
   color: string;

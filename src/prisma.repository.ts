@@ -1,5 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from 'generated/prisma';
+import { Calendar as PrismaCalendar, PrismaClient } from 'generated/prisma';
+
+export type Calendar = PrismaCalendar;
 
 @Injectable()
 export class PrismaRepository extends PrismaClient implements OnModuleInit {
