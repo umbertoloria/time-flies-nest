@@ -22,6 +22,18 @@ export class TaskController {
     private readonly todoService: TodoService,
   ) {}
 
+  @Post()
+  async create(
+    @Body() body: any,
+    @Param('cid') paramCalendarId: string,
+  ): Promise<TNewDoneTask> {
+    const dto = CreateTaskDto.fromBody(paramCalendarId, body);
+
+    const createdTask = await this.service.createDoneTask(dto);
+
+    return createdTask.toTNewDoneTask();
+  }
+
   @Get(':date')
   async read(
     // @Body() body: any,
@@ -54,18 +66,6 @@ export class TaskController {
       doneTasks: doneTasks.map((doneTask) => doneTask.toTNewDoneTask()),
       todos: undoneTodos.map((todo) => todo.toTNewTodo()),
     };
-  }
-
-  @Post()
-  async create(
-    @Body() body: any,
-    @Param('cid') paramCalendarId: string,
-  ): Promise<TNewDoneTask> {
-    const dto = CreateTaskDto.fromBody(paramCalendarId, body);
-
-    const createdTask = await this.service.createDoneTask(dto);
-
-    return createdTask.toTNewDoneTask();
   }
 
   @Post(':date')
