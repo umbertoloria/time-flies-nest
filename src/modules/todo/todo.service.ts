@@ -16,8 +16,10 @@ export class TodoService {
     private calendarService: CalendarService,
   ) {}
 
-  findUndoneTodosByCalendars(calendarIds: number[]) {
-    return this.repository.findTodosFromCalendars(calendarIds);
+  async findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoRto[]> {
+    const todos = await this.repository.findTodosFromCalendars(calendarIds);
+
+    return todos.map(TodoRto.fromEntity);
   }
 
   async findUndoneTodosByCalendar(

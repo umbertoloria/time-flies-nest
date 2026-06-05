@@ -11,7 +11,7 @@ import {
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
-import { TCalendar, TCalendarPrev, TCalendarRcd, TDay } from '../../sdk/types';
+import { TCalendar, TCalendarPrev, TCalendarRcd } from '../../sdk/types';
 import {
   AccessTokenGuard,
   CurrentUser,
@@ -52,7 +52,7 @@ export class CalendarController {
     const mapCalendar2Todos = calendarIds.map((calendarId) => ({
       calendarId,
       todoDates: undoneTodos
-        .filter((todo) => todo.calendar_id === calendarId)
+        .filter((todo) => todo.calendarId === calendarId)
         .map((todo) => todo.date),
     }));
 
@@ -115,18 +115,10 @@ export class CalendarController {
     const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
 
     // Response
-    const plannedDays = undoneTodos.map((todo) => ({
-      date: todo.date,
-      notes: todo.notes || undefined,
-    }));
-
     return {
       ...calendar,
-      days: tasks.map<TDay>((task) => ({
-        date: task.date,
-        notes: task.notes || undefined,
-      })),
-      plannedDays,
+      days: tasks.map((task) => task.toTDayWithId()),
+      plannedDays: undoneTodos.map((todo) => todo.toTDayWithId()),
     };
   }
 

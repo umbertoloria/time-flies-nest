@@ -27,12 +27,7 @@ export class TaskService {
   async findTasksFromCalendar(calendarId: number) {
     const tasks = await this.repository.findTasksFromCalendar(calendarId);
 
-    return tasks.map((task) => ({
-      id: task.id,
-      calendar: task.calendar_id,
-      date: task.date,
-      notes: task.notes || undefined,
-    }));
+    return tasks.map(TaskRto.fromEntity);
   }
 
   async areThereTasksWithNotes(calendarId: number) {

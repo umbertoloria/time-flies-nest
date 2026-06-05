@@ -67,7 +67,7 @@ export class TodoController {
           calendars: [],
         });
       }
-      const todoCalendar = idxCalendars[todo.calendar_id]!;
+      const todoCalendar = idxCalendars[todo.calendarId]!;
       let currDateCalendarI: null | number = null;
       for (let j = 0; j < response.dates[currDateI].calendars.length; j++) {
         const v = response.dates[currDateI].calendars[j];
