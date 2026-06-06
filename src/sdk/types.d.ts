@@ -1,6 +1,6 @@
 // Types
-// 2026-06-05T21:14:12Z
-// v3.9
+// 2026-06-06T12:29:01Z
+// v3.11
 
 // Calendar
 export type TCalendarPrev = TCalendarRcd & {
@@ -83,8 +83,9 @@ export namespace TCalendarSDK {
     calendars: ReadPlannedEventsResponseCalendar[];
   };
   export type ReadPlannedEventsResponseCalendar = TCalendarRcd & {
-    todos: TNewTodo[];
     sortedPin?: number;
+    todos?: TNewTodo[];
+    doneTasks?: TNewDoneTask[];
   };
   // Read Date Response
   export type ReadDateResponse = {

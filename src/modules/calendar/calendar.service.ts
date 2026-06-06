@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Calendar } from '../../prisma.repository';
 import { CalendarRepository } from './calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarRto } from './rto';
@@ -8,11 +7,16 @@ import { CalendarRto } from './rto';
 export class CalendarService {
   constructor(private repository: CalendarRepository) {}
 
-  readCalendarIDsFromUserIdViaSortedPin(
+  async readCalendarIDsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
-  ): Promise<Calendar[]> {
-    return this.repository.findCalendarsFromUserIdViaSortedPin(userId, showAll);
+  ): Promise<CalendarRto[]> {
+    const calendars = await this.repository.findCalendarsFromUserIdViaSortedPin(
+      userId,
+      showAll,
+    );
+
+    return calendars.map(CalendarRto.fromEntity);
   }
 
   async findCalendarFromUser(calendarId: number, userId: string) {

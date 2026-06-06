@@ -63,20 +63,16 @@ export class CalendarController {
       );
 
     // Response
-    return calendars.map<TCalendarPrev>((dbCalendar) => {
+    return calendars.map<TCalendarPrev>((calendar) => {
       const doneTaskDates = mapCalendar2DoneTasks.find(
-        ({ calendarId }) => calendarId === dbCalendar.id,
+        (task) => task.calendarId === calendar.id,
       )!.dates;
       const todoDates = mapCalendar2Todos.find(
-        ({ calendarId }) => calendarId === dbCalendar.id,
+        (todo) => todo.calendarId === calendar.id,
       )!.todoDates;
 
       return {
-        id: dbCalendar.id,
-        name: dbCalendar.name,
-        color: dbCalendar.color,
-        plannedColor: dbCalendar.planned_color,
-        usesNotes: dbCalendar.uses_notes || undefined,
+        ...calendar.toTCalendarRcd(),
         doneTaskDates,
         todoDates,
       };

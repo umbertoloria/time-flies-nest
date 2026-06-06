@@ -46,55 +46,69 @@ export class TodoController {
         dto.user.id,
         true,
       );
-    const { idx: idxCalendars, ids: calendarIds } =
-      createIdxItemsAndIds(calendars);
+    const calendarIds = [...new Set(calendars.map((calendar) => calendar.id))];
 
     const undoneTodos =
       await this.service.findUndoneTodosByCalendars(calendarIds);
 
+    const doneTasks = undoneTodos.length
+      ? await this.taskService.findTasksFromCalendarsAndDate(
+          calendarIds,
+          undoneTodos[0].date,
+        )
+      : [];
+
+    const sortedDates = [
+      ...new Set([
+        ...undoneTodos.map((todo) => todo.date),
+        ...doneTasks.map((task) => task.date),
+      ]),
+    ];
+
     // Response
-    const response: TCalendarSDK.ReadPlannedEventsResponse = {
-      dates: [],
+    return {
+      dates: sortedDates.map<TCalendarSDK.ReadPlannedEventsResponseDateBox>(
+        (date) => {
+          const dateUndoneTodos = undoneTodos.filter(
+            (todo) => todo.date === date,
+          );
+          const dateDoneTasks = doneTasks.filter((task) => task.date === date);
+          const dateCalendarIds = [
+            ...new Set([
+              ...dateUndoneTodos.map((todo) => todo.calendarId),
+              ...dateDoneTasks.map((task) => task.calendarId),
+            ]),
+          ];
+          return {
+            date,
+            calendars: calendars
+              .filter((calendar) => dateCalendarIds.includes(calendar.id))
+              .map<TCalendarSDK.ReadPlannedEventsResponseCalendar>(
+                (calendar) => {
+                  const dateCalendarUndoneTodos = dateUndoneTodos.filter(
+                    (todo) => todo.calendarId === calendar.id,
+                  );
+                  const dateCalendarDoneTasks = dateDoneTasks.filter(
+                    (task) => task.calendarId === calendar.id,
+                  );
+                  return {
+                    ...calendar.toTCalendarRcd(),
+                    todos: dateCalendarUndoneTodos.length
+                      ? dateCalendarUndoneTodos.map((todo) => todo.toTNewTodo())
+                      : undefined,
+                    doneTasks: dateCalendarDoneTasks.length
+                      ? dateCalendarDoneTasks.map((task) =>
+                          task.toTNewDoneTask(),
+                        )
+                      : undefined,
+                    sortedPin: calendar.sortedPin,
+                  };
+                },
+              ),
+          };
+        },
+      ),
     };
-    let currDateI: null | number = null;
-    for (let i = 0; i < undoneTodos.length; ++i) {
-      const todo = undoneTodos[i];
-      if (currDateI === null || response.dates[currDateI].date !== todo.date) {
-        currDateI = response.dates.length;
-        response.dates.push({
-          date: todo.date,
-          calendars: [],
-        });
-      }
-      const todoCalendar = idxCalendars[todo.calendarId]!;
-      let currDateCalendarI = response.dates[currDateI].calendars.findIndex(
-        (v) => v.id === todoCalendar.id,
-      );
-      if (currDateCalendarI < 0) {
-        currDateCalendarI = response.dates[currDateI].calendars.length;
-        response.dates[currDateI].calendars.push({
-          id: todoCalendar.id,
-          name: todoCalendar.name,
-          color: todoCalendar.color,
-          plannedColor: todoCalendar.planned_color,
-          usesNotes: todoCalendar.uses_notes || undefined,
-          todos: [],
-          sortedPin: todoCalendar.sorted_pin ?? undefined,
-        });
-      }
-      response.dates[currDateI].calendars[currDateCalendarI].todos.push({
-        id: todo.id,
-        // date: todoDate,
-        notes: todo.notes || undefined,
-      });
-    }
-    response.dates.forEach((date) => {
-      date.calendars.sort(
-        (a, b) =>
-          (a.sortedPin ?? Number.MAX_VALUE) - (b.sortedPin ?? Number.MAX_VALUE),
-      );
-    });
-    return response;
   }
 
   @Post(':cid/todo')

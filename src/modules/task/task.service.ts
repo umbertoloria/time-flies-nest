@@ -24,6 +24,18 @@ export class TaskService {
     }));
   }
 
+  async findTasksFromCalendarsAndDate(
+    calendarIds: number[],
+    dateFrom: string,
+  ): Promise<TaskRto[]> {
+    const tasks = await this.repository.findTasksFromCalendarsAndDate(
+      calendarIds,
+      dateFrom,
+    );
+
+    return tasks.map(TaskRto.fromEntity);
+  }
+
   async findTasksFromCalendar(calendarId: number) {
     const tasks = await this.repository.findTasksFromCalendar(calendarId);
 
