@@ -6,7 +6,7 @@ export class TodoRto {
     public readonly id: number,
     public readonly calendarId: number,
     public readonly date: string,
-    public readonly done_date?: string,
+    public readonly doneDate?: string,
     public readonly notes?: string,
   ) {}
 

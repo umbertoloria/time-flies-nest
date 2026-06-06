@@ -127,7 +127,7 @@ export class TodoController {
     );
 
     // TODO: Verify calendar is user's
-    if (todo.done_date) {
+    if (todo.doneDate) {
       // To-do Notes can't be updated after it's Done.
       throw new BadRequestException('Todo already done');
     }
@@ -155,7 +155,7 @@ export class TodoController {
     );
 
     // TODO: Verify calendar is user's
-    if (todo.done_date) {
+    if (todo.doneDate) {
       // To-do can't be MOVED after it's Done.
       throw new BadRequestException('Todo already done');
     }
