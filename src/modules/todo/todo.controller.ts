@@ -15,7 +15,11 @@ import {
   AccessTokenGuard,
   CurrentUser,
 } from '../../lib/guards/access-token.guard';
-import { createIdxItemsAndIds } from '../../lib/idx';
+import {
+  excludeDuplicates,
+  getIds,
+  getValuesFromList,
+} from '../../lib/extract';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -46,7 +50,7 @@ export class TodoController {
         dto.user.id,
         true,
       );
-    const calendarIds = [...new Set(calendars.map((calendar) => calendar.id))];
+    const calendarIds = getIds(calendars);
 
     const undoneTodos =
       await this.service.findUndoneTodosByCalendars(calendarIds);
@@ -58,12 +62,10 @@ export class TodoController {
         )
       : [];
 
-    const sortedDates = [
-      ...new Set([
-        ...undoneTodos.map((todo) => todo.date),
-        ...doneTasks.map((task) => task.date),
-      ]),
-    ];
+    const sortedDates = excludeDuplicates([
+      ...getValuesFromList(undoneTodos, 'date'),
+      ...getValuesFromList(doneTasks, 'date'),
+    ]);
 
     // Response
     return {
@@ -73,12 +75,10 @@ export class TodoController {
             (todo) => todo.date === date,
           );
           const dateDoneTasks = doneTasks.filter((task) => task.date === date);
-          const dateCalendarIds = [
-            ...new Set([
-              ...dateUndoneTodos.map((todo) => todo.calendarId),
-              ...dateDoneTasks.map((task) => task.calendarId),
-            ]),
-          ];
+          const dateCalendarIds = excludeDuplicates([
+            ...getValuesFromList(dateUndoneTodos, 'calendarId'),
+            ...getValuesFromList(dateDoneTasks, 'calendarId'),
+          ]);
           return {
             date,
             calendars: calendars
@@ -93,6 +93,7 @@ export class TodoController {
                   );
                   return {
                     ...calendar.toTCalendarRcd(),
+                    sortedPin: calendar.sortedPin,
                     todos: dateCalendarUndoneTodos.length
                       ? dateCalendarUndoneTodos.map((todo) => todo.toTNewTodo())
                       : undefined,
@@ -101,7 +102,6 @@ export class TodoController {
                           task.toTNewDoneTask(),
                         )
                       : undefined,
-                    sortedPin: calendar.sortedPin,
                   };
                 },
               ),
