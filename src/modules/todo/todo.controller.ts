@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { calendarService } from '../calendar/core/calendar.service';
-import { TodoService } from './todo.service';
+import { todoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../sdk/types';
 import {
@@ -32,10 +32,7 @@ import { CreateTaskDto } from '../task/dto';
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars')
 export class TodoController {
-  constructor(
-    private service: TodoService,
-    private taskService: TaskService,
-  ) {}
+  constructor(private taskService: TaskService) {}
 
   @Get('streamline')
   async readStreamline(
@@ -52,7 +49,7 @@ export class TodoController {
     const calendarIds = getIds(calendars);
 
     const undoneTodos =
-      await this.service.findUndoneTodosByCalendars(calendarIds);
+      await todoService.findUndoneTodosByCalendars(calendarIds);
 
     const doneTasks = undoneTodos.length
       ? await this.taskService.findTasksFromCalendarsAndDate(
@@ -118,7 +115,7 @@ export class TodoController {
   ): Promise<TNewTodo> {
     const dto = CreateTodoDto.fromBody(urlCid, body, user);
 
-    const insTodo = await this.service.createTodo(dto);
+    const insTodo = await todoService.createTodo(dto);
     console.log('created', insTodo);
 
     return insTodo.toTNewTodo();
@@ -134,7 +131,7 @@ export class TodoController {
     const dto = UpdateTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const todo = await this.service.findTodoFromCalendar(
+    const todo = await todoService.findTodoFromCalendar(
       dto.calendarId,
       dto.todoId,
     );
@@ -145,7 +142,7 @@ export class TodoController {
       throw new BadRequestException('Todo already done');
     }
 
-    const updTodo = await this.service.updateTodoNotes(dto);
+    const updTodo = await todoService.updateTodoNotes(dto);
     console.log('updated', updTodo);
 
     // Response
@@ -162,7 +159,7 @@ export class TodoController {
     const dto = MoveTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const todo = await this.service.findTodoFromCalendar(
+    const todo = await todoService.findTodoFromCalendar(
       dto.calendarId,
       dto.todoId,
     );
@@ -174,7 +171,7 @@ export class TodoController {
     }
 
     if (todo.date !== dto.date) {
-      const updTodo = await this.service.moveTodo(dto);
+      const updTodo = await todoService.moveTodo(dto);
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
 
@@ -196,7 +193,7 @@ export class TodoController {
     const dto = UpdateDoneTodoDto.fromBody(urlCid, urlTid, body, user);
 
     // BL
-    const updTodo = await this.service.updateTodoSetAsDone(dto);
+    const updTodo = await todoService.updateTodoSetAsDone(dto);
 
     const createTaskDto = CreateTaskDto.fromTodoSetAsDone(updTodo);
     const createdDoneTask =

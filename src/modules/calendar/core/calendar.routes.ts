@@ -7,15 +7,12 @@ import {
 } from './dto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { calendarService } from './calendar.service';
-import { TodoService } from '../../todo/todo.service';
+import { todoService } from '../../todo/todo.service';
 import { TaskService } from '../../task/task.service';
 import { TCalendarPrev } from '../../../sdk/types';
 
 export class CalendarRoutes {
-  constructor(
-    private todoService: TodoService,
-    private taskService: TaskService,
-  ) {}
+  constructor(private taskService: TaskService) {}
 
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = ReadCalendarsDto.fromGateway(gdto, user);
@@ -29,7 +26,7 @@ export class CalendarRoutes {
     const calendarIds = calendars.map((calendar) => calendar.id);
 
     const undoneTodos =
-      await this.todoService.findUndoneTodosByCalendars(calendarIds);
+      await todoService.findUndoneTodosByCalendars(calendarIds);
     const mapCalendar2Todos = calendarIds.map((calendarId) => ({
       calendarId,
       todoDates: undoneTodos
@@ -77,7 +74,7 @@ export class CalendarRoutes {
       dto.user.id,
     );
 
-    const undoneTodos = await this.todoService.findUndoneTodosByCalendars([
+    const undoneTodos = await todoService.findUndoneTodosByCalendars([
       calendar.id,
     ]);
 
@@ -104,7 +101,7 @@ export class CalendarRoutes {
 
       // ... from Todos.
       const areThereTodosWithNotesInCalendar =
-        await this.todoService.areThereTodosWithNotes(dto.calendarId);
+        await todoService.areThereTodosWithNotes(dto.calendarId);
       if (areThereTodosWithNotesInCalendar) {
         // TODO: This is a leak if user is not the Calendar owner
         throw new CalendarUsesNotesCannotBeDisabledError();

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { calendarService } from '../calendar/core/calendar.service';
-import { TodoService } from '../todo/todo.service';
+import { todoService } from '../todo/todo.service';
 import {
   AccessTokenGuard,
   CurrentUser,
@@ -12,10 +12,7 @@ import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars/:cid/date')
 export class TaskController {
-  constructor(
-    private readonly service: TaskService,
-    private readonly todoService: TodoService,
-  ) {}
+  constructor(private readonly service: TaskService) {}
 
   @Post()
   async create(
@@ -45,7 +42,7 @@ export class TaskController {
       dto.user.id,
     );
 
-    const undoneTodos = await this.todoService.findUndoneTodosByCalendar(
+    const undoneTodos = await todoService.findUndoneTodosByCalendar(
       calendar.id,
       dto.date,
     );

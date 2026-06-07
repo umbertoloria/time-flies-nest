@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { TodoNotFoundError } from './core/errors';
 import { calendarService } from '../calendar/core/calendar.service';
 import { todoRepository } from './todo.repository';
 import {
@@ -9,8 +9,7 @@ import {
 } from './dto';
 import { TodoRto } from './rto';
 
-@Injectable()
-export class TodoService {
+class TodoService {
   async findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoRto[]> {
     const todos = await todoRepository.findTodosFromCalendars(calendarIds);
 
@@ -33,7 +32,7 @@ export class TodoService {
     const todo = await todoRepository.findById(todoId);
 
     if (!todo || todo.calendar_id !== calendarId) {
-      throw new NotFoundException('Todo not found');
+      throw new TodoNotFoundError();
     }
 
     return TodoRto.fromEntity(todo);
@@ -58,7 +57,7 @@ export class TodoService {
     const upd = await todoRepository.updateNotes(dto);
 
     if (typeof upd !== 'object') {
-      throw new NotFoundException('Todo not found');
+      throw new TodoNotFoundError();
     }
 
     return TodoRto.fromEntity(upd);
@@ -68,7 +67,7 @@ export class TodoService {
     const upd = await todoRepository.updateDate(dto);
 
     if (typeof upd !== 'object') {
-      throw new NotFoundException('Todo not found');
+      throw new TodoNotFoundError();
     }
 
     return TodoRto.fromEntity(upd);
@@ -84,9 +83,11 @@ export class TodoService {
     const upd = await todoRepository.updateTodoDoneDate(todo.id, doneDate, dto);
 
     if (typeof upd !== 'object') {
-      throw new NotFoundException('Todo not found');
+      throw new TodoNotFoundError();
     }
 
     return TodoRto.fromEntity(upd);
   }
 }
+
+export const todoService = new TodoService();

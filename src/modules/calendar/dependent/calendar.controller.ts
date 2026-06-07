@@ -28,11 +28,8 @@ import { CalendarRoutes } from '../core/calendar.routes';
 export class CalendarController {
   private routes: CalendarRoutes;
 
-  constructor(
-    private todoService: TodoService,
-    private taskService: TaskService,
-  ) {
-    this.routes = new CalendarRoutes(this.todoService, this.taskService);
+  constructor(private taskService: TaskService) {
+    this.routes = new CalendarRoutes(this.taskService);
   }
 
   @Get()
