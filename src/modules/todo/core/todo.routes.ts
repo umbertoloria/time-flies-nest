@@ -1,40 +1,25 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import { calendarService } from '../calendar/core/calendar.service';
-import { todoService } from './core/todo.service';
-import { taskService } from '../task/core/task.service';
-import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../sdk/types';
-import {
-  AccessTokenGuard,
-  CurrentUser,
-} from '../../lib/guards/access-token.guard';
+import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../../sdk/types';
 import {
   excludeDuplicates,
   getIds,
   getValuesFromList,
-} from '../../lib/extract';
-import { CreateTaskDto } from '../task/core/dto';
+} from '../../../lib/extract';
+import { calendarService } from '../../calendar/core/calendar.service';
+import { taskService } from '../../task/core/task.service';
+import { CreateTaskDto } from '../../task/core/dto';
 import {
   CreateTodoDto,
   MoveTodoDto,
   ReadStreamlineDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
-} from './core/dto';
+} from './dto';
+import { todoService } from './todo.service';
+import { TodoAlreadyDoneError } from './errors';
 
-@UseGuards(AccessTokenGuard)
-@Controller('/calendars')
-export class TodoController {
-  @Get('streamline')
+class TodoRoutes {
   async readStreamline(
-    @CurrentUser() user: ReqUser,
+    user: ReqUser,
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
     const dto = ReadStreamlineDto.fromBody(user);
 
@@ -105,13 +90,12 @@ export class TodoController {
     };
   }
 
-  @Post(':cid/todo')
   async create(
-    @Body() body: any,
-    @Param('cid') urlCid: string,
-    @CurrentUser() user: ReqUser,
+    paramCalendarId: string,
+    body: any,
+    user: ReqUser,
   ): Promise<TNewTodo> {
-    const dto = CreateTodoDto.fromBody(urlCid, body, user);
+    const dto = CreateTodoDto.fromBody(paramCalendarId, body, user);
 
     const insTodo = await todoService.createTodo(dto);
     console.log('created', insTodo);
@@ -119,14 +103,18 @@ export class TodoController {
     return insTodo.toTNewTodo();
   }
 
-  @Post('/:cid/todo/:tid/update-notes')
   async updateTodoNotes(
-    @Body() body: any,
-    @Param('cid') urlCid: string,
-    @Param('tid') urlTid: string,
-    @CurrentUser() user: ReqUser,
+    paramCalendarId: string,
+    paramTodoId: string,
+    body: any,
+    user: ReqUser,
   ): Promise<TNewTodo> {
-    const dto = UpdateTodoDto.fromBody(urlCid, urlTid, body, user);
+    const dto = UpdateTodoDto.fromBody(
+      paramCalendarId,
+      paramTodoId,
+      body,
+      user,
+    );
 
     // BL
     const todo = await todoService.findTodoFromCalendar(
@@ -137,7 +125,7 @@ export class TodoController {
     // TODO: Verify calendar is user's
     if (todo.doneDate) {
       // To-do Notes can't be updated after it's Done.
-      throw new BadRequestException('Todo already done');
+      throw new TodoAlreadyDoneError();
     }
 
     const updTodo = await todoService.updateTodoNotes(dto);
@@ -147,14 +135,13 @@ export class TodoController {
     return updTodo.toTNewTodo();
   }
 
-  @Post('/:cid/todo/:tid/move')
   async moveTodo(
-    @Body() body: any,
-    @Param('cid') urlCid: string,
-    @Param('tid') urlTid: string,
-    @CurrentUser() user: ReqUser,
+    paramCalendarId: string,
+    paramTodoId: string,
+    body: any,
+    user: ReqUser,
   ): Promise<TNewTodo> {
-    const dto = MoveTodoDto.fromBody(urlCid, urlTid, body, user);
+    const dto = MoveTodoDto.fromBody(paramCalendarId, paramTodoId, body, user);
 
     // BL
     const todo = await todoService.findTodoFromCalendar(
@@ -165,7 +152,7 @@ export class TodoController {
     // TODO: Verify calendar is user's
     if (todo.doneDate) {
       // To-do can't be MOVED after it's Done.
-      throw new BadRequestException('Todo already done');
+      throw new TodoAlreadyDoneError();
     }
 
     if (todo.date !== dto.date) {
@@ -181,14 +168,18 @@ export class TodoController {
     return todo.toTNewTodo();
   }
 
-  @Post('/:cid/todo/:tid/set-as-done')
   async updateTodoSetAsDone(
-    @Body() body: any,
-    @Param('cid') urlCid: string,
-    @Param('tid') urlTid: string,
-    @CurrentUser() user: ReqUser,
+    paramCalendarId: string,
+    paramTodoId: string,
+    body: any,
+    user: ReqUser,
   ): Promise<TNewDoneTask> {
-    const dto = UpdateDoneTodoDto.fromBody(urlCid, urlTid, body, user);
+    const dto = UpdateDoneTodoDto.fromBody(
+      paramCalendarId,
+      paramTodoId,
+      body,
+      user,
+    );
 
     // BL
     const updTodo = await todoService.updateTodoSetAsDone(dto);
@@ -199,3 +190,5 @@ export class TodoController {
     return createdDoneTask.toTNewDoneTask();
   }
 }
+
+export const todoRoutes = new TodoRoutes();

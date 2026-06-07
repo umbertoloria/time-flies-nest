@@ -5,3 +5,11 @@ export class TodoNotFoundError extends Error {
   }
 }
 // throw new NotFoundException('Todo not found');
+
+export class TodoAlreadyDoneError extends Error {
+  constructor() {
+    super('Todo already done');
+    this.name = 'TodoAlreadyDoneError';
+  }
+}
+// throw new BadRequestException('Todo already done');

@@ -13,9 +13,12 @@ export class CreateTodoDto {
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(urlCid: string, body: any, user: ReqUser) {
+  static fromBody(paramCalendarId: string, body: any, user: ReqUser) {
     // Validation
-    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
+    const calendarId = fromBodyValidateInt(
+      paramCalendarId,
+      'Invalid CalendarID',
+    );
     const date = fromBodyGetRequiredLocalDate(body, 'date');
     // TODO: Validate "date"
     const notes = fromBodyGetOptionalString(body, 'notes');

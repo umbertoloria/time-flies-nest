@@ -12,10 +12,18 @@ export class UpdateTodoDto {
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(urlCid: string, urlTid: string, body: any, user: ReqUser) {
+  static fromBody(
+    paramCalendarId: string,
+    paramTodoId: string,
+    body: any,
+    user: ReqUser,
+  ) {
     // Validation
-    const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
-    const todoId = fromBodyValidateInt(urlTid, 'Invalid TodoID');
+    const calendarId = fromBodyValidateInt(
+      paramCalendarId,
+      'Invalid CalendarID',
+    );
+    const todoId = fromBodyValidateInt(paramTodoId, 'Invalid TodoID');
     const notes = fromBodyGetOptionalString(body, 'notes');
 
     return new UpdateTodoDto(

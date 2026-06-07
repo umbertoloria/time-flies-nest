@@ -1,5 +1,5 @@
 import { calendarService } from '../../calendar/core/calendar.service';
-import { todoRepository } from '../todo.repository';
+import { todoRepository } from '../dependent/todo.repository';
 import { TodoRto } from '../dependent/rto';
 import {
   CreateTodoDto,

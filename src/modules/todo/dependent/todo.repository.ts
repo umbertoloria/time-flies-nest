@@ -1,10 +1,10 @@
-import { prisma, Todo } from '../../prisma.repository';
+import { prisma, Todo } from '../../../prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
-} from './core/dto';
+} from '../core/dto';
 
 class TodoRepository {
   public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {
