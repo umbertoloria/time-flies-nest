@@ -4,7 +4,6 @@ import { CalendarController } from './modules/calendar/dependent/calendar.contro
 import { TaskController } from './modules/task/task.controller';
 import { TodoController } from './modules/todo/todo.controller';
 import { TaskService } from './modules/task/task.service';
-import { TaskRepository } from './modules/task/task.repository';
 
 @Module({
   imports: [
@@ -19,7 +18,6 @@ import { TaskRepository } from './modules/task/task.repository';
   ],
   providers: [
     //
-    TaskRepository,
     TaskService,
   ],
 })

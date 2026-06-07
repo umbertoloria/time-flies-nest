@@ -1,15 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TaskRepository } from './task.repository';
+import { taskRepository } from './task.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { isFirstOne } from '../../lib/list';
 import { TaskRto } from './rto';
 
 @Injectable()
 export class TaskService {
-  constructor(private readonly repository: TaskRepository) {}
-
   async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
-    const allTasks = await this.repository.findTasksFromCalendarsAndDate(
+    const allTasks = await taskRepository.findTasksFromCalendarsAndDate(
       calendarIds,
       dateFrom,
     );
@@ -28,7 +26,7 @@ export class TaskService {
     calendarIds: number[],
     dateFrom: string,
   ): Promise<TaskRto[]> {
-    const tasks = await this.repository.findTasksFromCalendarsAndDate(
+    const tasks = await taskRepository.findTasksFromCalendarsAndDate(
       calendarIds,
       dateFrom,
     );
@@ -37,14 +35,14 @@ export class TaskService {
   }
 
   async findTasksFromCalendar(calendarId: number) {
-    const tasks = await this.repository.findTasksFromCalendar(calendarId);
+    const tasks = await taskRepository.findTasksFromCalendar(calendarId);
 
     return tasks.map(TaskRto.fromEntity);
   }
 
   async areThereTasksWithNotes(calendarId: number) {
     const count =
-      await this.repository.countTasksWithNotesFromCalendar(calendarId);
+      await taskRepository.countTasksWithNotesFromCalendar(calendarId);
 
     return count > 0;
   }
@@ -53,7 +51,7 @@ export class TaskService {
     calendarId: number,
     date: string,
   ): Promise<TaskRto[]> {
-    const tasks = await this.repository.findTaskFromCalendarAndDate(
+    const tasks = await taskRepository.findTaskFromCalendarAndDate(
       calendarId,
       date,
     );
@@ -64,19 +62,19 @@ export class TaskService {
   }
 
   async createDoneTask(dto: CreateTaskDto) {
-    const task = await this.repository.create(dto);
+    const task = await taskRepository.create(dto);
 
     return TaskRto.fromEntity(task);
   }
 
   async updateTaskNotesByDate(dto: UpdateTaskDto) {
-    const task = await this.repository.findTask(dto.calendarId, dto.taskId);
+    const task = await taskRepository.findTask(dto.calendarId, dto.taskId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
     }
 
-    const upd = await this.repository.update(dto);
+    const upd = await taskRepository.update(dto);
 
     return TaskRto.fromEntity(upd);
   }

@@ -1,7 +1,7 @@
 import { prisma, Task } from '../../prisma.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 
-export class TaskRepository {
+class TaskRepository {
   public findTask(calendarId: number, taskId: number): Promise<Task | null> {
     return prisma.task.findUnique({
       where: {
@@ -86,3 +86,5 @@ export class TaskRepository {
     });
   }
 }
+
+export const taskRepository = new TaskRepository();
