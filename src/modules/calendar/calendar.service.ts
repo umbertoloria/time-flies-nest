@@ -1,7 +1,7 @@
-import { NotFoundException } from '@nestjs/common';
 import { CalendarRepository } from './calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarRto } from './rto';
+import { CalendarNotFoundError } from './core/errors';
 
 export class CalendarService {
   constructor(private repository: CalendarRepository) {}
@@ -22,7 +22,7 @@ export class CalendarService {
     const calendar = await this.repository.findById(calendarId);
 
     if (!calendar || calendar.user_id !== userId) {
-      throw new NotFoundException('Calendar not found');
+      throw new CalendarNotFoundError();
     }
 
     return CalendarRto.fromEntity(calendar);
@@ -40,7 +40,7 @@ export class CalendarService {
     const upd = await this.repository.update(dto);
 
     if (typeof upd !== 'object') {
-      throw new NotFoundException('Calendar not found');
+      throw new CalendarNotFoundError();
     }
 
     return CalendarRto.fromEntity(upd);
