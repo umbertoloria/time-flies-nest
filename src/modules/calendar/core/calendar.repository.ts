@@ -1,7 +1,7 @@
-import { Calendar, prisma } from '../../prisma.repository';
-import { CreateCalendarDto, UpdateCalendarDto } from './core/dto';
+import { Calendar, prisma } from '../../../prisma.repository';
+import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 
-export class CalendarRepository {
+class CalendarRepository {
   public findCalendarsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
@@ -57,3 +57,5 @@ export class CalendarRepository {
     });
   }
 }
+
+export const calendarRepository = new CalendarRepository();

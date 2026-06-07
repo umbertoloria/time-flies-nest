@@ -1,25 +1,24 @@
-import { CalendarRepository } from '../calendar.repository';
 import { CalendarRto } from '../rto';
+import { calendarRepository } from './calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
 
 export class CalendarService {
-  constructor(private repository: CalendarRepository) {}
-
   async readCalendarIDsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
   ): Promise<CalendarRto[]> {
-    const calendars = await this.repository.findCalendarsFromUserIdViaSortedPin(
-      userId,
-      showAll,
-    );
+    const calendars =
+      await calendarRepository.findCalendarsFromUserIdViaSortedPin(
+        userId,
+        showAll,
+      );
 
     return calendars.map(CalendarRto.fromEntity);
   }
 
   async findCalendarFromUser(calendarId: number, userId: string) {
-    const calendar = await this.repository.findById(calendarId);
+    const calendar = await calendarRepository.findById(calendarId);
 
     if (!calendar || calendar.user_id !== userId) {
       throw new CalendarNotFoundError();
@@ -29,7 +28,7 @@ export class CalendarService {
   }
 
   async createCalendar(dto: CreateCalendarDto) {
-    const calendar = await this.repository.create(dto);
+    const calendar = await calendarRepository.create(dto);
 
     return CalendarRto.fromEntity(calendar);
   }
@@ -37,7 +36,7 @@ export class CalendarService {
   async updateCalendar(dto: UpdateCalendarDto) {
     await this.findCalendarFromUser(dto.calendarId, dto.user.id);
 
-    const upd = await this.repository.update(dto);
+    const upd = await calendarRepository.update(dto);
 
     if (typeof upd !== 'object') {
       throw new CalendarNotFoundError();

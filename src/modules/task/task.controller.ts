@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { CalendarService } from '../calendar/core/calendar.service';
-import { CalendarRepository } from '../calendar/calendar.repository';
 import { TodoService } from '../todo/todo.service';
 import {
   AccessTokenGuard,
@@ -17,10 +16,9 @@ export class TaskController {
 
   constructor(
     private readonly service: TaskService,
-    private calendarRepository: CalendarRepository,
     private readonly todoService: TodoService,
   ) {
-    this.calendarService = new CalendarService(this.calendarRepository);
+    this.calendarService = new CalendarService();
   }
 
   @Post()

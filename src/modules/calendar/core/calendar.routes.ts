@@ -1,15 +1,15 @@
-import { ReadCalendarsGdto, UpdateCalendarGdto } from './core/gdto';
+import { ReadCalendarsGdto, UpdateCalendarGdto } from './gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
   ReadCalendarsDto,
   UpdateCalendarDto,
-} from './core/dto';
-import { CalendarUsesNotesCannotBeDisabledError } from './core/errors';
-import { CalendarService } from './core/calendar.service';
-import { TodoService } from '../todo/todo.service';
-import { TaskService } from '../task/task.service';
-import { TCalendarPrev } from '../../sdk/types';
+} from './dto';
+import { CalendarUsesNotesCannotBeDisabledError } from './errors';
+import { CalendarService } from './calendar.service';
+import { TodoService } from '../../todo/todo.service';
+import { TaskService } from '../../task/task.service';
+import { TCalendarPrev } from '../../../sdk/types';
 
 export class CalendarRoutes {
   constructor(
