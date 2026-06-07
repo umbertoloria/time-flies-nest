@@ -1,4 +1,4 @@
-import { CreateCalendarDto, ReadCalendarsDto } from './dto';
+import { CreateCalendarDto, ReadCalendarDto, ReadCalendarsDto } from './dto';
 import { ReadCalendarsGdto } from './gdto';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
@@ -60,5 +60,28 @@ export class CalendarRoutes {
     const createdCalendar = await this.service.createCalendar(dto);
 
     return createdCalendar.toTCalendarRcd();
+  }
+
+  async read(paramCalendarId: string, user: ReqUser) {
+    const dto = ReadCalendarDto.fromParam(paramCalendarId, user);
+
+    // BL
+    const calendar = await this.service.findCalendarFromUser(
+      dto.calendarId,
+      dto.user.id,
+    );
+
+    const undoneTodos = await this.todoService.findUndoneTodosByCalendars([
+      calendar.id,
+    ]);
+
+    const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
+
+    // Response
+    return {
+      ...calendar,
+      days: tasks.map((task) => task.toTDayWithId()),
+      plannedDays: undoneTodos.map((todo) => todo.toTDayWithId()),
+    };
   }
 }

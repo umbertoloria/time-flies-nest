@@ -61,30 +61,11 @@ export class CalendarController {
   }
 
   @Get('/:id')
-  async read(
+  read(
     @Param('id') paramCalendarId: string,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendar> {
-    const dto = ReadCalendarDto.fromParam(paramCalendarId, user);
-
-    // BL
-    const calendar = await this.service.findCalendarFromUser(
-      dto.calendarId,
-      dto.user.id,
-    );
-
-    const undoneTodos = await this.todoService.findUndoneTodosByCalendars([
-      calendar.id,
-    ]);
-
-    const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
-
-    // Response
-    return {
-      ...calendar,
-      days: tasks.map((task) => task.toTDayWithId()),
-      plannedDays: undoneTodos.map((todo) => todo.toTDayWithId()),
-    };
+    return this.routes.read(paramCalendarId, user);
   }
 
   @Post('/:id')
