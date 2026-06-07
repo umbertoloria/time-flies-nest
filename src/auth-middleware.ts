@@ -1,5 +1,7 @@
 import { IncomingHttpHeaders } from 'http';
 
+import 'dotenv/config';
+
 export const JWT_JWKS_URI = process.env.JWT_JWKS_URI!;
 export const JWT_ISSUER = process.env.JWT_ISSUER!;
 export const JWT_AUDIENCE = process.env.JWT_AUDIENCE!;

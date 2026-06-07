@@ -11,7 +11,7 @@ import { todoService } from '../../todo/todo.service';
 import { taskService } from '../../task/task.service';
 import { TCalendarPrev } from '../../../sdk/types';
 
-export class CalendarRoutes {
+class CalendarRoutes {
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = ReadCalendarsDto.fromGateway(gdto, user);
 
@@ -117,3 +117,5 @@ export class CalendarRoutes {
     return updatedCalendar.toTCalendarRcd();
   }
 }
+
+export const calendarRoutes = new CalendarRoutes();

@@ -19,20 +19,18 @@ import {
   UpdateCalendarGdto,
   UpdateCalendarGdtoSchema,
 } from './gdto';
-import { CalendarRoutes } from '../core/calendar.routes';
+import { calendarRoutes } from '../core/calendar.routes';
 
 @UseGuards(AccessTokenGuard)
 @Controller('calendars')
 export class CalendarController {
-  private routes = new CalendarRoutes();
-
   @Get()
   readAll(
     @Query(new ZodValidationPipe(ReadCalendarsGdtoSchema))
     gdto: ReadCalendarsGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarPrev[]> {
-    return this.routes.readAll(gdto, user);
+    return calendarRoutes.readAll(gdto, user);
   }
 
   @Post()
@@ -40,7 +38,7 @@ export class CalendarController {
     @Body() body: any,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarRcd> {
-    return this.routes.create(body, user);
+    return calendarRoutes.create(body, user);
   }
 
   @Get('/:id')
@@ -48,7 +46,7 @@ export class CalendarController {
     @Param('id') paramCalendarId: string,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendar> {
-    return this.routes.read(paramCalendarId, user);
+    return calendarRoutes.read(paramCalendarId, user);
   }
 
   @Post('/:id')
@@ -58,6 +56,6 @@ export class CalendarController {
     gdto: UpdateCalendarGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarRcd> {
-    return this.routes.update(paramCalendarId, gdto, user);
+    return calendarRoutes.update(paramCalendarId, gdto, user);
   }
 }
