@@ -6,7 +6,7 @@ import {
   UpdateTodoDto,
 } from './dto';
 
-export class TodoRepository {
+class TodoRepository {
   public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {
     return prisma.todo.findMany({
       where: {
@@ -110,3 +110,5 @@ export class TodoRepository {
     });
   }
 }
+
+export const todoRepository = new TodoRepository();

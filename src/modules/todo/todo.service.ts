@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { calendarService } from '../calendar/core/calendar.service';
-import { TodoRepository } from './todo.repository';
+import { todoRepository } from './todo.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -11,10 +11,8 @@ import { TodoRto } from './rto';
 
 @Injectable()
 export class TodoService {
-  constructor(private repository: TodoRepository) {}
-
   async findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoRto[]> {
-    const todos = await this.repository.findTodosFromCalendars(calendarIds);
+    const todos = await todoRepository.findTodosFromCalendars(calendarIds);
 
     return todos.map(TodoRto.fromEntity);
   }
@@ -23,7 +21,7 @@ export class TodoService {
     calendarId: number,
     filterDate: string,
   ): Promise<TodoRto[]> {
-    const undoneTodos = await this.repository.findUndoneTodosByCalendar(
+    const undoneTodos = await todoRepository.findUndoneTodosByCalendar(
       calendarId,
       filterDate,
     );
@@ -32,7 +30,7 @@ export class TodoService {
   }
 
   async findTodoFromCalendar(calendarId: number, todoId: number) {
-    const todo = await this.repository.findById(todoId);
+    const todo = await todoRepository.findById(todoId);
 
     if (!todo || todo.calendar_id !== calendarId) {
       throw new NotFoundException('Todo not found');
@@ -43,7 +41,7 @@ export class TodoService {
 
   async areThereTodosWithNotes(calendarId: number) {
     const count =
-      await this.repository.countTodosWithNotesFromCalendar(calendarId);
+      await todoRepository.countTodosWithNotesFromCalendar(calendarId);
 
     return count > 0;
   }
@@ -51,13 +49,13 @@ export class TodoService {
   async createTodo(dto: CreateTodoDto) {
     await calendarService.findCalendarFromUser(dto.calendarId, dto.user.id);
 
-    const created = await this.repository.create(dto);
+    const created = await todoRepository.create(dto);
 
     return TodoRto.fromEntity(created);
   }
 
   async updateTodoNotes(dto: UpdateTodoDto) {
-    const upd = await this.repository.updateNotes(dto);
+    const upd = await todoRepository.updateNotes(dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Todo not found');
@@ -67,7 +65,7 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto) {
-    const upd = await this.repository.updateDate(dto);
+    const upd = await todoRepository.updateDate(dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Todo not found');
@@ -83,11 +81,7 @@ export class TodoService {
 
     const doneDate = todo.date; // Always using the To-do Date as "default".
 
-    const upd = await this.repository.updateTodoDoneDate(
-      todo.id,
-      doneDate,
-      dto,
-    );
+    const upd = await todoRepository.updateTodoDoneDate(todo.id, doneDate, dto);
 
     if (typeof upd !== 'object') {
       throw new NotFoundException('Todo not found');

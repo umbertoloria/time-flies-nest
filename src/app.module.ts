@@ -5,7 +5,6 @@ import { TaskController } from './modules/task/task.controller';
 import { TodoController } from './modules/todo/todo.controller';
 import { TaskService } from './modules/task/task.service';
 import { TodoService } from './modules/todo/todo.service';
-import { TodoRepository } from './modules/todo/todo.repository';
 import { TaskRepository } from './modules/task/task.repository';
 
 @Module({
@@ -23,7 +22,6 @@ import { TaskRepository } from './modules/task/task.repository';
     //
     TaskRepository,
     TaskService,
-    TodoRepository,
     TodoService,
   ],
 })
