@@ -1,4 +1,4 @@
-import { ReadCalendarsDto } from './dto';
+import { CreateCalendarDto, ReadCalendarsDto } from './dto';
 import { ReadCalendarsGdto } from './gdto';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
@@ -52,5 +52,13 @@ export class CalendarRoutes {
         todoDates,
       };
     });
+  }
+
+  async create(body: any, user: ReqUser) {
+    const dto = CreateCalendarDto.fromBody(body, user);
+
+    const createdCalendar = await this.service.createCalendar(dto);
+
+    return createdCalendar.toTCalendarRcd();
   }
 }

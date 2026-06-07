@@ -23,11 +23,7 @@ import {
   UpdateCalendarGdto,
   UpdateCalendarGdtoSchema,
 } from './gdto';
-import {
-  CreateCalendarDto,
-  ReadCalendarDto,
-  UpdateCalendarDto,
-} from './dto';
+import { ReadCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarRoutes } from './calendar.routes';
 
 @UseGuards(AccessTokenGuard)
@@ -48,7 +44,7 @@ export class CalendarController {
   }
 
   @Get()
-  async readAll(
+  readAll(
     @Query(new ZodValidationPipe(ReadCalendarsGdtoSchema))
     gdto: ReadCalendarsGdto,
     @CurrentUser() user: ReqUser,
@@ -57,15 +53,11 @@ export class CalendarController {
   }
 
   @Post()
-  async create(
+  create(
     @Body() body: any,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarRcd> {
-    const dto = CreateCalendarDto.fromBody(body, user);
-
-    const createdCalendar = await this.service.createCalendar(dto);
-
-    return createdCalendar.toTCalendarRcd();
+    return this.routes.create(body, user);
   }
 
   @Get('/:id')
