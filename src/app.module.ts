@@ -5,7 +5,6 @@ import { TaskController } from './modules/task/task.controller';
 import { TodoController } from './modules/todo/todo.controller';
 import { PrismaRepository } from './prisma.repository';
 import { TaskService } from './modules/task/task.service';
-import { CalendarService } from './modules/calendar/calendar.service';
 import { TodoService } from './modules/todo/todo.service';
 import { CalendarRepository } from './modules/calendar/calendar.repository';
 import { TodoRepository } from './modules/todo/todo.repository';
@@ -27,7 +26,6 @@ import { TaskRepository } from './modules/task/task.repository';
     TaskRepository,
     TaskService,
     CalendarRepository,
-    CalendarService,
     TodoRepository,
     TodoService,
   ],

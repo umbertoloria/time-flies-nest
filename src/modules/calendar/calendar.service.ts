@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { CalendarRepository } from './calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarRto } from './rto';
 
-@Injectable()
 export class CalendarService {
   constructor(private repository: CalendarRepository) {}
 

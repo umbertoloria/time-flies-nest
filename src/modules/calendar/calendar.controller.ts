@@ -23,6 +23,7 @@ import {
   UpdateCalendarGdtoSchema,
 } from './gdto';
 import { CalendarRoutes } from './calendar.routes';
+import { CalendarRepository } from './calendar.repository';
 
 @UseGuards(AccessTokenGuard)
 @Controller('calendars')
@@ -30,12 +31,12 @@ export class CalendarController {
   private routes: CalendarRoutes;
 
   constructor(
-    private service: CalendarService,
+    private calendarRepository: CalendarRepository,
     private todoService: TodoService,
     private taskService: TaskService,
   ) {
     this.routes = new CalendarRoutes(
-      this.service,
+      new CalendarService(this.calendarRepository),
       this.todoService,
       this.taskService,
     );

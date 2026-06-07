@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CalendarService } from '../calendar/calendar.service';
+import { CalendarRepository } from '../calendar/calendar.repository';
 import { TodoRepository } from './todo.repository';
 import {
   CreateTodoDto,
@@ -11,10 +12,14 @@ import { TodoRto } from './rto';
 
 @Injectable()
 export class TodoService {
+  private calendarService: CalendarService;
+
   constructor(
     private repository: TodoRepository,
-    private calendarService: CalendarService,
-  ) {}
+    private calendarRepository: CalendarRepository,
+  ) {
+    this.calendarService = new CalendarService(this.calendarRepository);
+  }
 
   async findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoRto[]> {
     const todos = await this.repository.findTodosFromCalendars(calendarIds);

@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { CalendarService } from '../calendar/calendar.service';
+import { CalendarRepository } from '../calendar/calendar.repository';
 import { TodoService } from '../todo/todo.service';
 import {
   AccessTokenGuard,
@@ -12,11 +13,15 @@ import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars/:cid/date')
 export class TaskController {
+  private calendarService: CalendarService;
+
   constructor(
     private readonly service: TaskService,
-    private readonly calendarService: CalendarService,
+    private calendarRepository: CalendarRepository,
     private readonly todoService: TodoService,
-  ) {}
+  ) {
+    this.calendarService = new CalendarService(this.calendarRepository);
+  }
 
   @Post()
   async create(

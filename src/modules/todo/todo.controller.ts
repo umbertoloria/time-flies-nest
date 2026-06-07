@@ -28,15 +28,20 @@ import {
   UpdateTodoDto,
 } from './dto';
 import { CreateTaskDto } from '../task/dto';
+import { CalendarRepository } from '../calendar/calendar.repository';
 
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars')
 export class TodoController {
+  private calendarService: CalendarService;
+
   constructor(
     private service: TodoService,
-    private calendarService: CalendarService,
+    private calendarRepository: CalendarRepository,
     private taskService: TaskService,
-  ) {}
+  ) {
+    this.calendarService = new CalendarService(this.calendarRepository);
+  }
 
   @Get('streamline')
   async readStreamline(
