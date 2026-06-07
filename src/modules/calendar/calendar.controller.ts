@@ -7,7 +7,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CalendarService } from './core/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TCalendarRcd } from '../../sdk/types';
@@ -33,11 +32,7 @@ export class CalendarController {
     private todoService: TodoService,
     private taskService: TaskService,
   ) {
-    this.routes = new CalendarRoutes(
-      new CalendarService(),
-      this.todoService,
-      this.taskService,
-    );
+    this.routes = new CalendarRoutes(this.todoService, this.taskService);
   }
 
   @Get()

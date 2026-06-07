@@ -3,7 +3,7 @@ import { calendarRepository } from './calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
 
-export class CalendarService {
+class CalendarService {
   async readCalendarIDsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
@@ -45,3 +45,5 @@ export class CalendarService {
     return CalendarRto.fromEntity(upd);
   }
 }
+
+export const calendarService = new CalendarService();

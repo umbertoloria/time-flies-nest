@@ -7,7 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CalendarService } from '../calendar/core/calendar.service';
+import { calendarService } from '../calendar/core/calendar.service';
 import { TodoService } from './todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../sdk/types';
@@ -32,14 +32,10 @@ import { CreateTaskDto } from '../task/dto';
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars')
 export class TodoController {
-  private calendarService: CalendarService;
-
   constructor(
     private service: TodoService,
     private taskService: TaskService,
-  ) {
-    this.calendarService = new CalendarService();
-  }
+  ) {}
 
   @Get('streamline')
   async readStreamline(
@@ -49,7 +45,7 @@ export class TodoController {
 
     // BL
     const calendars =
-      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
+      await calendarService.readCalendarIDsFromUserIdViaSortedPin(
         dto.user.id,
         true,
       );

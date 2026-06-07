@@ -6,14 +6,13 @@ import {
   UpdateCalendarDto,
 } from './dto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
-import { CalendarService } from './calendar.service';
+import { calendarService } from './calendar.service';
 import { TodoService } from '../../todo/todo.service';
 import { TaskService } from '../../task/task.service';
 import { TCalendarPrev } from '../../../sdk/types';
 
 export class CalendarRoutes {
   constructor(
-    private service: CalendarService,
     private todoService: TodoService,
     private taskService: TaskService,
   ) {}
@@ -22,10 +21,11 @@ export class CalendarRoutes {
     const dto = ReadCalendarsDto.fromGateway(gdto, user);
 
     // BL
-    const calendars = await this.service.readCalendarIDsFromUserIdViaSortedPin(
-      dto.user.id,
-      dto.showAll,
-    );
+    const calendars =
+      await calendarService.readCalendarIDsFromUserIdViaSortedPin(
+        dto.user.id,
+        dto.showAll,
+      );
     const calendarIds = calendars.map((calendar) => calendar.id);
 
     const undoneTodos =
@@ -63,7 +63,7 @@ export class CalendarRoutes {
   async create(body: any, user: ReqUser) {
     const dto = CreateCalendarDto.fromBody(body, user);
 
-    const createdCalendar = await this.service.createCalendar(dto);
+    const createdCalendar = await calendarService.createCalendar(dto);
 
     return createdCalendar.toTCalendarRcd();
   }
@@ -72,7 +72,7 @@ export class CalendarRoutes {
     const dto = ReadCalendarDto.fromParam(paramCalendarId, user);
 
     // BL
-    const calendar = await this.service.findCalendarFromUser(
+    const calendar = await calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
@@ -118,7 +118,7 @@ export class CalendarRoutes {
       }
     }
 
-    const updatedCalendar = await this.service.updateCalendar(dto);
+    const updatedCalendar = await calendarService.updateCalendar(dto);
 
     return updatedCalendar.toTCalendarRcd();
   }
