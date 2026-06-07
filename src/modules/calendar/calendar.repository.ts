@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Calendar, PrismaRepository } from '../../prisma.repository';
-import { CreateCalendarDto, UpdateCalendarDto } from './dto';
+import { CreateCalendarDto, UpdateCalendarDto } from './core/dto';
 
 @Injectable()
 export class CalendarRepository {

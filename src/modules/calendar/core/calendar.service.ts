@@ -1,7 +1,7 @@
-import { CalendarRepository } from './calendar.repository';
+import { CalendarRepository } from '../calendar.repository';
+import { CalendarRto } from '../rto';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
-import { CalendarRto } from './rto';
-import { CalendarNotFoundError } from './core/errors';
+import { CalendarNotFoundError } from './errors';
 
 export class CalendarService {
   constructor(private repository: CalendarRepository) {}

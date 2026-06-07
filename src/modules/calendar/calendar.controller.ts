@@ -7,7 +7,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CalendarService } from './calendar.service';
+import { CalendarService } from './core/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendar, TCalendarPrev, TCalendarRcd } from '../../sdk/types';
@@ -21,7 +21,7 @@ import {
   ReadCalendarsGdtoSchema,
   UpdateCalendarGdto,
   UpdateCalendarGdtoSchema,
-} from './gdto';
+} from './core/gdto';
 import { CalendarRoutes } from './calendar.routes';
 import { CalendarRepository } from './calendar.repository';
 

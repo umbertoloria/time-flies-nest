@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
-import { CalendarService } from '../calendar/calendar.service';
+import { CalendarService } from '../calendar/core/calendar.service';
 import { CalendarRepository } from '../calendar/calendar.repository';
 import { TodoService } from '../todo/todo.service';
 import {

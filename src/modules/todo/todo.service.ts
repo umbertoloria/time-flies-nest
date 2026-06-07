@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CalendarService } from '../calendar/calendar.service';
+import { CalendarService } from '../calendar/core/calendar.service';
 import { CalendarRepository } from '../calendar/calendar.repository';
 import { TodoRepository } from './todo.repository';
 import {

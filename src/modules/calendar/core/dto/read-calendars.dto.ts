@@ -1,4 +1,4 @@
-import { validateDate } from '../../../lib/validate';
+import { validateDate } from '../../../../lib/validate';
 import { ReadCalendarsGdto } from '../gdto';
 
 export class ReadCalendarsDto {

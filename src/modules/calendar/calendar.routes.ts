@@ -1,12 +1,12 @@
-import { ReadCalendarsGdto, UpdateCalendarGdto } from './gdto';
+import { ReadCalendarsGdto, UpdateCalendarGdto } from './core/gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
   ReadCalendarsDto,
   UpdateCalendarDto,
-} from './dto';
+} from './core/dto';
 import { CalendarUsesNotesCannotBeDisabledError } from './core/errors';
-import { CalendarService } from './calendar.service';
+import { CalendarService } from './core/calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
 import { TCalendarPrev } from '../../sdk/types';
