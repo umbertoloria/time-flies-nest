@@ -16,7 +16,12 @@ import {
   AccessTokenGuard,
   CurrentUser,
 } from '../../lib/guards/access-token.guard';
-import { ReadCalendarsGdto, UpdateCalendarGdto } from './gdto';
+import { ZodValidationPipe } from '../../lib/pipe/zod-validation.pipe';
+import {
+  ReadCalendarsGdto,
+  ReadCalendarsGdtoSchema,
+  UpdateCalendarGdto,
+} from './gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
@@ -35,7 +40,8 @@ export class CalendarController {
 
   @Get()
   async readAll(
-    @Query() gdto: ReadCalendarsGdto,
+    @Query(new ZodValidationPipe(ReadCalendarsGdtoSchema))
+    gdto: ReadCalendarsGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarPrev[]> {
     const dto = ReadCalendarsDto.fromGateway(gdto, user);

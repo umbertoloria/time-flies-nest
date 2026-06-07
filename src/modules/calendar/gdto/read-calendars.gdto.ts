@@ -1,13 +1,9 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { z } from 'zod';
+import { zBoolean, zLocalDate } from '../../../lib/validation';
 
-export class ReadCalendarsGdto {
-  // TODO: Improve Date validation
-  @IsString()
-  readonly dateFrom: string;
+export const ReadCalendarsGdtoSchema = z.object({
+  dateFrom: zLocalDate('Invalid "dateFrom" param: must be a date'),
+  showAll: zBoolean('Invalid "showAll" param: must be a boolean').optional(),
+});
 
-  @IsOptional()
-  @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === true)
-  readonly showAll?: boolean;
-}
+export type ReadCalendarsGdto = z.infer<typeof ReadCalendarsGdtoSchema>;
