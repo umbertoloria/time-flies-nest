@@ -26,18 +26,26 @@ import {
 import {
   CreateCalendarDto,
   ReadCalendarDto,
-  ReadCalendarsDto,
   UpdateCalendarDto,
 } from './dto';
+import { CalendarRoutes } from './calendar.routes';
 
 @UseGuards(AccessTokenGuard)
 @Controller('calendars')
 export class CalendarController {
+  private routes: CalendarRoutes;
+
   constructor(
     private service: CalendarService,
     private todoService: TodoService,
     private taskService: TaskService,
-  ) {}
+  ) {
+    this.routes = new CalendarRoutes(
+      this.service,
+      this.todoService,
+      this.taskService,
+    );
+  }
 
   @Get()
   async readAll(
@@ -45,45 +53,7 @@ export class CalendarController {
     gdto: ReadCalendarsGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarPrev[]> {
-    const dto = ReadCalendarsDto.fromGateway(gdto, user);
-
-    // BL
-    const calendars = await this.service.readCalendarIDsFromUserIdViaSortedPin(
-      dto.user.id,
-      dto.showAll,
-    );
-    const calendarIds = calendars.map((calendar) => calendar.id);
-
-    const undoneTodos =
-      await this.todoService.findUndoneTodosByCalendars(calendarIds);
-    const mapCalendar2Todos = calendarIds.map((calendarId) => ({
-      calendarId,
-      todoDates: undoneTodos
-        .filter((todo) => todo.calendarId === calendarId)
-        .map((todo) => todo.date),
-    }));
-
-    const mapCalendar2DoneTasks =
-      await this.taskService.findTasksDatesFromCalendars(
-        dto.dateFrom,
-        calendarIds,
-      );
-
-    // Response
-    return calendars.map<TCalendarPrev>((calendar) => {
-      const doneTaskDates = mapCalendar2DoneTasks.find(
-        (task) => task.calendarId === calendar.id,
-      )!.dates;
-      const todoDates = mapCalendar2Todos.find(
-        (todo) => todo.calendarId === calendar.id,
-      )!.todoDates;
-
-      return {
-        ...calendar.toTCalendarRcd(),
-        doneTaskDates,
-        todoDates,
-      };
-    });
+    return this.routes.readAll(gdto, user);
   }
 
   @Post()
