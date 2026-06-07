@@ -1,5 +1,5 @@
-import { Calendar } from '../../../prisma.repository';
-import { TCalendarRcd } from '../../../sdk/types';
+import { Calendar } from '../../../../prisma.repository';
+import { TCalendarRcd } from '../../../../sdk/types';
 
 export class CalendarRto {
   constructor(

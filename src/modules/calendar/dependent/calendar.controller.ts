@@ -7,21 +7,21 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { TodoService } from '../todo/todo.service';
-import { TaskService } from '../task/task.service';
-import { TCalendar, TCalendarPrev, TCalendarRcd } from '../../sdk/types';
+import { TodoService } from '../../todo/todo.service';
+import { TaskService } from '../../task/task.service';
+import { TCalendar, TCalendarPrev, TCalendarRcd } from '../../../sdk/types';
 import {
   AccessTokenGuard,
   CurrentUser,
-} from '../../lib/guards/access-token.guard';
-import { ZodValidationPipe } from '../../lib/pipe/zod-validation.pipe';
+} from '../../../lib/guards/access-token.guard';
+import { ZodValidationPipe } from '../../../lib/pipe/zod-validation.pipe';
 import {
   ReadCalendarsGdto,
   ReadCalendarsGdtoSchema,
   UpdateCalendarGdto,
   UpdateCalendarGdtoSchema,
-} from './core/gdto';
-import { CalendarRoutes } from './core/calendar.routes';
+} from './gdto';
+import { CalendarRoutes } from '../core/calendar.routes';
 
 @UseGuards(AccessTokenGuard)
 @Controller('calendars')

@@ -1,5 +1,5 @@
 import { Calendar, prisma } from '../../../prisma.repository';
-import { CreateCalendarDto, UpdateCalendarDto } from './dto';
+import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
 
 class CalendarRepository {
   public findCalendarsFromUserIdViaSortedPin(

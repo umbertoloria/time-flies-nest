@@ -1,5 +1,5 @@
-import { CalendarRto } from '../rto';
-import { calendarRepository } from './calendar.repository';
+import { CalendarRto } from '../dependent/rto';
+import { calendarRepository } from '../dependent/calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
 

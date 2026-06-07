@@ -1,4 +1,4 @@
-import { ReadCalendarsGdto, UpdateCalendarGdto } from './gdto';
+import { ReadCalendarsGdto, UpdateCalendarGdto } from '../dependent/gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
