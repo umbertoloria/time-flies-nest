@@ -21,6 +21,7 @@ import {
   ReadCalendarsGdto,
   ReadCalendarsGdtoSchema,
   UpdateCalendarGdto,
+  UpdateCalendarGdtoSchema,
 } from './gdto';
 import {
   CreateCalendarDto,
@@ -127,7 +128,8 @@ export class CalendarController {
   @Post('/:id')
   async update(
     @Param('id') paramCalendarId: string,
-    @Body() gdto: UpdateCalendarGdto,
+    @Body(new ZodValidationPipe(UpdateCalendarGdtoSchema))
+    gdto: UpdateCalendarGdto,
     @CurrentUser() user: ReqUser,
   ): Promise<TCalendarRcd> {
     const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);

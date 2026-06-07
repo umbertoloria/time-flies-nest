@@ -1,18 +1,11 @@
-import { IsBoolean, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { z } from 'zod';
+import { zBoolean, zHexColor } from '../../../lib/validation';
 
-export class UpdateCalendarGdto {
-  @IsString()
-  readonly name: string;
+export const UpdateCalendarGdtoSchema = z.object({
+  name: z.string().min(1, 'Invalid "name" param: must be a string'),
+  color: zHexColor('Invalid "color" param: must be a color'),
+  plannedColor: zHexColor('Invalid "plannedColor" param: must be a color'),
+  usesNotes: zBoolean('Invalid "usesNotes" param: must be a boolean'),
+});
 
-  // TODO: Improve Color validation
-  @IsString()
-  readonly color: string;
-
-  @IsString()
-  readonly plannedColor: string;
-
-  @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === true)
-  readonly usesNotes: boolean;
-}
+export type UpdateCalendarGdto = z.infer<typeof UpdateCalendarGdtoSchema>;

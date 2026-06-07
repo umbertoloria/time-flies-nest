@@ -9,3 +9,6 @@ export const zBoolean = (msg: string) =>
 
 export const zLocalDate = (msg: string) =>
   z.string().regex(/^\d{4}-\d{2}-\d{2}$/, msg);
+
+export const zHexColor = (msg: string) =>
+  z.string().regex(/^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/, msg);
