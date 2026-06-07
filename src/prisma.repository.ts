@@ -1,4 +1,3 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import {
   Calendar as PrismaCalendar,
   PrismaClient,
@@ -10,9 +9,6 @@ export type Calendar = PrismaCalendar;
 export type Task = PrismaTask;
 export type Todo = PrismaTodo;
 
-@Injectable()
-export class PrismaRepository extends PrismaClient implements OnModuleInit {
-  async onModuleInit() {
-    await this.$connect();
-  }
-}
+class PrismaRepository extends PrismaClient {}
+
+export const prisma = new PrismaRepository();

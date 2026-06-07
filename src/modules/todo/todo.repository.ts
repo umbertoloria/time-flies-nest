@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaRepository, Todo } from '../../prisma.repository';
+import { prisma, Todo } from '../../prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -7,12 +6,9 @@ import {
   UpdateTodoDto,
 } from './dto';
 
-@Injectable()
 export class TodoRepository {
-  constructor(private readonly repo: PrismaRepository) {}
-
   public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {
-    return this.repo.todo.findMany({
+    return prisma.todo.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -29,7 +25,7 @@ export class TodoRepository {
     calendarId: number,
     filterDate: string,
   ): Promise<Todo[]> {
-    return this.repo.todo.findMany({
+    return prisma.todo.findMany({
       where: {
         calendar_id: calendarId,
         date: filterDate,
@@ -42,7 +38,7 @@ export class TodoRepository {
   }
 
   public findById(todoId: number): Promise<Todo | null> {
-    return this.repo.todo.findUnique({
+    return prisma.todo.findUnique({
       where: {
         id: todoId,
       },
@@ -50,7 +46,7 @@ export class TodoRepository {
   }
 
   public countTodosWithNotesFromCalendar(calendarId: number) {
-    return this.repo.todo.count({
+    return prisma.todo.count({
       where: {
         calendar_id: calendarId,
         NOT: {
@@ -61,7 +57,7 @@ export class TodoRepository {
   }
 
   public create(dto: CreateTodoDto): Promise<Todo> {
-    return this.repo.todo.create({
+    return prisma.todo.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
@@ -73,7 +69,7 @@ export class TodoRepository {
   }
 
   public updateNotes(dto: UpdateTodoDto): Promise<Todo> {
-    return this.repo.todo.update({
+    return prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -86,7 +82,7 @@ export class TodoRepository {
 
   public updateDate(dto: MoveTodoDto): Promise<Todo> {
     // FIXME: Returns also nulls or not?
-    return this.repo.todo.update({
+    return prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -102,7 +98,7 @@ export class TodoRepository {
     doneDate: string,
     dto: UpdateDoneTodoDto,
   ): Promise<Todo> {
-    return this.repo.todo.update({
+    return prisma.todo.update({
       where: {
         id: todoId,
       },

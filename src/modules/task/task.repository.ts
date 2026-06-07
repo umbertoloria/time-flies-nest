@@ -1,13 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaRepository, Task } from '../../prisma.repository';
+import { prisma, Task } from '../../prisma.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 
-@Injectable()
 export class TaskRepository {
-  constructor(private readonly repo: PrismaRepository) {}
-
   public findTask(calendarId: number, taskId: number): Promise<Task | null> {
-    return this.repo.task.findUnique({
+    return prisma.task.findUnique({
       where: {
         id: taskId,
         calendar_id: calendarId,
@@ -19,7 +15,7 @@ export class TaskRepository {
     calendarIds: number[],
     dateFrom: string,
   ) {
-    return this.repo.task.findMany({
+    return prisma.task.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -35,7 +31,7 @@ export class TaskRepository {
   }
 
   public findTasksFromCalendar(calendarId: number): Promise<Task[]> {
-    return this.repo.task.findMany({
+    return prisma.task.findMany({
       where: {
         calendar_id: calendarId,
       },
@@ -46,7 +42,7 @@ export class TaskRepository {
   }
 
   public countTasksWithNotesFromCalendar(calendarId: number) {
-    return this.repo.task.count({
+    return prisma.task.count({
       where: {
         calendar_id: calendarId,
         NOT: {
@@ -60,7 +56,7 @@ export class TaskRepository {
     calendarId: number,
     date: string,
   ): Promise<Task[]> {
-    return this.repo.task.findMany({
+    return prisma.task.findMany({
       where: {
         calendar_id: calendarId,
         date,
@@ -69,7 +65,7 @@ export class TaskRepository {
   }
 
   public create(dto: CreateTaskDto): Promise<Task> {
-    return this.repo.task.create({
+    return prisma.task.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
@@ -79,7 +75,7 @@ export class TaskRepository {
   }
 
   public update(dto: UpdateTaskDto): Promise<Task> {
-    return this.repo.task.update({
+    return prisma.task.update({
       where: {
         id: dto.taskId,
         calendar_id: dto.calendarId,
