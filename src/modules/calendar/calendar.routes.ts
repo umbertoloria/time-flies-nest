@@ -1,5 +1,11 @@
-import { CreateCalendarDto, ReadCalendarDto, ReadCalendarsDto } from './dto';
-import { ReadCalendarsGdto } from './gdto';
+import { BadRequestException } from '@nestjs/common';
+import {
+  CreateCalendarDto,
+  ReadCalendarDto,
+  ReadCalendarsDto,
+  UpdateCalendarDto,
+} from './dto';
+import { ReadCalendarsGdto, UpdateCalendarGdto } from './gdto';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '../todo/todo.service';
 import { TaskService } from '../task/task.service';
@@ -83,5 +89,37 @@ export class CalendarRoutes {
       days: tasks.map((task) => task.toTDayWithId()),
       plannedDays: undoneTodos.map((todo) => todo.toTDayWithId()),
     };
+  }
+
+  async update(
+    paramCalendarId: string,
+    gdto: UpdateCalendarGdto,
+    user: ReqUser,
+  ) {
+    const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);
+
+    // BL
+    if (!dto.usesNotes) {
+      // Calendar "Uses Notes" cannot be disabled if it contains Notes...
+
+      // ... from Todos.
+      const areThereTodosWithNotesInCalendar =
+        await this.todoService.areThereTodosWithNotes(dto.calendarId);
+      if (areThereTodosWithNotesInCalendar) {
+        // TODO: This is a leak if user is not the Calendar owner
+        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
+      }
+
+      // ... from (Done) Tasks.
+      const areThereTasksWithNotesInCalendar =
+        await this.taskService.areThereTasksWithNotes(dto.calendarId);
+      if (areThereTasksWithNotesInCalendar) {
+        throw new BadRequestException('Calendar UsesNotes cannot be disabled');
+      }
+    }
+
+    const updatedCalendar = await this.service.updateCalendar(dto);
+
+    return updatedCalendar.toTCalendarRcd();
   }
 }
