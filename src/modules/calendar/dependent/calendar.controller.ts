@@ -7,8 +7,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { TodoService } from '../../todo/todo.service';
-import { TaskService } from '../../task/task.service';
 import { TCalendar, TCalendarPrev, TCalendarRcd } from '../../../sdk/types';
 import {
   AccessTokenGuard,
@@ -26,11 +24,7 @@ import { CalendarRoutes } from '../core/calendar.routes';
 @UseGuards(AccessTokenGuard)
 @Controller('calendars')
 export class CalendarController {
-  private routes: CalendarRoutes;
-
-  constructor(private taskService: TaskService) {
-    this.routes = new CalendarRoutes(this.taskService);
-  }
+  private routes = new CalendarRoutes();
 
   @Get()
   readAll(

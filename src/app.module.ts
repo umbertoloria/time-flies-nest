@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { CalendarController } from './modules/calendar/dependent/calendar.controller';
 import { TaskController } from './modules/task/task.controller';
 import { TodoController } from './modules/todo/todo.controller';
-import { TaskService } from './modules/task/task.service';
 
 @Module({
   imports: [
@@ -16,9 +15,6 @@ import { TaskService } from './modules/task/task.service';
     TodoController,
     CalendarController,
   ],
-  providers: [
-    //
-    TaskService,
-  ],
+  providers: [],
 })
 export class AppModule {}

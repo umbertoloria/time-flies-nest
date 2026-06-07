@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { taskRepository } from './task.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { isFirstOne } from '../../lib/list';
 import { TaskRto } from './rto';
 
-@Injectable()
-export class TaskService {
+class TaskService {
   async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
     const allTasks = await taskRepository.findTasksFromCalendarsAndDate(
       calendarIds,
@@ -79,3 +78,5 @@ export class TaskService {
     return TaskRto.fromEntity(upd);
   }
 }
+
+export const taskService = new TaskService();

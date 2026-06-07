@@ -8,12 +8,10 @@ import {
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { calendarService } from './calendar.service';
 import { todoService } from '../../todo/todo.service';
-import { TaskService } from '../../task/task.service';
+import { taskService } from '../../task/task.service';
 import { TCalendarPrev } from '../../../sdk/types';
 
 export class CalendarRoutes {
-  constructor(private taskService: TaskService) {}
-
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = ReadCalendarsDto.fromGateway(gdto, user);
 
@@ -34,11 +32,10 @@ export class CalendarRoutes {
         .map((todo) => todo.date),
     }));
 
-    const mapCalendar2DoneTasks =
-      await this.taskService.findTasksDatesFromCalendars(
-        dto.dateFrom,
-        calendarIds,
-      );
+    const mapCalendar2DoneTasks = await taskService.findTasksDatesFromCalendars(
+      dto.dateFrom,
+      calendarIds,
+    );
 
     // Response
     return calendars.map<TCalendarPrev>((calendar) => {
@@ -78,7 +75,7 @@ export class CalendarRoutes {
       calendar.id,
     ]);
 
-    const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
+    const tasks = await taskService.findTasksFromCalendar(dto.calendarId);
 
     // Response
     return {
@@ -109,7 +106,7 @@ export class CalendarRoutes {
 
       // ... from (Done) Tasks.
       const areThereTasksWithNotesInCalendar =
-        await this.taskService.areThereTasksWithNotes(dto.calendarId);
+        await taskService.areThereTasksWithNotes(dto.calendarId);
       if (areThereTasksWithNotesInCalendar) {
         throw new CalendarUsesNotesCannotBeDisabledError();
       }

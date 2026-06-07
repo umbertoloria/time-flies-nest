@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { TaskService } from './task.service';
+import { taskService } from './task.service';
 import { TCalendarSDK, TNewDoneTask } from '../../sdk/types';
 import { calendarService } from '../calendar/core/calendar.service';
 import { todoService } from '../todo/todo.service';
@@ -12,8 +12,6 @@ import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars/:cid/date')
 export class TaskController {
-  constructor(private readonly service: TaskService) {}
-
   @Post()
   async create(
     @Body() body: any,
@@ -21,7 +19,7 @@ export class TaskController {
   ): Promise<TNewDoneTask> {
     const dto = CreateTaskDto.fromBody(paramCalendarId, body);
 
-    const createdTask = await this.service.createDoneTask(dto);
+    const createdTask = await taskService.createDoneTask(dto);
 
     return createdTask.toTNewDoneTask();
   }
@@ -47,7 +45,7 @@ export class TaskController {
       dto.date,
     );
 
-    const doneTasks = await this.service.findTasksFromCalendarAndDate(
+    const doneTasks = await taskService.findTasksFromCalendarAndDate(
       dto.calendarId,
       dto.date,
     );
@@ -68,7 +66,7 @@ export class TaskController {
   ): Promise<TNewDoneTask> {
     const dto = UpdateTaskDto.fromBody(paramCalendarId, paramTaskId, body);
 
-    const updatedTask = await this.service.updateTaskNotesByDate(dto);
+    const updatedTask = await taskService.updateTaskNotesByDate(dto);
 
     return updatedTask.toTNewDoneTask();
   }
