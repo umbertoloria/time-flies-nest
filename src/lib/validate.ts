@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestError } from '../core/errors';
 
 // STRING
 export function fromBodyGetOptionalString(
@@ -18,7 +18,7 @@ export function fromBodyGetRequiredString(
 ): string {
   const value = fromBodyGetOptionalString(bodyParams, paramName);
   if (typeof value !== 'string') {
-    throw new BadRequestException(`Param "${paramName}" required`);
+    throw new BadRequestError(`Param "${paramName}" required`);
   }
   return value;
 }
@@ -29,7 +29,7 @@ const REG_EXP_HEX_COLOR = new RegExp('^#[A-Fa-f0-9]{6}$');
 export function validateColor(value: string, errorMsg: string): string {
   const ex = REG_EXP_HEX_COLOR.exec(value);
   if (!ex) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   return value;
 }
@@ -45,9 +45,7 @@ export function fromBodyGetOptionalColor(
   }
   const ex = REG_EXP_HEX_COLOR.exec(value);
   if (!ex) {
-    throw new BadRequestException(
-      `Param "${paramName}" invalid: must be a color`,
-    );
+    throw new BadRequestError(`Param "${paramName}" invalid: must be a color`);
   }
   return value;
 }
@@ -58,9 +56,7 @@ export function fromBodyGetRequiredColor(
 ): string {
   const value = fromBodyGetOptionalColor(bodyParams, paramName);
   if (typeof value !== 'string') {
-    throw new BadRequestException(
-      `Param "${paramName}" invalid: must be a color`,
-    );
+    throw new BadRequestError(`Param "${paramName}" invalid: must be a color`);
   }
   return value;
 }
@@ -71,7 +67,7 @@ const REG_EXP_LOCAL_DATE = new RegExp('^(\\d{4})-(\\d{2})-(\\d{2})$');
 export function validateDate(strValue: string, errorMsg: string): string {
   const ex = REG_EXP_LOCAL_DATE.exec(strValue);
   if (!ex) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   const strYear = ex[1];
   const strMonth = ex[2];
@@ -80,16 +76,16 @@ export function validateDate(strValue: string, errorMsg: string): string {
   const month = parseInt(strMonth);
   const day = parseInt(strDay);
   if (Number.isNaN(year) || year < 1999 || year > 2999) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   if (Number.isNaN(month) || month < 1 || month > 12) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   if (Number.isNaN(day) || day < 1 || day > 31) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   if (!checkDate(year, month, day)) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   return (
     `${year}`.padStart(4, '0') +
@@ -120,9 +116,7 @@ export function fromBodyGetRequiredLocalDate(
   // Es. "2024-10-20"
   const value = fromBodyGetOptionalLocalDate(bodyParams, paramName);
   if (typeof value !== 'string') {
-    throw new BadRequestException(
-      `Param "${paramName}" invalid: must be a date`,
-    );
+    throw new BadRequestError(`Param "${paramName}" invalid: must be a date`);
   }
   return value;
 }
@@ -158,7 +152,7 @@ export function fromBodyGetRequiredBool(
 ): boolean {
   const value = fromBodyGetOptionalBool(bodyParams, paramName);
   if (value !== true && value !== false) {
-    throw new BadRequestException(
+    throw new BadRequestError(
       `Param "${paramName}" invalid: must be a boolean`,
     );
   }
@@ -172,7 +166,7 @@ export function fromBodyValidateInt(
 ): number {
   const intValue = parseInt(strValue);
   if (Number.isNaN(intValue)) {
-    throw new BadRequestException(errorMsg);
+    throw new BadRequestError(errorMsg);
   }
   return intValue;
 }
