@@ -2,7 +2,7 @@ import { z } from 'zod';
 import {
   zBoolean,
   zLocalDate,
-} from '../../../../dependent/validation/validation';
+} from '../../../../common/dependent/validation/validation';
 
 export const ReadCalendarsGdtoSchema = z.object({
   dateFrom: zLocalDate('Invalid "dateFrom" param: must be a date'),

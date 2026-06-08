@@ -1,3 +1,3 @@
-import { startHonoServer } from './dependent/hono/server-hono';
+import { startHonoServer } from './common/dependent/hono/server-hono';
 
 startHonoServer();

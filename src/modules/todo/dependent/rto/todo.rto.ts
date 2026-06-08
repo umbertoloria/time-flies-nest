@@ -1,5 +1,5 @@
-import { Todo } from '../../../../dependent/prisma.repository';
-import { TDay, TNewTodo } from '../../../../core/sdk/types';
+import { Todo } from '../../../../common/dependent/prisma.repository';
+import { TDay, TNewTodo } from '../../../../common/core/sdk/types';
 
 export class TodoRto {
   constructor(
