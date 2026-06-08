@@ -6,12 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "format": "biome format --write src/",
-    "build:prisma": "prisma generate",
-    "build:api": "tsc",
-    "build": "npm run build:prisma && npm run build:api",
-    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
     "start": "node dist/main.js",
+    "dev": "tsx watch src/main.ts",
+    "format": "biome format --write src/",
+    "prisma:generate": "prisma generate",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
