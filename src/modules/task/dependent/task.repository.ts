@@ -1,5 +1,5 @@
-import { prisma, Task } from '../../prisma.repository';
-import { CreateTaskDto, UpdateTaskDto } from './dto';
+import { prisma, Task } from '../../../prisma.repository';
+import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
 
 class TaskRepository {
   public findTask(calendarId: number, taskId: number): Promise<Task | null> {

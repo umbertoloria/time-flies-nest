@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { calendarService } from '../calendar/core/calendar.service';
 import { todoService } from './todo.service';
-import { taskService } from '../task/task.service';
+import { taskService } from '../task/dependent/task.service';
 import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../sdk/types';
 import {
   AccessTokenGuard,
@@ -27,7 +27,7 @@ import {
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
-import { CreateTaskDto } from '../task/dto';
+import { CreateTaskDto } from '../task/core/dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars')

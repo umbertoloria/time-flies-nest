@@ -2,8 +2,8 @@ import {
   fromBodyGetOptionalString,
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
-} from '../../../lib/validate';
-import { TodoRto } from '../../todo/rto';
+} from '../../../../lib/validate';
+import { TodoRto } from '../../../todo/rto';
 
 export class CreateTaskDto {
   constructor(

@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { taskRepository } from './task.repository';
-import { CreateTaskDto, UpdateTaskDto } from './dto';
-import { isFirstOne } from '../../lib/list';
+import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
+import { isFirstOne } from '../../../lib/list';
 import { TaskRto } from './rto';
 
 class TaskService {

@@ -8,7 +8,7 @@ import {
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { calendarService } from './calendar.service';
 import { todoService } from '../../todo/todo.service';
-import { taskService } from '../../task/task.service';
+import { taskService } from '../../task/dependent/task.service';
 import { TCalendarPrev } from '../../../sdk/types';
 
 class CalendarRoutes {
