@@ -71,6 +71,7 @@ export function createHonoServer() {
     return c.json(
       {
         statusCode: 500,
+        error: 'Internal Server Error',
         message: err.message,
       },
       500,

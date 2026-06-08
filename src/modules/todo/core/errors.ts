@@ -4,7 +4,6 @@ export class TodoNotFoundError extends Error {
     this.name = 'TodoNotFoundError';
   }
 }
-// throw new NotFoundException('Todo not found');
 
 export class TodoAlreadyDoneError extends Error {
   constructor() {
@@ -12,4 +11,3 @@ export class TodoAlreadyDoneError extends Error {
     this.name = 'TodoAlreadyDoneError';
   }
 }
-// throw new BadRequestException('Todo already done');

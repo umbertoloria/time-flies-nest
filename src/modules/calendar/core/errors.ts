@@ -4,7 +4,6 @@ export class CalendarNotFoundError extends Error {
     this.name = 'CalendarNotFoundError';
   }
 }
-// throw new NotFoundException('Calendar not found');
 
 export class CalendarUsesNotesCannotBeDisabledError extends Error {
   constructor() {
@@ -12,4 +11,3 @@ export class CalendarUsesNotesCannotBeDisabledError extends Error {
     this.name = 'CalendarUsesNotesCannotBeDisabledError';
   }
 }
-// throw new BadRequestException('Calendar UsesNotes cannot be disabled');
