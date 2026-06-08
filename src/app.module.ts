@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TaskController } from './modules/task/dependent/task.controller';
 import { TodoController } from './modules/todo/dependent/todo.controller';
 
 @Module({
@@ -10,7 +9,6 @@ import { TodoController } from './modules/todo/dependent/todo.controller';
   ],
   controllers: [
     // Order is important here!
-    TaskController,
     TodoController,
   ],
   providers: [],

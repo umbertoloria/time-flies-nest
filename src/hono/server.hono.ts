@@ -3,7 +3,11 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { corsAllowedOrigins } from '../main';
 import { calendarRoutes } from '../modules/calendar/core/calendar.routes';
-import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from '../modules/calendar/dependent/gdto';
+import {
+  ReadCalendarsGdtoSchema,
+  UpdateCalendarGdtoSchema,
+} from '../modules/calendar/dependent/gdto';
+import { taskRoutes } from '../modules/task/core/task.routes';
 import { authMiddleware } from './auth-hono.middleware';
 
 export type HonoEnv = {
@@ -76,6 +80,42 @@ export function startHonoServer(port: number) {
     const gdto = UpdateCalendarGdtoSchema.parse(body);
 
     const response = await calendarRoutes.update(paramCalendarId, gdto, user);
+
+    return c.json(response);
+  });
+
+  app.post('/calendars/:id/date', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const body = await c.req.json();
+
+    const response = await taskRoutes.create(paramCalendarId, body, user);
+
+    return c.json(response);
+  });
+
+  app.get('/calendars/:id/date/:date', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const paramDate = c.req.param('date');
+
+    const response = await taskRoutes.read(paramCalendarId, paramDate, user);
+
+    return c.json(response);
+  });
+
+  app.post('/calendars/:id/date/:tid', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const paramTaskId = c.req.param('tid');
+    const body = await c.req.json();
+
+    const response = await taskRoutes.update(
+      paramCalendarId,
+      paramTaskId,
+      body,
+      user,
+    );
 
     return c.json(response);
   });
