@@ -1,5 +1,5 @@
-import { Task } from '../../../../common/dependent/prisma.repository';
-import { TDay, TNewDoneTask } from '../../../../common/core/sdk/types';
+import { Task } from '@shared/dependent/prisma.repository';
+import { TDay, TNewDoneTask } from '@shared/core/sdk/types';
 
 export class TaskRto {
   constructor(

@@ -1,4 +1,4 @@
-import { calendarService } from '../../calendar/core/calendar.service';
+import { calendarService } from '@app/calendar/core/calendar.service';
 import { todoRepository } from '../dependent/todo.repository';
 import { TodoRto } from '../dependent/rto';
 import {

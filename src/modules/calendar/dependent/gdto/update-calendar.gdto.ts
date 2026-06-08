@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  zBoolean,
-  zHexColor,
-} from '../../../../common/dependent/validation/validation';
+import { zBoolean, zHexColor } from '@shared/dependent/validation/validation';
 
 export const UpdateCalendarGdtoSchema = z.object({
   name: z.string().min(1, 'Invalid "name" param: must be a string'),

@@ -7,9 +7,9 @@ import {
 } from './dto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { calendarService } from './calendar.service';
-import { todoService } from '../../todo/core/todo.service';
-import { taskService } from '../../task/core/task.service';
-import { TCalendarPrev } from '../../../common/core/sdk/types';
+import { todoService } from '@app/todo/core/todo.service';
+import { taskService } from '@app/task/core/task.service';
+import { TCalendarPrev } from '@shared/core/sdk/types';
 
 class CalendarRoutes {
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {

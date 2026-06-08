@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { HonoEnv } from '../../../common/dependent/hono/server-hono';
+import { HonoEnv } from '@shared/dependent/hono/server-hono';
 import { calendarRoutes } from '../core/calendar.routes';
 import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from './gdto';
 

@@ -6,6 +6,11 @@
     "outDir": "./dist",
     "baseUrl": "./",
 
+    "paths": {
+      "@shared/*": ["src/common/*"],
+      "@app/*": ["src/modules/*"],
+    },
+
     // "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,

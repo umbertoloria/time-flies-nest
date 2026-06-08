@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { HonoEnv } from '../../../common/dependent/hono/server-hono';
+import { HonoEnv } from '@shared/dependent/hono/server-hono';
 import { taskRoutes } from '../core/task.routes';
 
 const app = new Hono<HonoEnv>();

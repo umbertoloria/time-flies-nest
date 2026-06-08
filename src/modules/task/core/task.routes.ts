@@ -1,8 +1,8 @@
 import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
-import { todoService } from '../../todo/core/todo.service';
+import { todoService } from '@app/todo/core/todo.service';
+import { TCalendarSDK, TNewDoneTask } from '@shared/core/sdk/types';
+import { calendarService } from '@app/calendar/core/calendar.service';
 import { taskService } from './task.service';
-import { TCalendarSDK, TNewDoneTask } from '../../../common/core/sdk/types';
-import { calendarService } from '../../calendar/core/calendar.service';
 
 class TaskRoutes {
   async create(

@@ -1,7 +1,7 @@
 import {
   fromBodyGetOptionalString,
   fromBodyValidateInt,
-} from '../../../../common/core/lib/validate';
+} from '@shared/core/lib/validate';
 
 export class UpdateDoneTodoDto {
   // TODO: Unify with "UpdateTodoDto" and "MoveTodoDto"

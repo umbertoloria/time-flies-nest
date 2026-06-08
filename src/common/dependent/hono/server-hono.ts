@@ -3,25 +3,22 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { authMiddleware } from './auth.middleware';
 import {
   BadRequestError,
   ForbiddenError,
   UnauthorizedError,
 } from '../../core/errors';
+import { getConfigs } from '../configs';
+import { authMiddleware } from './auth.middleware';
 import {
   CalendarNotFoundError,
   CalendarUsesNotesCannotBeDisabledError,
-} from '../../../modules/calendar/core/errors';
-import { TaskNotFoundError } from '../../../modules/task/core/errors';
-import {
-  TodoAlreadyDoneError,
-  TodoNotFoundError,
-} from '../../../modules/todo/core/errors';
-import { getConfigs } from '../configs';
-import { calendarApp } from '../../../modules/calendar/dependent/calendar.hono';
-import { taskApp } from '../../../modules/task/dependent/task.hono';
-import { todoApp } from '../../../modules/todo/dependent/todo.hono';
+} from '@app/calendar/core/errors';
+import { TaskNotFoundError } from '@app/task/core/errors';
+import { TodoAlreadyDoneError, TodoNotFoundError } from '@app/todo/core/errors';
+import { calendarApp } from '@app/calendar/dependent/calendar.hono';
+import { taskApp } from '@app/task/dependent/task.hono';
+import { todoApp } from '@app/todo/dependent/todo.hono';
 
 export type HonoEnv = {
   Variables: {
