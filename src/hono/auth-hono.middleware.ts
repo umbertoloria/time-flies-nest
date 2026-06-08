@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory';
 import { HTTPException } from 'hono/http-exception';
 import { extractBearerTokenFromHeaders } from '../auth-middleware';
-import { createReqUser } from '../lib/guards/access-token.guard';
+import { createReqUserFromJWT } from '../lib/req-user-from-jwt';
 import { validateJwt } from '../jwt-validator';
 import { HonoEnv } from './server.hono';
 
@@ -12,7 +12,7 @@ export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
     const token = extractBearerTokenFromHeaders(headers);
     const payload = await validateJwt(token);
 
-    const currUser = createReqUser(payload);
+    const currUser = createReqUserFromJWT(payload);
 
     c.set('user', currUser);
 

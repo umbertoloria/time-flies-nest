@@ -192,8 +192,14 @@ export function startHonoServer(port: number) {
 
   console.log(`🚀 Hono Server listening on port ${port}`);
 
-  serve({
-    fetch: app.fetch,
-    port,
-  });
+  serve(
+    {
+      fetch: app.fetch,
+      port,
+    },
+    (info) => {
+      const { address, port } = info;
+      console.log(`Application is running on: http://${address}:${port}`);
+    },
+  );
 }
