@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 import { corsAllowedOrigins } from '../main';
 import { calendarRoutes } from '../modules/calendar/core/calendar.routes';
 import {
@@ -10,6 +11,20 @@ import {
 import { taskRoutes } from '../modules/task/core/task.routes';
 import { todoRoutes } from '../modules/todo/core/todo.routes';
 import { authMiddleware } from './auth-hono.middleware';
+import {
+  BadRequestError,
+  ForbiddenError,
+  UnauthorizedError,
+} from '../core/errors';
+import {
+  CalendarNotFoundError,
+  CalendarUsesNotesCannotBeDisabledError,
+} from '../modules/calendar/core/errors';
+import { TaskNotFoundError } from '../modules/task/core/errors';
+import {
+  TodoAlreadyDoneError,
+  TodoNotFoundError,
+} from '../modules/todo/core/errors';
 
 export type HonoEnv = {
   Variables: {
@@ -33,8 +48,56 @@ export function startHonoServer(port: number) {
 
   app.use('*', authMiddleware);
 
+  const errorStatusMap = new Map<Function, number>([
+    // Common
+    [BadRequestError, 400],
+    [UnauthorizedError, 401],
+    [ForbiddenError, 403],
+    // Domain-specific
+    [CalendarNotFoundError, 404],
+    [CalendarUsesNotesCannotBeDisabledError, 400],
+    [TaskNotFoundError, 404],
+    [TodoNotFoundError, 404],
+    [TodoAlreadyDoneError, 400],
+  ]);
+
+  function getHttpErrorName(status: number): string {
+    const names: Record<number, string> = {
+      400: 'Bad Request',
+      401: 'Unauthorized',
+      403: 'Forbidden',
+      404: 'Not Found',
+      409: 'Conflict',
+    };
+    return names[status] || 'Internal Server Error';
+  }
+
   app.onError((err, c) => {
     console.error(`❌ Hono Error: ${err.message}`);
+
+    if (err instanceof HTTPException) {
+      return c.json(
+        {
+          statusCode: err.status,
+          error: getHttpErrorName(err.status),
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+
+    const mappedStatus = errorStatusMap.get(err.constructor);
+    if (mappedStatus) {
+      return c.json(
+        {
+          statusCode: mappedStatus,
+          error: getHttpErrorName(mappedStatus),
+          message: err.message,
+        },
+        mappedStatus as any,
+      );
+    }
+
     return c.json(
       {
         statusCode: 500,
