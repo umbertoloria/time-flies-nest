@@ -48,7 +48,7 @@ export class AccessTokenGuard implements CanActivate {
   }
 }
 
-function createReqUser(payload: JWTPayload): ReqUser {
+export function createReqUser(payload: JWTPayload): ReqUser {
   const scopes = (payload.scope as string)?.split(' ') ?? [];
 
   const audience = Array.isArray(payload.aud)
