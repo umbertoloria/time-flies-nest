@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
+import { ZodError } from 'zod';
 import { calendarRoutes } from '../../modules/calendar/core/calendar.routes';
 import {
   ReadCalendarsGdtoSchema,
@@ -73,7 +74,7 @@ export function startHonoServer() {
   }
 
   app.onError((err, c) => {
-    console.error(`❌ Hono Error: ${err.message}`);
+    console.error(`Hono Error: ${err.message}`);
 
     if (err instanceof HTTPException) {
       return c.json(
@@ -83,6 +84,17 @@ export function startHonoServer() {
           message: err.message,
         },
         err.status,
+      );
+    }
+
+    if (err instanceof ZodError) {
+      return c.json(
+        {
+          statusCode: 400,
+          error: getHttpErrorName(400),
+          message: JSON.parse(err.message),
+        },
+        400,
       );
     }
 
