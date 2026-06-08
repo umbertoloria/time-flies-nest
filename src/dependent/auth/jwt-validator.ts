@@ -1,6 +1,10 @@
+import 'dotenv/config';
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
-import { JWT_AUDIENCE, JWT_ISSUER, JWT_JWKS_URI } from './auth-middleware.js';
-import { ForbiddenError } from './core/errors';
+import { ForbiddenError } from '../../core/errors';
+
+export const JWT_JWKS_URI = process.env.JWT_JWKS_URI!;
+export const JWT_ISSUER = process.env.JWT_ISSUER!;
+export const JWT_AUDIENCE = process.env.JWT_AUDIENCE!;
 
 const jwks = createRemoteJWKSet(new URL(JWT_JWKS_URI));
 

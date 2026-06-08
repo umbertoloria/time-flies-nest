@@ -1,15 +1,15 @@
 import { createMiddleware } from 'hono/factory';
 import { HTTPException } from 'hono/http-exception';
-import { extractBearerTokenFromHeaders } from '../auth-middleware';
-import { createReqUserFromJWT } from '../lib/req-user-from-jwt';
-import { validateJwt } from '../jwt-validator';
+import { UnauthorizedError } from '../../core/errors';
+import { validateJwt } from '../auth/jwt-validator';
+import { createReqUserFromJWT } from '../../lib/req-user-from-jwt';
 import { HonoEnv } from './server.hono';
 
 export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   const headers = c.req.header();
 
   try {
-    const token = extractBearerTokenFromHeaders(headers);
+    const token = extractBearerTokenFromHeaders(headers.authorization);
     const payload = await validateJwt(token);
 
     const currUser = createReqUserFromJWT(payload);
@@ -25,3 +25,19 @@ export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
     throw new HTTPException(403, { message: err.message || 'Forbidden' });
   }
 });
+
+function extractBearerTokenFromHeaders(authorization?: string): string {
+  const bearerPrefix = 'Bearer ';
+
+  if (!authorization) {
+    throw new UnauthorizedError('Authorization header is missing');
+  }
+
+  if (!authorization.startsWith(bearerPrefix)) {
+    throw new UnauthorizedError(
+      `Authorization header must start with "${bearerPrefix}"`,
+    );
+  }
+
+  return authorization.slice(bearerPrefix.length);
+}

@@ -1,4 +1,4 @@
-import { startHonoServer } from './hono/server.hono';
+import { startHonoServer } from './dependent/hono/server.hono';
 
 export const PORT = parseInt('' + process.env.PORT, 10);
 
