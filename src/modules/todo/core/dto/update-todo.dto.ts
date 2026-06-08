@@ -1,29 +1,27 @@
 import {
   fromBodyGetOptionalString,
-  fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
-} from '../../../lib/validate';
+} from '../../../../lib/validate';
 
-export class CreateTodoDto {
+export class UpdateTodoDto {
   constructor(
     //
     public readonly calendarId: number,
-    public readonly date: string,
+    public readonly todoId: number,
     public readonly notes: string | undefined,
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(urlCid: string, body: any, user: ReqUser) {
+  static fromBody(urlCid: string, urlTid: string, body: any, user: ReqUser) {
     // Validation
     const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
-    const date = fromBodyGetRequiredLocalDate(body, 'date');
-    // TODO: Validate "date"
+    const todoId = fromBodyValidateInt(urlTid, 'Invalid TodoID');
     const notes = fromBodyGetOptionalString(body, 'notes');
 
-    return new CreateTodoDto(
+    return new UpdateTodoDto(
       //
       calendarId,
-      date,
+      todoId,
       notes,
       user,
     );

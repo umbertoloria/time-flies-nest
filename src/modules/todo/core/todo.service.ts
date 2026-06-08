@@ -1,13 +1,13 @@
-import { TodoNotFoundError } from './core/errors';
-import { calendarService } from '../calendar/core/calendar.service';
-import { todoRepository } from './todo.repository';
+import { calendarService } from '../../calendar/core/calendar.service';
+import { todoRepository } from '../todo.repository';
+import { TodoRto } from '../dependent/rto';
 import {
   CreateTodoDto,
   MoveTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
-import { TodoRto } from './rto';
+import { TodoNotFoundError } from './errors';
 
 class TodoService {
   async findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoRto[]> {

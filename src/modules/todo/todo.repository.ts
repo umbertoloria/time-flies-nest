@@ -4,7 +4,7 @@ import {
   MoveTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
-} from './dto';
+} from './core/dto';
 
 class TodoRepository {
   public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {

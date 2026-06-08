@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { calendarService } from '../calendar/core/calendar.service';
-import { todoService } from './todo.service';
+import { todoService } from './core/todo.service';
 import { taskService } from '../task/core/task.service';
 import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../sdk/types';
 import {
@@ -20,14 +20,14 @@ import {
   getIds,
   getValuesFromList,
 } from '../../lib/extract';
+import { CreateTaskDto } from '../task/core/dto';
 import {
   CreateTodoDto,
   MoveTodoDto,
   ReadStreamlineDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
-} from './dto';
-import { CreateTaskDto } from '../task/core/dto';
+} from './core/dto';
 
 @UseGuards(AccessTokenGuard)
 @Controller('/calendars')

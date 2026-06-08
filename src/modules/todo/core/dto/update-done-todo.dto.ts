@@ -1,9 +1,10 @@
 import {
   fromBodyGetOptionalString,
   fromBodyValidateInt,
-} from '../../../lib/validate';
+} from '../../../../lib/validate';
 
-export class UpdateTodoDto {
+export class UpdateDoneTodoDto {
+  // TODO: Unify with "UpdateTodoDto" and "MoveTodoDto"
   constructor(
     //
     public readonly calendarId: number,
@@ -18,7 +19,7 @@ export class UpdateTodoDto {
     const todoId = fromBodyValidateInt(urlTid, 'Invalid TodoID');
     const notes = fromBodyGetOptionalString(body, 'notes');
 
-    return new UpdateTodoDto(
+    return new UpdateDoneTodoDto(
       //
       calendarId,
       todoId,

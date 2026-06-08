@@ -1,7 +1,7 @@
 import {
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
-} from '../../../lib/validate';
+} from '../../../../lib/validate';
 
 export class MoveTodoDto {
   constructor(

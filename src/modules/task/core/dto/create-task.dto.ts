@@ -3,7 +3,7 @@ import {
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '../../../../lib/validate';
-import { TodoRto } from '../../../todo/rto';
+import { TodoRto } from '../../../todo/dependent/rto';
 
 export class CreateTaskDto {
   constructor(

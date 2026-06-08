@@ -1,28 +1,29 @@
 import {
   fromBodyGetOptionalString,
+  fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
-} from '../../../lib/validate';
+} from '../../../../lib/validate';
 
-export class UpdateDoneTodoDto {
-  // TODO: Unify with "UpdateTodoDto" and "MoveTodoDto"
+export class CreateTodoDto {
   constructor(
     //
     public readonly calendarId: number,
-    public readonly todoId: number,
+    public readonly date: string,
     public readonly notes: string | undefined,
     public readonly user: ReqUser,
   ) {}
 
-  static fromBody(urlCid: string, urlTid: string, body: any, user: ReqUser) {
+  static fromBody(urlCid: string, body: any, user: ReqUser) {
     // Validation
     const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
-    const todoId = fromBodyValidateInt(urlTid, 'Invalid TodoID');
+    const date = fromBodyGetRequiredLocalDate(body, 'date');
+    // TODO: Validate "date"
     const notes = fromBodyGetOptionalString(body, 'notes');
 
-    return new UpdateDoneTodoDto(
+    return new CreateTodoDto(
       //
       calendarId,
-      todoId,
+      date,
       notes,
       user,
     );

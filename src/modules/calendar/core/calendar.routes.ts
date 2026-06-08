@@ -7,7 +7,7 @@ import {
 } from './dto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { calendarService } from './calendar.service';
-import { todoService } from '../../todo/todo.service';
+import { todoService } from '../../todo/core/todo.service';
 import { taskService } from '../../task/core/task.service';
 import { TCalendarPrev } from '../../../sdk/types';
 
