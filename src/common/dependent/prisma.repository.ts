@@ -3,12 +3,10 @@ import {
   PrismaClient,
   Task as PrismaTask,
   Todo as PrismaTodo,
-} from 'generated/prisma';
+} from '@prisma/client';
 
 export type Calendar = PrismaCalendar;
 export type Task = PrismaTask;
 export type Todo = PrismaTodo;
 
-class PrismaRepository extends PrismaClient {}
-
-export const prisma = new PrismaRepository();
+export const prisma = new PrismaClient();

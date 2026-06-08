@@ -1,6 +1,8 @@
 .git
-.gitignore
 .idea
 dist
 node_modules
-npm-debug.log
+.env.example
+.gitignore
+.gitattributes
+docker-compose.yaml
