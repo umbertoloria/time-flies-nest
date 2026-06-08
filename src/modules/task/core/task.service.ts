@@ -1,8 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
-import { taskRepository } from './task.repository';
-import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
 import { isFirstOne } from '../../../lib/list';
-import { TaskRto } from './rto';
+import { taskRepository } from '../dependent/task.repository';
+import { TaskRto } from '../dependent/rto';
+import { CreateTaskDto, UpdateTaskDto } from './dto';
+import { TaskNotFoundError } from './errors';
 
 class TaskService {
   async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
@@ -70,7 +70,7 @@ class TaskService {
     const task = await taskRepository.findTask(dto.calendarId, dto.taskId);
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new TaskNotFoundError();
     }
 
     const upd = await taskRepository.update(dto);
