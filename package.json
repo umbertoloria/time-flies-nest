@@ -8,8 +8,8 @@
   "scripts": {
     "format": "biome format --write src/",
     "build:prisma": "prisma generate",
-    "build:hono": "tsc",
-    "build": "npm run build:prisma && npm run build:hono",
+    "build:api": "tsc",
+    "build": "npm run build:prisma && npm run build:api",
     "dev": "tsx watch src/main.ts",
     "start": "node dist/main.js",
     "test": "jest",
