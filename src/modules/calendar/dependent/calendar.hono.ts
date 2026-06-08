@@ -1,8 +1,6 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@shared/dependent/hono/server-hono';
-import { createModuleErrorHandler } from '@shared/dependent/hono/errors-handler';
 import { calendarRoutes } from '../core/calendar.routes';
-import { mapCalendarError2StatusCode } from '../core/errors';
 import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from './gdto';
 
 const app = new Hono<HonoEnv>();
@@ -47,7 +45,5 @@ app.post('/calendars/:id', async (c) => {
 
   return c.json(response);
 });
-
-app.onError(createModuleErrorHandler(mapCalendarError2StatusCode));
 
 export const calendarApp = app;

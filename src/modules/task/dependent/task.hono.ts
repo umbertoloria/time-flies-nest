@@ -1,8 +1,6 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@shared/dependent/hono/server-hono';
-import { createModuleErrorHandler } from '@shared/dependent/hono/errors-handler';
 import { taskRoutes } from '../core/task.routes';
-import { mapTaskError2StatusCode } from '../core/errors';
 
 const app = new Hono<HonoEnv>();
 
@@ -41,7 +39,5 @@ app.post('/calendars/:id/date/:tid', async (c) => {
 
   return c.json(response);
 });
-
-app.onError(createModuleErrorHandler(mapTaskError2StatusCode));
 
 export const taskApp = app;

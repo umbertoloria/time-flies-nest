@@ -21,3 +21,9 @@ export class ForbiddenError extends Error {
     this.name = 'ForbiddenError';
   }
 }
+
+export const mapAppError2StatusCode = new Map<Function, number>([
+  [BadRequestError, 400],
+  [UnauthorizedError, 401],
+  [ForbiddenError, 403],
+]);
