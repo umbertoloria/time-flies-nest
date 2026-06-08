@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+
     "baseUrl": "./",
 
     "paths": {
@@ -18,13 +19,12 @@
     "forceConsistentCasingInFileNames": true,
 
     "esModuleInterop": true,
-    "resolvePackageJsonExports": true,
 
     // "declaration": true,
     "sourceMap": true,
     "removeComments": true,
     // "incremental": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
   },
 
   "include": [
@@ -32,6 +32,5 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
   ]
 }

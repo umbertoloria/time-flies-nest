@@ -6,7 +6,10 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**"]
+    "includes": [
+      "src/**",
+      "!src/generated"
+    ]
   },
   "formatter": {
     "enabled": true,
