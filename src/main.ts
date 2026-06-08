@@ -1,12 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { startHonoServer } from './hono/server.hono';
 
-const PORT = parseInt('' + process.env.PORT, 10);
+export const PORT = parseInt('' + process.env.PORT, 10);
 
-const corsAllowedOrigins = process.env.CORS_ORIGINS_WHITELIST?.split(',') || [];
+export const corsAllowedOrigins =
+  process.env.CORS_ORIGINS_WHITELIST?.split(',') || [];
 
 async function bootstrap() {
+  startHonoServer(PORT);
+
   const app = await NestFactory.create(AppModule, {
     /*httpsOptions: {
       key: fs.readFileSync('./secrets/server.key'),
@@ -39,7 +43,9 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(PORT);
+  // await app.listen(PORT);
+  // FIXME
+  await app.listen(2255);
 
   const logger = new Logger('Bootstrap');
   const server = app.getHttpServer();
