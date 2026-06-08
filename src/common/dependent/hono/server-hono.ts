@@ -3,7 +3,6 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { taskRoutes } from '../../../modules/task/core/task.routes';
 import { todoRoutes } from '../../../modules/todo/core/todo.routes';
 import { authMiddleware } from './auth.middleware';
 import {
@@ -22,6 +21,7 @@ import {
 } from '../../../modules/todo/core/errors';
 import { getConfigs } from '../configs';
 import { calendarApp } from '../../../modules/calendar/dependent/calendar.hono';
+import { taskApp } from '../../../modules/task/dependent/task.hono';
 
 export type HonoEnv = {
   Variables: {
@@ -183,43 +183,7 @@ export function startHonoServer() {
   });
 
   app.route('', calendarApp);
-
-  // ---------------- TASK ROUTES ---------------- //
-  app.post('/calendars/:id/date', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const body = await c.req.json();
-
-    const response = await taskRoutes.create(paramCalendarId, body, user);
-
-    return c.json(response);
-  });
-
-  app.get('/calendars/:id/date/:date', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const paramDate = c.req.param('date');
-
-    const response = await taskRoutes.read(paramCalendarId, paramDate, user);
-
-    return c.json(response);
-  });
-
-  app.post('/calendars/:id/date/:tid', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const paramTaskId = c.req.param('tid');
-    const body = await c.req.json();
-
-    const response = await taskRoutes.update(
-      paramCalendarId,
-      paramTaskId,
-      body,
-      user,
-    );
-
-    return c.json(response);
-  });
+  app.route('', taskApp);
 
   serve(
     {
