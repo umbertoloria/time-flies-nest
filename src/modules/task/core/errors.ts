@@ -4,3 +4,7 @@ export class TaskNotFoundError extends Error {
     this.name = 'TaskNotFoundError';
   }
 }
+
+export const mapTaskError2StatusCode = new Map<Function, number>([
+  [TaskNotFoundError, 404],
+]);

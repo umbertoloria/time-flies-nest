@@ -11,3 +11,8 @@ export class TodoAlreadyDoneError extends Error {
     this.name = 'TodoAlreadyDoneError';
   }
 }
+
+export const mapTodoError2StatusCode = new Map<Function, number>([
+  [TodoNotFoundError, 404],
+  [TodoAlreadyDoneError, 400],
+]);

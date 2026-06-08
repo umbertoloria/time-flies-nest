@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { HonoEnv } from '@shared/dependent/hono/server-hono';
 import { createModuleErrorHandler } from '@shared/dependent/hono/errors-handler';
 import { taskRoutes } from '../core/task.routes';
-import { TaskNotFoundError } from '../core/errors';
+import { mapTaskError2StatusCode } from '../core/errors';
 
 const app = new Hono<HonoEnv>();
 
@@ -42,9 +42,6 @@ app.post('/calendars/:id/date/:tid', async (c) => {
   return c.json(response);
 });
 
-const mapError2StatusCode = new Map<Function, number>([
-  [TaskNotFoundError, 404],
-]);
-app.onError(createModuleErrorHandler(mapError2StatusCode));
+app.onError(createModuleErrorHandler(mapTaskError2StatusCode));
 
 export const taskApp = app;

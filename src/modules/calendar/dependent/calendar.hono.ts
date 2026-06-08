@@ -2,10 +2,7 @@ import { Hono } from 'hono';
 import { HonoEnv } from '@shared/dependent/hono/server-hono';
 import { createModuleErrorHandler } from '@shared/dependent/hono/errors-handler';
 import { calendarRoutes } from '../core/calendar.routes';
-import {
-  CalendarNotFoundError,
-  CalendarUsesNotesCannotBeDisabledError,
-} from '../core/errors';
+import { mapCalendarError2StatusCode } from '../core/errors';
 import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from './gdto';
 
 const app = new Hono<HonoEnv>();
@@ -51,10 +48,6 @@ app.post('/calendars/:id', async (c) => {
   return c.json(response);
 });
 
-const mapError2StatusCode = new Map<Function, number>([
-  [CalendarNotFoundError, 404],
-  [CalendarUsesNotesCannotBeDisabledError, 400],
-]);
-app.onError(createModuleErrorHandler(mapError2StatusCode));
+app.onError(createModuleErrorHandler(mapCalendarError2StatusCode));
 
 export const calendarApp = app;

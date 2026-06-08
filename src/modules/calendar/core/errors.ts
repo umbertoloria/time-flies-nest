@@ -11,3 +11,8 @@ export class CalendarUsesNotesCannotBeDisabledError extends Error {
     this.name = 'CalendarUsesNotesCannotBeDisabledError';
   }
 }
+
+export const mapCalendarError2StatusCode = new Map<Function, number>([
+  [CalendarNotFoundError, 404],
+  [CalendarUsesNotesCannotBeDisabledError, 400],
+]);
