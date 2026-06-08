@@ -2,7 +2,6 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
-import { corsAllowedOrigins } from '../../main';
 import { calendarRoutes } from '../../modules/calendar/core/calendar.routes';
 import {
   ReadCalendarsGdtoSchema,
@@ -25,6 +24,7 @@ import {
   TodoAlreadyDoneError,
   TodoNotFoundError,
 } from '../../modules/todo/core/errors';
+import { getConfigs } from '../../core/configs';
 
 export type HonoEnv = {
   Variables: {
@@ -32,13 +32,13 @@ export type HonoEnv = {
   };
 };
 
-export function startHonoServer(port: number) {
+export function startHonoServer() {
   const app = new Hono<HonoEnv>();
 
   app.use(
     '*',
     cors({
-      origin: corsAllowedOrigins,
+      origin: getConfigs().corsAllowedOrigins,
       allowHeaders: ['Content-Type', 'Authorization'],
       // allowMethods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       allowMethods: ['GET', 'POST'],
@@ -253,12 +253,10 @@ export function startHonoServer(port: number) {
     return c.json(response);
   });
 
-  console.log(`🚀 Hono Server listening on port ${port}`);
-
   serve(
     {
       fetch: app.fetch,
-      port,
+      port: getConfigs().port,
     },
     (info) => {
       const { address, port } = info;

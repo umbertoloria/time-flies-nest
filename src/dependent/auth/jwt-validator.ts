@@ -1,16 +1,12 @@
-import 'dotenv/config';
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
+import { getConfigs } from '../../core/configs';
 import { ForbiddenError } from '../../core/errors';
 
-export const JWT_JWKS_URI = process.env.JWT_JWKS_URI!;
-export const JWT_ISSUER = process.env.JWT_ISSUER!;
-export const JWT_AUDIENCE = process.env.JWT_AUDIENCE!;
-
-const jwks = createRemoteJWKSet(new URL(JWT_JWKS_URI));
+const jwks = createRemoteJWKSet(new URL(getConfigs().jwtJwksUri));
 
 export async function validateJwt(token: string): Promise<JWTPayload> {
   const { payload } = await jwtVerify(token, jwks, {
-    issuer: JWT_ISSUER,
+    issuer: getConfigs().jwtIssuer,
   });
 
   verifyPayload(payload);
@@ -27,7 +23,7 @@ function verifyPayload(payload: JWTPayload): void {
     : payload.aud
       ? [payload.aud]
       : [];
-  if (!audiences.includes(JWT_AUDIENCE)) {
+  if (!audiences.includes(getConfigs().jwtAudience)) {
     throw new ForbiddenError('Invalid audience');
   }
 
