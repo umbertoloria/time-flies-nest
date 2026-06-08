@@ -3,7 +3,6 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { todoRoutes } from '../../../modules/todo/core/todo.routes';
 import { authMiddleware } from './auth.middleware';
 import {
   BadRequestError,
@@ -22,6 +21,7 @@ import {
 import { getConfigs } from '../configs';
 import { calendarApp } from '../../../modules/calendar/dependent/calendar.hono';
 import { taskApp } from '../../../modules/task/dependent/task.hono';
+import { todoApp } from '../../../modules/todo/dependent/todo.hono';
 
 export type HonoEnv = {
   Variables: {
@@ -115,73 +115,7 @@ export function startHonoServer() {
     );
   });
 
-  // ---------------- TOD0 ROUTES ---------------- //
-  app.get('/calendars/streamline', async (c) => {
-    const user = c.get('user');
-
-    const response = await todoRoutes.readStreamline(user);
-
-    return c.json(response);
-  });
-
-  app.post('/calendars/:id/todo', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const body = await c.req.json();
-
-    const response = await todoRoutes.create(paramCalendarId, body, user);
-
-    return c.json(response);
-  });
-
-  app.post('/calendars/:id/todo/:tid/update-notes', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const paramTodoId = c.req.param('tid');
-    const body = await c.req.json();
-
-    const response = await todoRoutes.updateTodoNotes(
-      paramCalendarId,
-      paramTodoId,
-      body,
-      user,
-    );
-
-    return c.json(response);
-  });
-
-  app.post('/calendars/:id/todo/:tid/move', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const paramTodoId = c.req.param('tid');
-    const body = await c.req.json();
-
-    const response = await todoRoutes.moveTodo(
-      paramCalendarId,
-      paramTodoId,
-      body,
-      user,
-    );
-
-    return c.json(response);
-  });
-
-  app.post('/calendars/:id/todo/:tid/set-as-done', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const paramTodoId = c.req.param('tid');
-    const body = await c.req.json();
-
-    const response = await todoRoutes.updateTodoSetAsDone(
-      paramCalendarId,
-      paramTodoId,
-      body,
-      user,
-    );
-
-    return c.json(response);
-  });
-
+  app.route('', todoApp);
   app.route('', calendarApp);
   app.route('', taskApp);
 
