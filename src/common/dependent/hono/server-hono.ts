@@ -1,4 +1,3 @@
-import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
@@ -10,15 +9,7 @@ import {
 } from '../../core/errors';
 import { getConfigs } from '../configs';
 import { authMiddleware } from './auth.middleware';
-import {
-  CalendarNotFoundError,
-  CalendarUsesNotesCannotBeDisabledError,
-} from '@app/calendar/core/errors';
-import { TaskNotFoundError } from '@app/task/core/errors';
-import { TodoAlreadyDoneError, TodoNotFoundError } from '@app/todo/core/errors';
-import { calendarApp } from '@app/calendar/dependent/calendar.hono';
-import { taskApp } from '@app/task/dependent/task.hono';
-import { todoApp } from '@app/todo/dependent/todo.hono';
+import { getHttpErrorName, getKoResponse } from './errors-handler';
 
 export type HonoEnv = {
   Variables: {
@@ -26,7 +17,7 @@ export type HonoEnv = {
   };
 };
 
-export function startHonoServer() {
+export function createHonoServer() {
   const app = new Hono<HonoEnv>();
 
   app.use(
@@ -42,32 +33,18 @@ export function startHonoServer() {
 
   app.use('*', authMiddleware);
 
-  const errorStatusMap = new Map<Function, number>([
-    // Common
+  const mapError2StatusCode = new Map<Function, number>([
     [BadRequestError, 400],
     [UnauthorizedError, 401],
     [ForbiddenError, 403],
-    // Domain-specific
-    [CalendarNotFoundError, 404],
-    [CalendarUsesNotesCannotBeDisabledError, 400],
-    [TaskNotFoundError, 404],
-    [TodoNotFoundError, 404],
-    [TodoAlreadyDoneError, 400],
   ]);
-
-  function getHttpErrorName(status: number): string {
-    const names: Record<number, string> = {
-      400: 'Bad Request',
-      401: 'Unauthorized',
-      403: 'Forbidden',
-      404: 'Not Found',
-      409: 'Conflict',
-    };
-    return names[status] || 'Internal Server Error';
-  }
-
   app.onError((err, c) => {
     console.error(`Hono Error: ${err.message}`);
+
+    const koResponse = getKoResponse(mapError2StatusCode, err, c);
+    if (koResponse) {
+      return koResponse;
+    }
 
     if (err instanceof HTTPException) {
       return c.json(
@@ -91,18 +68,6 @@ export function startHonoServer() {
       );
     }
 
-    const mappedStatus = errorStatusMap.get(err.constructor);
-    if (mappedStatus) {
-      return c.json(
-        {
-          statusCode: mappedStatus,
-          error: getHttpErrorName(mappedStatus),
-          message: err.message,
-        },
-        mappedStatus as any,
-      );
-    }
-
     return c.json(
       {
         statusCode: 500,
@@ -112,18 +77,5 @@ export function startHonoServer() {
     );
   });
 
-  app.route('', todoApp);
-  app.route('', calendarApp);
-  app.route('', taskApp);
-
-  serve(
-    {
-      fetch: app.fetch,
-      port: getConfigs().port,
-    },
-    (info) => {
-      const { address, port } = info;
-      console.log(`Application is running on: http://${address}:${port}`);
-    },
-  );
+  return app;
 }

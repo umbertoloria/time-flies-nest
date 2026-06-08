@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@shared/dependent/hono/server-hono';
+import { createModuleErrorHandler } from '@shared/dependent/hono/errors-handler';
 import { todoRoutes } from '../core/todo.routes';
+import { TodoAlreadyDoneError, TodoNotFoundError } from '../core/errors';
 
 const app = new Hono<HonoEnv>();
 
@@ -69,5 +71,11 @@ app.post('/calendars/:id/todo/:tid/set-as-done', async (c) => {
 
   return c.json(response);
 });
+
+const mapError2StatusCode = new Map<Function, number>([
+  [TodoNotFoundError, 404],
+  [TodoAlreadyDoneError, 400],
+]);
+app.onError(createModuleErrorHandler(mapError2StatusCode));
 
 export const todoApp = app;
