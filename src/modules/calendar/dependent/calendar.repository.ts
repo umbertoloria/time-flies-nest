@@ -1,4 +1,4 @@
-import { Calendar, prisma } from '../../../prisma.repository';
+import { Calendar, prisma } from '../../../dependent/prisma.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
 
 class CalendarRepository {

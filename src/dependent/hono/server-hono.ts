@@ -10,7 +10,7 @@ import {
 } from '../../modules/calendar/dependent/gdto';
 import { taskRoutes } from '../../modules/task/core/task.routes';
 import { todoRoutes } from '../../modules/todo/core/todo.routes';
-import { authMiddleware } from './auth-hono.middleware';
+import { authMiddleware } from './auth.middleware';
 import {
   BadRequestError,
   ForbiddenError,
@@ -25,7 +25,7 @@ import {
   TodoAlreadyDoneError,
   TodoNotFoundError,
 } from '../../modules/todo/core/errors';
-import { getConfigs } from '../../core/configs';
+import { getConfigs } from '../configs';
 
 export type HonoEnv = {
   Variables: {

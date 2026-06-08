@@ -1,9 +1,9 @@
-import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../../sdk/types';
+import { TCalendarSDK, TNewDoneTask, TNewTodo } from '../../../core/sdk/types';
 import {
   excludeDuplicates,
   getIds,
   getValuesFromList,
-} from '../../../lib/extract';
+} from '../../../core/lib/extract';
 import { calendarService } from '../../calendar/core/calendar.service';
 import { taskService } from '../../task/core/task.service';
 import { CreateTaskDto } from '../../task/core/dto';

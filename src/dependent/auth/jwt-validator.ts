@@ -1,6 +1,6 @@
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
-import { getConfigs } from '../../core/configs';
 import { ForbiddenError } from '../../core/errors';
+import { getConfigs } from '../configs';
 
 const jwks = createRemoteJWKSet(new URL(getConfigs().jwtJwksUri));
 

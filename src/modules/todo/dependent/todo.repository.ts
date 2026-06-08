@@ -1,4 +1,4 @@
-import { prisma, Todo } from '../../../prisma.repository';
+import { prisma, Todo } from '../../../dependent/prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,

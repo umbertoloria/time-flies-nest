@@ -1,7 +1,7 @@
 import {
   fromBodyGetOptionalString,
   fromBodyValidateInt,
-} from '../../../../lib/validate';
+} from '../../../../core/lib/validate';
 
 export class UpdateTodoDto {
   constructor(

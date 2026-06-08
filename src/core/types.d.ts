@@ -1,7 +1,3 @@
-interface Request {
-  currUser?: ReqUser;
-}
-
 interface ReqUser {
   id: string;
   sub: string;

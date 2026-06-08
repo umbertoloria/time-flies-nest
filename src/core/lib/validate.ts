@@ -1,4 +1,4 @@
-import { BadRequestError } from '../core/errors';
+import { BadRequestError } from '../errors';
 
 // STRING
 export function fromBodyGetOptionalString(

@@ -1,4 +1,4 @@
-import { prisma, Task } from '../../../prisma.repository';
+import { prisma, Task } from '../../../dependent/prisma.repository';
 import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
 
 class TaskRepository {
