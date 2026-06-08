@@ -1,6 +1,5 @@
 .git
 .idea
-dist
 node_modules
 .env.example
 .gitignore

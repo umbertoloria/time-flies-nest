@@ -1,13 +1,15 @@
-FROM node:20
+FROM oven/bun:alpine
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-RUN npm ci
+COPY package.json bun.lock ./
+
+RUN bun install --frozen-lockfile
 
 COPY . .
-RUN npm run prisma:generate
-RUN npm run build
+
+RUN DATABASE_URL=postgresql://mock:mock@localhost:5432/mock bun run build
 
 ENV NODE_ENV=production
 EXPOSE 8663
-CMD ["npm", "run", "start"]
+
+CMD ["bun", "run", "start"]
