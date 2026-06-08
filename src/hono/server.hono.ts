@@ -8,6 +8,7 @@ import {
   UpdateCalendarGdtoSchema,
 } from '../modules/calendar/dependent/gdto';
 import { taskRoutes } from '../modules/task/core/task.routes';
+import { todoRoutes } from '../modules/todo/core/todo.routes';
 import { authMiddleware } from './auth-hono.middleware';
 
 export type HonoEnv = {
@@ -43,6 +44,74 @@ export function startHonoServer(port: number) {
     );
   });
 
+  // ---------------- TOD0 ROUTES ---------------- //
+  app.get('/calendars/streamline', async (c) => {
+    const user = c.get('user');
+
+    const response = await todoRoutes.readStreamline(user);
+
+    return c.json(response);
+  });
+
+  app.post('/calendars/:id/todo', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const body = await c.req.json();
+
+    const response = await todoRoutes.create(paramCalendarId, body, user);
+
+    return c.json(response);
+  });
+
+  app.post('/calendars/:id/todo/:tid/update-notes', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const paramTodoId = c.req.param('tid');
+    const body = await c.req.json();
+
+    const response = await todoRoutes.updateTodoNotes(
+      paramCalendarId,
+      paramTodoId,
+      body,
+      user,
+    );
+
+    return c.json(response);
+  });
+
+  app.post('/calendars/:id/todo/:tid/move', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const paramTodoId = c.req.param('tid');
+    const body = await c.req.json();
+
+    const response = await todoRoutes.moveTodo(
+      paramCalendarId,
+      paramTodoId,
+      body,
+      user,
+    );
+
+    return c.json(response);
+  });
+
+  app.post('/calendars/:id/todo/:tid/set-as-done', async (c) => {
+    const user = c.get('user');
+    const paramCalendarId = c.req.param('id');
+    const paramTodoId = c.req.param('tid');
+    const body = await c.req.json();
+
+    const response = await todoRoutes.updateTodoSetAsDone(
+      paramCalendarId,
+      paramTodoId,
+      body,
+      user,
+    );
+
+    return c.json(response);
+  });
+
+  // ---------------- CALENDAR ROUTES ---------------- //
   app.get('/calendars', async (c) => {
     const user = c.get('user');
     const query = c.req.query();
@@ -84,6 +153,7 @@ export function startHonoServer(port: number) {
     return c.json(response);
   });
 
+  // ---------------- TASK ROUTES ---------------- //
   app.post('/calendars/:id/date', async (c) => {
     const user = c.get('user');
     const paramCalendarId = c.req.param('id');
@@ -119,8 +189,6 @@ export function startHonoServer(port: number) {
 
     return c.json(response);
   });
-
-  // FIXME: Add the others
 
   console.log(`🚀 Hono Server listening on port ${port}`);
 
