@@ -3,11 +3,6 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { calendarRoutes } from '../../../modules/calendar/core/calendar.routes';
-import {
-  ReadCalendarsGdtoSchema,
-  UpdateCalendarGdtoSchema,
-} from '../../../modules/calendar/dependent/gdto';
 import { taskRoutes } from '../../../modules/task/core/task.routes';
 import { todoRoutes } from '../../../modules/todo/core/todo.routes';
 import { authMiddleware } from './auth.middleware';
@@ -26,6 +21,7 @@ import {
   TodoNotFoundError,
 } from '../../../modules/todo/core/errors';
 import { getConfigs } from '../configs';
+import { calendarApp } from '../../../modules/calendar/dependent/calendar.hono';
 
 export type HonoEnv = {
   Variables: {
@@ -186,47 +182,7 @@ export function startHonoServer() {
     return c.json(response);
   });
 
-  // ---------------- CALENDAR ROUTES ---------------- //
-  app.get('/calendars', async (c) => {
-    const user = c.get('user');
-    const query = c.req.query();
-
-    const gdto = ReadCalendarsGdtoSchema.parse(query);
-
-    const response = await calendarRoutes.readAll(gdto, user);
-
-    return c.json(response);
-  });
-
-  app.post('/calendars', async (c) => {
-    const user = c.get('user');
-    const body = await c.req.json();
-
-    const response = await calendarRoutes.create(body, user);
-
-    return c.json(response);
-  });
-
-  app.get('/calendars/:id', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-
-    const response = await calendarRoutes.read(paramCalendarId, user);
-
-    return c.json(response);
-  });
-
-  app.post('/calendars/:id', async (c) => {
-    const user = c.get('user');
-    const paramCalendarId = c.req.param('id');
-    const body = await c.req.json();
-
-    const gdto = UpdateCalendarGdtoSchema.parse(body);
-
-    const response = await calendarRoutes.update(paramCalendarId, gdto, user);
-
-    return c.json(response);
-  });
+  app.route('', calendarApp);
 
   // ---------------- TASK ROUTES ---------------- //
   app.post('/calendars/:id/date', async (c) => {
