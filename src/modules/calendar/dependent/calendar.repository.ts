@@ -1,12 +1,17 @@
-import { Calendar, prisma } from '@shared/dependent/prisma.repository';
+import {
+  Calendar,
+  ExtendedPrismaClient,
+} from '@shared/dependent/prisma.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
 
-class CalendarRepository {
+export class CalendarRepository {
+  constructor(private prisma: ExtendedPrismaClient) {}
+
   public findCalendarsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
   ): Promise<Calendar[]> {
-    return prisma.calendar.findMany({
+    return this.prisma.calendar.findMany({
       where: {
         user_id: userId,
         ...(showAll
@@ -24,7 +29,7 @@ class CalendarRepository {
   }
 
   public findById(calendarId: number): Promise<Calendar | null> {
-    return prisma.calendar.findUnique({
+    return this.prisma.calendar.findUnique({
       where: {
         id: calendarId,
       },
@@ -32,7 +37,7 @@ class CalendarRepository {
   }
 
   public create(dto: CreateCalendarDto): Promise<Calendar> {
-    return prisma.calendar.create({
+    return this.prisma.calendar.create({
       data: {
         name: dto.name,
         color: dto.color,
@@ -44,7 +49,7 @@ class CalendarRepository {
   }
 
   public update(dto: UpdateCalendarDto): Promise<Calendar> {
-    return prisma.calendar.update({
+    return this.prisma.calendar.update({
       where: {
         id: dto.calendarId,
       },
@@ -57,5 +62,3 @@ class CalendarRepository {
     });
   }
 }
-
-export const calendarRepository = new CalendarRepository();

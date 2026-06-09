@@ -1,9 +1,10 @@
 import type { Context } from 'hono';
+import { HonoEnv } from './server-hono.ts';
 
 export const getKoResponse = (
   mapError2StatusCode: Map<Function, number>,
   err: Error,
-  c: Context,
+  c: Context<HonoEnv>,
 ) => {
   const status = mapError2StatusCode.get(err.constructor);
 
@@ -19,19 +20,6 @@ export const getKoResponse = (
   }
 
   return undefined;
-};
-
-export const createModuleErrorHandler = (
-  mapError2StatusCode: Map<Function, number>,
-) => {
-  return (err: Error, c: Context) => {
-    const koResponse = getKoResponse(mapError2StatusCode, err, c);
-    if (koResponse) {
-      return koResponse;
-    }
-
-    throw err;
-  };
 };
 
 export function getHttpErrorName(status: number): string {

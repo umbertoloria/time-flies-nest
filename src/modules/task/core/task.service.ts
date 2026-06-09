@@ -1,12 +1,14 @@
 import { isFirstOne } from '@shared/core/lib/list';
-import { taskRepository } from '../dependent/task.repository';
+import { TaskRepository } from '../dependent/task.repository';
 import { TaskRto } from '../dependent/rto';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { TaskNotFoundError } from './errors';
 
-class TaskService {
+export class TaskService {
+  constructor(private taskRepository: TaskRepository) {}
+
   async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
-    const allTasks = await taskRepository.findTasksFromCalendarsAndDate(
+    const allTasks = await this.taskRepository.findTasksFromCalendarsAndDate(
       calendarIds,
       dateFrom,
     );
@@ -25,7 +27,7 @@ class TaskService {
     calendarIds: number[],
     dateFrom: string,
   ): Promise<TaskRto[]> {
-    const tasks = await taskRepository.findTasksFromCalendarsAndDate(
+    const tasks = await this.taskRepository.findTasksFromCalendarsAndDate(
       calendarIds,
       dateFrom,
     );
@@ -34,14 +36,14 @@ class TaskService {
   }
 
   async findTasksFromCalendar(calendarId: number) {
-    const tasks = await taskRepository.findTasksFromCalendar(calendarId);
+    const tasks = await this.taskRepository.findTasksFromCalendar(calendarId);
 
     return tasks.map(TaskRto.fromEntity);
   }
 
   async areThereTasksWithNotes(calendarId: number) {
     const count =
-      await taskRepository.countTasksWithNotesFromCalendar(calendarId);
+      await this.taskRepository.countTasksWithNotesFromCalendar(calendarId);
 
     return count > 0;
   }
@@ -50,7 +52,7 @@ class TaskService {
     calendarId: number,
     date: string,
   ): Promise<TaskRto[]> {
-    const tasks = await taskRepository.findTaskFromCalendarAndDate(
+    const tasks = await this.taskRepository.findTaskFromCalendarAndDate(
       calendarId,
       date,
     );
@@ -61,22 +63,20 @@ class TaskService {
   }
 
   async createDoneTask(dto: CreateTaskDto) {
-    const task = await taskRepository.create(dto);
+    const task = await this.taskRepository.create(dto);
 
     return TaskRto.fromEntity(task);
   }
 
   async updateTaskNotesByDate(dto: UpdateTaskDto) {
-    const task = await taskRepository.findTask(dto.calendarId, dto.taskId);
+    const task = await this.taskRepository.findTask(dto.calendarId, dto.taskId);
 
     if (!task) {
       throw new TaskNotFoundError();
     }
 
-    const upd = await taskRepository.update(dto);
+    const upd = await this.taskRepository.update(dto);
 
     return TaskRto.fromEntity(upd);
   }
 }
-
-export const taskService = new TaskService();

@@ -11,8 +11,18 @@ export type Calendar = PrismaCalendar;
 export type Task = PrismaTask;
 export type Todo = PrismaTodo;
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-const adapter = new PrismaPg(pool);
-export const prisma = new PrismaClient({ adapter });
+export type ExtendedPrismaClient = PrismaClient;
+
+let prisma: null | ExtendedPrismaClient = null;
+
+export const getPrisma = (databaseUrl: string) => {
+  if (!prisma) {
+    const pool = new Pool({
+      connectionString: databaseUrl,
+    });
+    const adapter = new PrismaPg(pool);
+    prisma = new PrismaClient({ adapter });
+  }
+
+  return prisma;
+};

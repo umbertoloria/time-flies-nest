@@ -1,4 +1,7 @@
-import { prisma, Todo } from '@shared/dependent/prisma.repository';
+import {
+  ExtendedPrismaClient,
+  Todo,
+} from '@shared/dependent/prisma.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -6,9 +9,11 @@ import {
   UpdateTodoDto,
 } from '../core/dto';
 
-class TodoRepository {
+export class TodoRepository {
+  constructor(private prisma: ExtendedPrismaClient) {}
+
   public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {
-    return prisma.todo.findMany({
+    return this.prisma.todo.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -25,7 +30,7 @@ class TodoRepository {
     calendarId: number,
     filterDate: string,
   ): Promise<Todo[]> {
-    return prisma.todo.findMany({
+    return this.prisma.todo.findMany({
       where: {
         calendar_id: calendarId,
         date: filterDate,
@@ -38,7 +43,7 @@ class TodoRepository {
   }
 
   public findById(todoId: number): Promise<Todo | null> {
-    return prisma.todo.findUnique({
+    return this.prisma.todo.findUnique({
       where: {
         id: todoId,
       },
@@ -46,7 +51,7 @@ class TodoRepository {
   }
 
   public countTodosWithNotesFromCalendar(calendarId: number) {
-    return prisma.todo.count({
+    return this.prisma.todo.count({
       where: {
         calendar_id: calendarId,
         NOT: {
@@ -57,7 +62,7 @@ class TodoRepository {
   }
 
   public create(dto: CreateTodoDto): Promise<Todo> {
-    return prisma.todo.create({
+    return this.prisma.todo.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
@@ -69,7 +74,7 @@ class TodoRepository {
   }
 
   public updateNotes(dto: UpdateTodoDto): Promise<Todo> {
-    return prisma.todo.update({
+    return this.prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -82,7 +87,7 @@ class TodoRepository {
 
   public updateDate(dto: MoveTodoDto): Promise<Todo> {
     // FIXME: Returns also nulls or not?
-    return prisma.todo.update({
+    return this.prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -98,7 +103,7 @@ class TodoRepository {
     doneDate: string,
     dto: UpdateDoneTodoDto,
   ): Promise<Todo> {
-    return prisma.todo.update({
+    return this.prisma.todo.update({
       where: {
         id: todoId,
       },
@@ -110,5 +115,3 @@ class TodoRepository {
     });
   }
 }
-
-export const todoRepository = new TodoRepository();

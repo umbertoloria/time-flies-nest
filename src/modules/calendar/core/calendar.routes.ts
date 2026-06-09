@@ -6,25 +6,31 @@ import {
   UpdateCalendarDto,
 } from './dto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
-import { calendarService } from './calendar.service';
-import { todoService } from '@app/todo/core/todo.service';
-import { taskService } from '@app/task/core/task.service';
+import { CalendarService } from './calendar.service';
+import { TodoService } from '@app/todo/core/todo.service';
+import { TaskService } from '@app/task/core/task.service';
 import { TCalendarPrev } from '@shared/core/sdk/types';
 
-class CalendarRoutes {
+export class CalendarRoutes {
+  constructor(
+    private calendarService: CalendarService,
+    private taskService: TaskService,
+    private todoService: TodoService,
+  ) {}
+
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = ReadCalendarsDto.fromGateway(gdto, user);
 
     // BL
     const calendars =
-      await calendarService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
         dto.user.id,
         dto.showAll,
       );
     const calendarIds = calendars.map((calendar) => calendar.id);
 
     const undoneTodos =
-      await todoService.findUndoneTodosByCalendars(calendarIds);
+      await this.todoService.findUndoneTodosByCalendars(calendarIds);
     const mapCalendar2Todos = calendarIds.map((calendarId) => ({
       calendarId,
       todoDates: undoneTodos
@@ -32,10 +38,11 @@ class CalendarRoutes {
         .map((todo) => todo.date),
     }));
 
-    const mapCalendar2DoneTasks = await taskService.findTasksDatesFromCalendars(
-      dto.dateFrom,
-      calendarIds,
-    );
+    const mapCalendar2DoneTasks =
+      await this.taskService.findTasksDatesFromCalendars(
+        dto.dateFrom,
+        calendarIds,
+      );
 
     // Response
     return calendars.map<TCalendarPrev>((calendar) => {
@@ -57,7 +64,7 @@ class CalendarRoutes {
   async create(body: any, user: ReqUser) {
     const dto = CreateCalendarDto.fromBody(body, user);
 
-    const createdCalendar = await calendarService.createCalendar(dto);
+    const createdCalendar = await this.calendarService.createCalendar(dto);
 
     return createdCalendar.toTCalendarRcd();
   }
@@ -66,16 +73,16 @@ class CalendarRoutes {
     const dto = ReadCalendarDto.fromParam(paramCalendarId, user);
 
     // BL
-    const calendar = await calendarService.findCalendarFromUser(
+    const calendar = await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
 
-    const undoneTodos = await todoService.findUndoneTodosByCalendars([
+    const undoneTodos = await this.todoService.findUndoneTodosByCalendars([
       calendar.id,
     ]);
 
-    const tasks = await taskService.findTasksFromCalendar(dto.calendarId);
+    const tasks = await this.taskService.findTasksFromCalendar(dto.calendarId);
 
     // Response
     return {
@@ -98,7 +105,7 @@ class CalendarRoutes {
 
       // ... from Todos.
       const areThereTodosWithNotesInCalendar =
-        await todoService.areThereTodosWithNotes(dto.calendarId);
+        await this.todoService.areThereTodosWithNotes(dto.calendarId);
       if (areThereTodosWithNotesInCalendar) {
         // TODO: This is a leak if user is not the Calendar owner
         throw new CalendarUsesNotesCannotBeDisabledError();
@@ -106,16 +113,14 @@ class CalendarRoutes {
 
       // ... from (Done) Tasks.
       const areThereTasksWithNotesInCalendar =
-        await taskService.areThereTasksWithNotes(dto.calendarId);
+        await this.taskService.areThereTasksWithNotes(dto.calendarId);
       if (areThereTasksWithNotesInCalendar) {
         throw new CalendarUsesNotesCannotBeDisabledError();
       }
     }
 
-    const updatedCalendar = await calendarService.updateCalendar(dto);
+    const updatedCalendar = await this.calendarService.updateCalendar(dto);
 
     return updatedCalendar.toTCalendarRcd();
   }
 }
-
-export const calendarRoutes = new CalendarRoutes();

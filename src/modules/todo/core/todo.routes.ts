@@ -4,8 +4,6 @@ import {
   getIds,
   getValuesFromList,
 } from '@shared/core/lib/extract';
-import { calendarService } from '@app/calendar/core/calendar.service';
-import { taskService } from '@app/task/core/task.service';
 import { CreateTaskDto } from '@app/task/core/dto';
 import {
   CreateTodoDto,
@@ -14,10 +12,18 @@ import {
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
-import { todoService } from './todo.service';
+import { TodoService } from './todo.service';
+import { CalendarService } from '@app/calendar/core/calendar.service';
+import { TaskService } from '@app/task/core/task.service';
 import { TodoAlreadyDoneError } from './errors';
 
-class TodoRoutes {
+export class TodoRoutes {
+  constructor(
+    private todoService: TodoService,
+    private calendarService: CalendarService,
+    private taskService: TaskService,
+  ) {}
+
   async readStreamline(
     user: ReqUser,
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
@@ -25,17 +31,17 @@ class TodoRoutes {
 
     // BL
     const calendars =
-      await calendarService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
         dto.user.id,
         true,
       );
     const calendarIds = getIds(calendars);
 
     const undoneTodos =
-      await todoService.findUndoneTodosByCalendars(calendarIds);
+      await this.todoService.findUndoneTodosByCalendars(calendarIds);
 
     const doneTasks = undoneTodos.length
-      ? await taskService.findTasksFromCalendarsAndDate(
+      ? await this.taskService.findTasksFromCalendarsAndDate(
           calendarIds,
           undoneTodos[0].date,
         )
@@ -97,7 +103,7 @@ class TodoRoutes {
   ): Promise<TNewTodo> {
     const dto = CreateTodoDto.fromBody(paramCalendarId, body, user);
 
-    const insTodo = await todoService.createTodo(dto);
+    const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
 
     return insTodo.toTNewTodo();
@@ -117,7 +123,7 @@ class TodoRoutes {
     );
 
     // BL
-    const todo = await todoService.findTodoFromCalendar(
+    const todo = await this.todoService.findTodoFromCalendar(
       dto.calendarId,
       dto.todoId,
     );
@@ -128,7 +134,7 @@ class TodoRoutes {
       throw new TodoAlreadyDoneError();
     }
 
-    const updTodo = await todoService.updateTodoNotes(dto);
+    const updTodo = await this.todoService.updateTodoNotes(dto);
     console.log('updated', updTodo);
 
     // Response
@@ -144,7 +150,7 @@ class TodoRoutes {
     const dto = MoveTodoDto.fromBody(paramCalendarId, paramTodoId, body, user);
 
     // BL
-    const todo = await todoService.findTodoFromCalendar(
+    const todo = await this.todoService.findTodoFromCalendar(
       dto.calendarId,
       dto.todoId,
     );
@@ -156,7 +162,7 @@ class TodoRoutes {
     }
 
     if (todo.date !== dto.date) {
-      const updTodo = await todoService.moveTodo(dto);
+      const updTodo = await this.todoService.moveTodo(dto);
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
 
@@ -182,13 +188,12 @@ class TodoRoutes {
     );
 
     // BL
-    const updTodo = await todoService.updateTodoSetAsDone(dto);
+    const updTodo = await this.todoService.updateTodoSetAsDone(dto);
 
     const createTaskDto = CreateTaskDto.fromTodoSetAsDone(updTodo);
-    const createdDoneTask = await taskService.createDoneTask(createTaskDto);
+    const createdDoneTask =
+      await this.taskService.createDoneTask(createTaskDto);
 
     return createdDoneTask.toTNewDoneTask();
   }
 }
-
-export const todoRoutes = new TodoRoutes();

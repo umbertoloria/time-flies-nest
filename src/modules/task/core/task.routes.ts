@@ -1,10 +1,16 @@
 import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
-import { todoService } from '@app/todo/core/todo.service';
 import { TCalendarSDK, TNewDoneTask } from '@shared/core/sdk/types';
-import { calendarService } from '@app/calendar/core/calendar.service';
-import { taskService } from './task.service';
+import { TaskService } from './task.service';
+import { CalendarService } from '@app/calendar/core/calendar.service';
+import { TodoService } from '@app/todo/core/todo.service';
 
-class TaskRoutes {
+export class TaskRoutes {
+  constructor(
+    private taskService: TaskService,
+    private calendarService: CalendarService,
+    private todoService: TodoService,
+  ) {}
+
   async create(
     paramCalendarId: string,
     body: any,
@@ -13,7 +19,7 @@ class TaskRoutes {
     // FIXME: Ops... forgot to check if user owns the calendar...
     const dto = CreateTaskDto.fromBody(paramCalendarId, body);
 
-    const createdTask = await taskService.createDoneTask(dto);
+    const createdTask = await this.taskService.createDoneTask(dto);
 
     return createdTask.toTNewDoneTask();
   }
@@ -27,17 +33,17 @@ class TaskRoutes {
     const dto = ReadCalendarDateDto.fromBody(paramCalendarId, date, user);
 
     // BL
-    const calendar = await calendarService.findCalendarFromUser(
+    const calendar = await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
     );
 
-    const undoneTodos = await todoService.findUndoneTodosByCalendar(
+    const undoneTodos = await this.todoService.findUndoneTodosByCalendar(
       calendar.id,
       dto.date,
     );
 
-    const doneTasks = await taskService.findTasksFromCalendarAndDate(
+    const doneTasks = await this.taskService.findTasksFromCalendarAndDate(
       dto.calendarId,
       dto.date,
     );
@@ -59,10 +65,8 @@ class TaskRoutes {
     // FIXME: Ops... forgot to check if user owns the calendar...
     const dto = UpdateTaskDto.fromBody(paramCalendarId, paramTaskId, body);
 
-    const updatedTask = await taskService.updateTaskNotesByDate(dto);
+    const updatedTask = await this.taskService.updateTaskNotesByDate(dto);
 
     return updatedTask.toTNewDoneTask();
   }
 }
-
-export const taskRoutes = new TaskRoutes();

@@ -1,9 +1,14 @@
-import { prisma, Task } from '@shared/dependent/prisma.repository';
+import {
+  ExtendedPrismaClient,
+  Task,
+} from '@shared/dependent/prisma.repository';
 import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
 
-class TaskRepository {
+export class TaskRepository {
+  constructor(private prisma: ExtendedPrismaClient) {}
+
   public findTask(calendarId: number, taskId: number): Promise<Task | null> {
-    return prisma.task.findUnique({
+    return this.prisma.task.findUnique({
       where: {
         id: taskId,
         calendar_id: calendarId,
@@ -15,7 +20,7 @@ class TaskRepository {
     calendarIds: number[],
     dateFrom: string,
   ) {
-    return prisma.task.findMany({
+    return this.prisma.task.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -31,7 +36,7 @@ class TaskRepository {
   }
 
   public findTasksFromCalendar(calendarId: number): Promise<Task[]> {
-    return prisma.task.findMany({
+    return this.prisma.task.findMany({
       where: {
         calendar_id: calendarId,
       },
@@ -42,7 +47,7 @@ class TaskRepository {
   }
 
   public countTasksWithNotesFromCalendar(calendarId: number) {
-    return prisma.task.count({
+    return this.prisma.task.count({
       where: {
         calendar_id: calendarId,
         NOT: {
@@ -56,7 +61,7 @@ class TaskRepository {
     calendarId: number,
     date: string,
   ): Promise<Task[]> {
-    return prisma.task.findMany({
+    return this.prisma.task.findMany({
       where: {
         calendar_id: calendarId,
         date,
@@ -65,7 +70,7 @@ class TaskRepository {
   }
 
   public create(dto: CreateTaskDto): Promise<Task> {
-    return prisma.task.create({
+    return this.prisma.task.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
@@ -75,7 +80,7 @@ class TaskRepository {
   }
 
   public update(dto: UpdateTaskDto): Promise<Task> {
-    return prisma.task.update({
+    return this.prisma.task.update({
       where: {
         id: dto.taskId,
         calendar_id: dto.calendarId,
@@ -86,5 +91,3 @@ class TaskRepository {
     });
   }
 }
-
-export const taskRepository = new TaskRepository();
