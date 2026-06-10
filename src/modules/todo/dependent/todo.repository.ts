@@ -1,3 +1,4 @@
+import { ITodoRepository } from '../core/itodo.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import {
   CreateTodoDto,
@@ -5,19 +6,16 @@ import {
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from '../core/dto';
-import { TodoEntity } from '../core/entity';
 import {
   entitiesFromTodos,
   entityFromTodo,
   entityFromTodoOrNull,
 } from './entity-mapper';
 
-export class TodoRepository {
+export class TodoRepository implements ITodoRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  public async findTodosFromCalendars(
-    calendarIds: number[],
-  ): Promise<TodoEntity[]> {
+  async findTodosFromCalendars(calendarIds: number[]) {
     const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: {
@@ -33,10 +31,7 @@ export class TodoRepository {
     return entitiesFromTodos(records);
   }
 
-  public async findUndoneTodosByCalendar(
-    calendarId: number,
-    filterDate: string,
-  ): Promise<TodoEntity[]> {
+  async findUndoneTodosByCalendar(calendarId: number, filterDate: string) {
     const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: calendarId,
@@ -51,7 +46,7 @@ export class TodoRepository {
     return entitiesFromTodos(records);
   }
 
-  public async findById(todoId: number): Promise<TodoEntity | null> {
+  async findById(todoId: number) {
     const record = await this.prisma.todo.findUnique({
       where: {
         id: todoId,
@@ -61,7 +56,7 @@ export class TodoRepository {
     return entityFromTodoOrNull(record);
   }
 
-  public countTodosWithNotesFromCalendar(calendarId: number) {
+  countTodosWithNotesFromCalendar(calendarId: number) {
     return this.prisma.todo.count({
       where: {
         calendar_id: calendarId,
@@ -72,7 +67,7 @@ export class TodoRepository {
     });
   }
 
-  public async create(dto: CreateTodoDto): Promise<TodoEntity> {
+  async create(dto: CreateTodoDto) {
     const record = await this.prisma.todo.create({
       data: {
         calendar_id: dto.calendarId,
@@ -86,7 +81,7 @@ export class TodoRepository {
     return entityFromTodo(record);
   }
 
-  public async updateNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
+  async updateNotes(dto: UpdateTodoDto) {
     const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
@@ -100,7 +95,7 @@ export class TodoRepository {
     return entityFromTodo(record);
   }
 
-  public async updateDate(dto: MoveTodoDto): Promise<TodoEntity | null> {
+  async updateDate(dto: MoveTodoDto) {
     // FIXME: Returns also nulls or not?
     const record = await this.prisma.todo.update({
       where: {
@@ -115,11 +110,11 @@ export class TodoRepository {
     return entityFromTodoOrNull(record);
   }
 
-  public async updateTodoDoneDate(
+  async updateTodoDoneDate(
     todoId: number,
     doneDate: string,
     dto: UpdateDoneTodoDto,
-  ): Promise<TodoEntity> {
+  ) {
     const record = await this.prisma.todo.update({
       where: {
         id: todoId,

@@ -1,4 +1,4 @@
-import { TodoRepository } from '../dependent/todo.repository';
+import { ITodoRepository } from './itodo.repository';
 import { CalendarService } from '@app/calendar/core/calendar.service';
 import {
   CreateTodoDto,
@@ -11,7 +11,7 @@ import { TodoNotFoundError } from './errors';
 
 export class TodoService {
   constructor(
-    private todoRepository: TodoRepository,
+    private todoRepository: ITodoRepository,
     private calendarService: CalendarService,
   ) {}
 
