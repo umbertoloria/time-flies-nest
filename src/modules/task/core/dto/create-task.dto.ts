@@ -3,7 +3,7 @@ import {
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '@core/lib/validate';
-import { TodoRto } from '@app/todo/dependent/rto';
+import { TodoEntity } from '@app/todo/core/entity';
 
 export class CreateTaskDto {
   constructor(
@@ -29,7 +29,7 @@ export class CreateTaskDto {
     );
   }
 
-  static fromTodoSetAsDone(updTodo: TodoRto) {
+  static fromTodoSetAsDone(updTodo: TodoEntity) {
     return new CreateTaskDto(
       //
       updTodo.calendarId,

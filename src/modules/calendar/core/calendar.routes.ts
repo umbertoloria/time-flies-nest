@@ -12,6 +12,7 @@ import { TodoService } from '@app/todo/core/todo.service';
 import { TaskService } from '@app/task/core/task.service';
 import { TCalendarPrev } from '@core/sdk/types';
 import { TaskRto } from '@app/task/core/rto';
+import { TodoRto } from '@app/todo/core/rto';
 
 export class CalendarRoutes {
   constructor(
@@ -90,7 +91,9 @@ export class CalendarRoutes {
     return {
       ...calendar,
       days: tasks.map((task) => TaskRto.fromEntity(task).toTDayWithId()),
-      plannedDays: undoneTodos.map((todo) => todo.toTDayWithId()),
+      plannedDays: undoneTodos.map((todo) =>
+        TodoRto.fromEntity(todo).toTDayWithId(),
+      ),
     };
   }
 

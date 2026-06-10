@@ -1,16 +1,24 @@
-import { ExtendedPrismaClient, Todo } from '@dep/prisma';
+import { ExtendedPrismaClient } from '@dep/prisma';
 import {
   CreateTodoDto,
   MoveTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from '../core/dto';
+import { TodoEntity } from '../core/entity';
+import {
+  entitiesFromTodos,
+  entityFromTodo,
+  entityFromTodoOrNull,
+} from './entity-mapper';
 
 export class TodoRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  public findTodosFromCalendars(calendarIds: number[]): Promise<Todo[]> {
-    return this.prisma.todo.findMany({
+  public async findTodosFromCalendars(
+    calendarIds: number[],
+  ): Promise<TodoEntity[]> {
+    const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -21,13 +29,15 @@ export class TodoRepository {
         date: 'asc',
       },
     });
+
+    return entitiesFromTodos(records);
   }
 
-  public findUndoneTodosByCalendar(
+  public async findUndoneTodosByCalendar(
     calendarId: number,
     filterDate: string,
-  ): Promise<Todo[]> {
-    return this.prisma.todo.findMany({
+  ): Promise<TodoEntity[]> {
+    const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: calendarId,
         date: filterDate,
@@ -37,14 +47,18 @@ export class TodoRepository {
         date: 'asc',
       },
     });
+
+    return entitiesFromTodos(records);
   }
 
-  public findById(todoId: number): Promise<Todo | null> {
-    return this.prisma.todo.findUnique({
+  public async findById(todoId: number): Promise<TodoEntity | null> {
+    const record = await this.prisma.todo.findUnique({
       where: {
         id: todoId,
       },
     });
+
+    return entityFromTodoOrNull(record);
   }
 
   public countTodosWithNotesFromCalendar(calendarId: number) {
@@ -58,8 +72,8 @@ export class TodoRepository {
     });
   }
 
-  public create(dto: CreateTodoDto): Promise<Todo> {
-    return this.prisma.todo.create({
+  public async create(dto: CreateTodoDto): Promise<TodoEntity> {
+    const record = await this.prisma.todo.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
@@ -68,10 +82,12 @@ export class TodoRepository {
         // missed: undefined, // TODO: Deal with Legacy "missed" flag
       },
     });
+
+    return entityFromTodo(record);
   }
 
-  public updateNotes(dto: UpdateTodoDto): Promise<Todo> {
-    return this.prisma.todo.update({
+  public async updateNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
+    const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -80,11 +96,13 @@ export class TodoRepository {
         notes: dto.notes || null,
       },
     });
+
+    return entityFromTodo(record);
   }
 
-  public updateDate(dto: MoveTodoDto): Promise<Todo> {
+  public async updateDate(dto: MoveTodoDto): Promise<TodoEntity | null> {
     // FIXME: Returns also nulls or not?
-    return this.prisma.todo.update({
+    const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
@@ -93,14 +111,16 @@ export class TodoRepository {
         date: dto.date,
       },
     });
+
+    return entityFromTodoOrNull(record);
   }
 
-  public updateTodoDoneDate(
+  public async updateTodoDoneDate(
     todoId: number,
     doneDate: string,
     dto: UpdateDoneTodoDto,
-  ): Promise<Todo> {
-    return this.prisma.todo.update({
+  ): Promise<TodoEntity> {
+    const record = await this.prisma.todo.update({
       where: {
         id: todoId,
       },
@@ -110,5 +130,7 @@ export class TodoRepository {
         notes: dto.notes || undefined,
       },
     });
+
+    return entityFromTodo(record);
   }
 }

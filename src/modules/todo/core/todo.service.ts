@@ -1,12 +1,12 @@
 import { TodoRepository } from '../dependent/todo.repository';
 import { CalendarService } from '@app/calendar/core/calendar.service';
-import { TodoRto } from '../dependent/rto';
 import {
   CreateTodoDto,
   MoveTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
+import { TodoEntity } from './entity';
 import { TodoNotFoundError } from './errors';
 
 export class TodoService {
@@ -15,32 +15,28 @@ export class TodoService {
     private calendarService: CalendarService,
   ) {}
 
-  async findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoRto[]> {
-    const todos = await this.todoRepository.findTodosFromCalendars(calendarIds);
-
-    return todos.map(TodoRto.fromEntity);
+  findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
+    return this.todoRepository.findTodosFromCalendars(calendarIds);
   }
 
-  async findUndoneTodosByCalendar(
+  findUndoneTodosByCalendar(
     calendarId: number,
     filterDate: string,
-  ): Promise<TodoRto[]> {
-    const undoneTodos = await this.todoRepository.findUndoneTodosByCalendar(
+  ): Promise<TodoEntity[]> {
+    return this.todoRepository.findUndoneTodosByCalendar(
       calendarId,
       filterDate,
     );
-
-    return undoneTodos.map(TodoRto.fromEntity);
   }
 
   async findTodoFromCalendar(calendarId: number, todoId: number) {
     const todo = await this.todoRepository.findById(todoId);
 
-    if (!todo || todo.calendar_id !== calendarId) {
+    if (!todo || todo.calendarId !== calendarId) {
       throw new TodoNotFoundError();
     }
 
-    return TodoRto.fromEntity(todo);
+    return todo;
   }
 
   async areThereTodosWithNotes(calendarId: number) {
@@ -56,32 +52,30 @@ export class TodoService {
       dto.user.id,
     );
 
-    const created = await this.todoRepository.create(dto);
-
-    return TodoRto.fromEntity(created);
+    return await this.todoRepository.create(dto);
   }
 
-  async updateTodoNotes(dto: UpdateTodoDto) {
+  async updateTodoNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
     const upd = await this.todoRepository.updateNotes(dto);
 
-    if (typeof upd !== 'object') {
+    if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();
     }
 
-    return TodoRto.fromEntity(upd);
+    return upd;
   }
 
-  async moveTodo(dto: MoveTodoDto) {
+  async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
     const upd = await this.todoRepository.updateDate(dto);
 
-    if (typeof upd !== 'object') {
+    if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();
     }
 
-    return TodoRto.fromEntity(upd);
+    return upd;
   }
 
-  async updateTodoSetAsDone(dto: UpdateDoneTodoDto) {
+  async updateTodoSetAsDone(dto: UpdateDoneTodoDto): Promise<TodoEntity> {
     await this.calendarService.findCalendarFromUser(
       dto.calendarId,
       dto.user.id,
@@ -97,10 +91,10 @@ export class TodoService {
       dto,
     );
 
-    if (typeof upd !== 'object') {
+    if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();
     }
 
-    return TodoRto.fromEntity(upd);
+    return upd;
   }
 }

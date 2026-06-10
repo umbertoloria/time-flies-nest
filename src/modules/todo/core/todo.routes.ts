@@ -18,6 +18,7 @@ import { TaskService } from '@app/task/core/task.service';
 import { TodoAlreadyDoneError } from './errors';
 import { CalendarRto } from '@app/calendar/core/rto';
 import { TaskRto } from '@app/task/core/rto';
+import { TodoRto } from '@app/todo/core/rto';
 
 export class TodoRoutes {
   constructor(
@@ -82,7 +83,9 @@ export class TodoRoutes {
                     ...CalendarRto.fromEntity(calendar).toTCalendarRcd(),
                     sortedPin: calendar.sortedPin,
                     todos: dateCalendarUndoneTodos.length
-                      ? dateCalendarUndoneTodos.map((todo) => todo.toTNewTodo())
+                      ? dateCalendarUndoneTodos.map((todo) =>
+                          TodoRto.fromEntity(todo).toTNewTodo(),
+                        )
                       : undefined,
                     doneTasks: dateCalendarDoneTasks.length
                       ? dateCalendarDoneTasks.map((task) =>
@@ -108,7 +111,7 @@ export class TodoRoutes {
     const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
 
-    return insTodo.toTNewTodo();
+    return TodoRto.fromEntity(insTodo).toTNewTodo();
   }
 
   async updateTodoNotes(
@@ -140,7 +143,7 @@ export class TodoRoutes {
     console.log('updated', updTodo);
 
     // Response
-    return updTodo.toTNewTodo();
+    return TodoRto.fromEntity(updTodo).toTNewTodo();
   }
 
   async moveTodo(
@@ -168,12 +171,12 @@ export class TodoRoutes {
       console.log('updated', updTodo);
       // TODO: There could be multiple ToDos on the same day
 
-      return updTodo.toTNewTodo();
+      return TodoRto.fromEntity(updTodo).toTNewTodo();
     }
     // Otherwise, pointless update...
 
     // Response
-    return todo.toTNewTodo();
+    return TodoRto.fromEntity(todo).toTNewTodo();
   }
 
   async updateTodoSetAsDone(

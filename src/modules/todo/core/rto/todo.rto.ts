@@ -1,4 +1,4 @@
-import { Todo } from '@dep/prisma';
+import { TodoEntity } from '../entity';
 import { TDay, TNewTodo } from '@core/sdk/types';
 
 export class TodoRto {
@@ -10,12 +10,12 @@ export class TodoRto {
     public readonly notes?: string,
   ) {}
 
-  static fromEntity(entity: Todo) {
+  static fromEntity(entity: TodoEntity) {
     return new TodoRto(
       entity.id,
-      entity.calendar_id,
+      entity.calendarId,
       entity.date,
-      entity.done_date ?? undefined,
+      entity.doneDate ?? undefined,
       entity.notes ?? undefined,
     );
   }

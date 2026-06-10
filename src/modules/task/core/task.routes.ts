@@ -5,6 +5,7 @@ import { CalendarService } from '@app/calendar/core/calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
 import { CalendarRto } from '@app/calendar/core/rto';
 import { TaskRto } from '@app/task/core/rto';
+import { TodoRto } from '@app/todo/core/rto';
 
 export class TaskRoutes {
   constructor(
@@ -56,7 +57,7 @@ export class TaskRoutes {
       doneTasks: doneTasks.map((doneTask) =>
         TaskRto.fromEntity(doneTask).toTNewDoneTask(),
       ),
-      todos: undoneTodos.map((todo) => todo.toTNewTodo()),
+      todos: undoneTodos.map((todo) => TodoRto.fromEntity(todo).toTNewTodo()),
     };
   }
 
