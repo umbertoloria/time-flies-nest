@@ -4,12 +4,19 @@ import { getConfigs } from '../configs';
 
 const jwks = createRemoteJWKSet(new URL(getConfigs().jwtJwksUri));
 
-export async function validateJwt(token: string): Promise<JWTPayload> {
+export async function verifyJwtAndCreateReqUser(token: string) {
+  const payload = await validateToken(token);
+
+  verifyPayload(payload);
+
+  return createReqUserFromJWT(payload);
+}
+
+async function validateToken(token: string): Promise<JWTPayload> {
   const { payload } = await jwtVerify(token, jwks, {
     issuer: getConfigs().jwtIssuer,
   });
 
-  verifyPayload(payload);
   return payload;
 }
 
@@ -35,4 +42,23 @@ function verifyPayload(payload: JWTPayload): void {
     throw new ForbiddenError('Insufficient scope');
   }
   */
+}
+
+function createReqUserFromJWT(payload: JWTPayload): ReqUser {
+  const scopes = (payload.scope as string)?.split(' ') ?? [];
+
+  const audience = Array.isArray(payload.aud)
+    ? payload.aud
+    : payload.aud
+      ? [payload.aud]
+      : [];
+
+  return {
+    id: payload.sub!,
+    sub: payload.sub!,
+    clientId: payload.client_id as string,
+    organizationId: payload.organization_id as string,
+    scopes,
+    audience,
+  };
 }
