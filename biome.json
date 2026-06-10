@@ -7,8 +7,7 @@
   },
   "files": {
     "includes": [
-      "src/**",
-      "!src/generated"
+      "src/**"
     ]
   },
   "formatter": {
@@ -107,7 +106,9 @@
         "useNamespaceKeyword": "error"
       }
     },
-    "includes": ["src/**"]
+    "includes": [
+      "src/**"
+    ]
   },
   "javascript": {
     "formatter": {
@@ -120,7 +121,9 @@
       "attributePosition": "auto",
       "bracketSpacing": true
     },
-    "globals": ["exports"],
+    "globals": [
+      "exports"
+    ],
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
     }
@@ -133,10 +136,17 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "includes": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.mts",
+        "**/*.cts"
+      ],
       "linter": {
         "rules": {
-          "complexity": { "noArguments": "error" },
+          "complexity": {
+            "noArguments": "error"
+          },
           "correctness": {
             "noConstAssign": "off",
             "noGlobalObjectCalls": "off",
@@ -147,7 +157,9 @@
             "noUnreachable": "off",
             "noUnreachableSuper": "off"
           },
-          "style": { "useConst": "error" },
+          "style": {
+            "useConst": "error"
+          },
           "suspicious": {
             "noClassAssign": "off",
             "noDuplicateClassMembers": "off",
