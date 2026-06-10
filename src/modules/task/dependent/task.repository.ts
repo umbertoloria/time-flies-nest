@@ -1,3 +1,4 @@
+import { ITaskRepository } from '../core/itask.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
 import { TaskEntity } from '../core/entity';
@@ -7,10 +8,10 @@ import {
   entityFromTaskOrNull,
 } from './entity-mapper';
 
-export class TaskRepository {
+export class TaskRepository implements ITaskRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  public async findTask(
+  async findTask(
     calendarId: number,
     taskId: number,
   ): Promise<TaskEntity | null> {
@@ -24,10 +25,7 @@ export class TaskRepository {
     return entityFromTaskOrNull(record);
   }
 
-  public async findTasksFromCalendarsAndDate(
-    calendarIds: number[],
-    dateFrom: string,
-  ) {
+  async findTasksFromCalendarsAndDate(calendarIds: number[], dateFrom: string) {
     const records = await this.prisma.task.findMany({
       where: {
         calendar_id: {
@@ -45,9 +43,7 @@ export class TaskRepository {
     return entitiesFromTasks(records);
   }
 
-  public async findTasksFromCalendar(
-    calendarId: number,
-  ): Promise<TaskEntity[]> {
+  async findTasksFromCalendar(calendarId: number) {
     const records = await this.prisma.task.findMany({
       where: {
         calendar_id: calendarId,
@@ -60,7 +56,7 @@ export class TaskRepository {
     return entitiesFromTasks(records);
   }
 
-  public countTasksWithNotesFromCalendar(calendarId: number) {
+  countTasksWithNotesFromCalendar(calendarId: number) {
     return this.prisma.task.count({
       where: {
         calendar_id: calendarId,
@@ -71,10 +67,7 @@ export class TaskRepository {
     });
   }
 
-  public async findTaskFromCalendarAndDate(
-    calendarId: number,
-    date: string,
-  ): Promise<TaskEntity[]> {
+  async findTaskFromCalendarAndDate(calendarId: number, date: string) {
     const records = await this.prisma.task.findMany({
       where: {
         calendar_id: calendarId,
@@ -85,7 +78,7 @@ export class TaskRepository {
     return entitiesFromTasks(records);
   }
 
-  public async create(dto: CreateTaskDto): Promise<TaskEntity> {
+  async create(dto: CreateTaskDto) {
     const record = await this.prisma.task.create({
       data: {
         calendar_id: dto.calendarId,
@@ -97,7 +90,7 @@ export class TaskRepository {
     return entityFromTask(record);
   }
 
-  public async update(dto: UpdateTaskDto): Promise<TaskEntity> {
+  async update(dto: UpdateTaskDto) {
     const record = await this.prisma.task.update({
       where: {
         id: dto.taskId,

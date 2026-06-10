@@ -2,7 +2,7 @@ import { CalendarRoutes } from '@app/calendar/core/calendar.routes';
 import { TaskRoutes } from '@app/task/core/task.routes';
 import { TodoRoutes } from '@app/todo/core/todo.routes';
 import { Context } from 'hono';
-import { HonoEnv } from '../server-hono';
+import { HonoEnv } from '@dep/hono';
 import { CalendarRepository } from '@app/calendar/dependent/calendar.repository';
 import { TaskRepository } from '@app/task/dependent/task.repository';
 import { TodoRepository } from '@app/todo/dependent/todo.repository';

@@ -1,11 +1,11 @@
+import { ITaskRepository } from './itask.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { TaskEntity } from './entity';
 import { isFirstOne } from '@core/lib/list';
-import { TaskRepository } from '../dependent/task.repository';
 import { TaskNotFoundError } from './errors';
 
 export class TaskService {
-  constructor(private taskRepository: TaskRepository) {}
+  constructor(private taskRepository: ITaskRepository) {}
 
   async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
     const allTasks = await this.taskRepository.findTasksFromCalendarsAndDate(
