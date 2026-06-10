@@ -2,7 +2,7 @@ import {
   fromBodyGetOptionalString,
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
-} from '@shared/core/lib/validate';
+} from '@core/lib/validate';
 import { TodoRto } from '@app/todo/dependent/rto';
 
 export class CreateTaskDto {

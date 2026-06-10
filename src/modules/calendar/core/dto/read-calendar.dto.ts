@@ -1,4 +1,4 @@
-import { fromBodyValidateInt } from '@shared/core/lib/validate';
+import { fromBodyValidateInt } from '@core/lib/validate';
 
 export class ReadCalendarDto {
   constructor(

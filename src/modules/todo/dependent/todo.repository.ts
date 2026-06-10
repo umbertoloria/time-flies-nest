@@ -1,4 +1,4 @@
-import { ExtendedPrismaClient, Todo } from '@shared/dependent/prisma';
+import { ExtendedPrismaClient, Todo } from '@dep/prisma';
 import {
   CreateTodoDto,
   MoveTodoDto,

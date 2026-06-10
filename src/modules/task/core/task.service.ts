@@ -1,4 +1,4 @@
-import { isFirstOne } from '@shared/core/lib/list';
+import { isFirstOne } from '@core/lib/list';
 import { TaskRepository } from '../dependent/task.repository';
 import { TaskRto } from '../dependent/rto';
 import { CreateTaskDto, UpdateTaskDto } from './dto';

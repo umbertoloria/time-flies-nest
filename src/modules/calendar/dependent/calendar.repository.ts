@@ -1,4 +1,4 @@
-import { Calendar, ExtendedPrismaClient } from '@shared/dependent/prisma';
+import { Calendar, ExtendedPrismaClient } from '@dep/prisma';
 import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
 
 export class CalendarRepository {

@@ -9,7 +9,7 @@ import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
 import { TaskService } from '@app/task/core/task.service';
-import { TCalendarPrev } from '@shared/core/sdk/types';
+import { TCalendarPrev } from '@core/sdk/types';
 
 export class CalendarRoutes {
   constructor(

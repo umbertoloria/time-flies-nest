@@ -2,7 +2,7 @@ import {
   fromBodyGetRequiredBool,
   fromBodyGetRequiredColor,
   fromBodyGetRequiredString,
-} from '@shared/core/lib/validate';
+} from '@core/lib/validate';
 
 export class CreateCalendarDto {
   constructor(

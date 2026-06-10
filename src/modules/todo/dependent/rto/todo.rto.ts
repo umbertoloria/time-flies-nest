@@ -1,5 +1,5 @@
-import { Todo } from '@shared/dependent/prisma';
-import { TDay, TNewTodo } from '@shared/core/sdk/types';
+import { Todo } from '@dep/prisma';
+import { TDay, TNewTodo } from '@core/sdk/types';
 
 export class TodoRto {
   constructor(

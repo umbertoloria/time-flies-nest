@@ -2,14 +2,14 @@ import { Env, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { ExtendedPrismaClient } from '@shared/dependent/prisma';
-import { getConfig } from '@shared/core/config';
-import { authMiddleware } from 'src/shared/dependent/hono/middleware/auth.middleware';
-import { prismaMiddleware } from '@shared/dependent/hono/middleware/prisma.middleware';
+import { ExtendedPrismaClient } from '@dep/prisma';
+import { getConfig } from '@core/config';
+import { authMiddleware } from './middleware/auth.middleware';
+import { prismaMiddleware } from './middleware/prisma.middleware';
 import {
   AppContext,
   appContextMiddleware,
-} from '@shared/dependent/hono/middleware/app-context.middleware';
+} from './middleware/app-context.middleware';
 import { getHttpErrorName, getKoResponse } from './errors-mapper';
 
 export type HonoEnv = Env & {

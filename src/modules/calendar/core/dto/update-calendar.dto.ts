@@ -1,4 +1,4 @@
-import { fromBodyValidateInt, validateColor } from '@shared/core/lib/validate';
+import { fromBodyValidateInt, validateColor } from '@core/lib/validate';
 import { UpdateCalendarGdto } from '../../dependent/gdto';
 
 export class UpdateCalendarDto {

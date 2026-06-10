@@ -2,7 +2,7 @@ import {
   fromBodyGetOptionalString,
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
-} from '@shared/core/lib/validate';
+} from '@core/lib/validate';
 
 export class CreateTodoDto {
   constructor(
