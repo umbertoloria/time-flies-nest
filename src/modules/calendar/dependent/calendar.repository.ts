@@ -1,14 +1,20 @@
-import { Calendar, ExtendedPrismaClient } from '@dep/prisma';
+import { ExtendedPrismaClient } from '@dep/prisma';
 import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
+import {
+  entitiesFromCalendars,
+  entityFromCalendar,
+  entityFromCalendarOrNull,
+} from './entity-mapper.ts';
+import { CalendarEntity } from '@app/calendar/core/entity';
 
 export class CalendarRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  public findCalendarsFromUserIdViaSortedPin(
+  public async findCalendarsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
-  ): Promise<Calendar[]> {
-    return this.prisma.calendar.findMany({
+  ): Promise<CalendarEntity[]> {
+    const records = await this.prisma.calendar.findMany({
       where: {
         user_id: userId,
         ...(showAll
@@ -23,18 +29,22 @@ export class CalendarRepository {
         sorted_pin: 'asc',
       },
     });
+
+    return entitiesFromCalendars(records);
   }
 
-  public findById(calendarId: number): Promise<Calendar | null> {
-    return this.prisma.calendar.findUnique({
+  public async findById(calendarId: number): Promise<CalendarEntity | null> {
+    const record = await this.prisma.calendar.findUnique({
       where: {
         id: calendarId,
       },
     });
+
+    return entityFromCalendarOrNull(record);
   }
 
-  public create(dto: CreateCalendarDto): Promise<Calendar> {
-    return this.prisma.calendar.create({
+  public async create(dto: CreateCalendarDto): Promise<CalendarEntity> {
+    const record = await this.prisma.calendar.create({
       data: {
         name: dto.name,
         color: dto.color,
@@ -43,10 +53,12 @@ export class CalendarRepository {
         user_id: dto.user.id,
       },
     });
+
+    return entityFromCalendar(record);
   }
 
-  public update(dto: UpdateCalendarDto): Promise<Calendar> {
-    return this.prisma.calendar.update({
+  public async update(dto: UpdateCalendarDto): Promise<CalendarEntity> {
+    const record = await this.prisma.calendar.update({
       where: {
         id: dto.calendarId,
       },
@@ -57,5 +69,7 @@ export class CalendarRepository {
         uses_notes: dto.usesNotes,
       },
     });
+
+    return entityFromCalendar(record);
   }
 }

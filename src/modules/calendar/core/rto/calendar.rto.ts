@@ -1,4 +1,4 @@
-import { Calendar } from '@dep/prisma';
+import { CalendarEntity } from '../entity';
 import { TCalendarRcd } from '@core/sdk/types';
 
 export class CalendarRto {
@@ -12,15 +12,15 @@ export class CalendarRto {
     public readonly sortedPin?: number,
   ) {}
 
-  static fromEntity(entity: Calendar) {
+  static fromEntity(entity: CalendarEntity) {
     return new CalendarRto(
       entity.id,
-      entity.user_id,
+      entity.userId,
       entity.name,
       entity.color,
-      entity.planned_color,
-      entity.uses_notes ?? undefined,
-      entity.sorted_pin ?? undefined,
+      entity.plannedColor,
+      entity.usesNotes ?? undefined,
+      entity.sortedPin ?? undefined,
     );
   }
 

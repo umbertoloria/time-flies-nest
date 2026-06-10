@@ -1,4 +1,4 @@
-import { CalendarRto } from '../dependent/rto';
+import { CalendarRto } from './rto';
 import { CalendarRepository } from '../dependent/calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
@@ -22,7 +22,7 @@ export class CalendarService {
   async findCalendarFromUser(calendarId: number, userId: string) {
     const calendar = await this.calendarRepository.findById(calendarId);
 
-    if (!calendar || calendar.user_id !== userId) {
+    if (!calendar || calendar.userId !== userId) {
       throw new CalendarNotFoundError();
     }
 
