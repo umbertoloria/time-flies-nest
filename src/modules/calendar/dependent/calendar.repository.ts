@@ -1,19 +1,16 @@
+import { ICalendarRepository } from '../core/icalendar.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
-import { CalendarEntity } from '../core/entity';
 import {
   entitiesFromCalendars,
   entityFromCalendar,
   entityFromCalendarOrNull,
 } from './entity-mapper';
 
-export class CalendarRepository {
+export class CalendarRepository implements ICalendarRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  public async findCalendarsFromUserIdViaSortedPin(
-    userId: string,
-    showAll: boolean,
-  ): Promise<CalendarEntity[]> {
+  async findCalendarsFromUserIdViaSortedPin(userId: string, showAll: boolean) {
     const records = await this.prisma.calendar.findMany({
       where: {
         user_id: userId,
@@ -33,7 +30,7 @@ export class CalendarRepository {
     return entitiesFromCalendars(records);
   }
 
-  public async findById(calendarId: number): Promise<CalendarEntity | null> {
+  async findById(calendarId: number) {
     const record = await this.prisma.calendar.findUnique({
       where: {
         id: calendarId,
@@ -43,7 +40,7 @@ export class CalendarRepository {
     return entityFromCalendarOrNull(record);
   }
 
-  public async create(dto: CreateCalendarDto): Promise<CalendarEntity> {
+  async create(dto: CreateCalendarDto) {
     const record = await this.prisma.calendar.create({
       data: {
         name: dto.name,
@@ -57,7 +54,7 @@ export class CalendarRepository {
     return entityFromCalendar(record);
   }
 
-  public async update(dto: UpdateCalendarDto): Promise<CalendarEntity> {
+  async update(dto: UpdateCalendarDto) {
     const record = await this.prisma.calendar.update({
       where: {
         id: dto.calendarId,

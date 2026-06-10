@@ -1,10 +1,10 @@
+import { ICalendarRepository } from './icalendar.repository';
 import { CalendarEntity } from './entity';
-import { CalendarRepository } from '../dependent/calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
 
 export class CalendarService {
-  constructor(private calendarRepository: CalendarRepository) {}
+  constructor(private calendarRepository: ICalendarRepository) {}
 
   readCalendarIDsFromUserIdViaSortedPin(
     userId: string,
