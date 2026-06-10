@@ -1,6 +1,4 @@
-import 'dotenv/config';
-
-export const getConfigs = () => {
+export const getConfig = () => {
   return {
     corsAllowedOrigins: process.env.CORS_ORIGINS_WHITELIST?.split(',') || [],
     jwtJwksUri: process.env.JWT_JWKS_URI!,

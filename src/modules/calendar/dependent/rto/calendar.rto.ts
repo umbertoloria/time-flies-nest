@@ -1,4 +1,4 @@
-import { Calendar } from '@shared/dependent/prisma.repository';
+import { Calendar } from '@shared/dependent/prisma';
 import { TCalendarRcd } from '@shared/core/sdk/types';
 
 export class CalendarRto {

@@ -1,4 +1,4 @@
-import { Task } from '@shared/dependent/prisma.repository';
+import { Task } from '@shared/dependent/prisma';
 import { TDay, TNewDoneTask } from '@shared/core/sdk/types';
 
 export class TaskRto {

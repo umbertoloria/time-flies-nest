@@ -5,7 +5,7 @@ import {
   PrismaClient,
   Task as PrismaTask,
   Todo as PrismaTodo,
-} from '../../../generated/prisma/client';
+} from 'generated/prisma/client';
 
 export type Calendar = PrismaCalendar;
 export type Task = PrismaTask;
@@ -15,7 +15,7 @@ export type ExtendedPrismaClient = PrismaClient;
 
 let prisma: null | ExtendedPrismaClient = null;
 
-export const getPrisma = (databaseUrl: string) => {
+export const getPrismaInstance = (databaseUrl: string) => {
   if (!prisma) {
     const pool = new Pool({
       connectionString: databaseUrl,

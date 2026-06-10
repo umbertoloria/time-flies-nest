@@ -1,14 +1,14 @@
-import { CalendarRoutes } from '@app/calendar/core/calendar.routes.ts';
-import { TaskRoutes } from '@app/task/core/task.routes.ts';
-import { TodoRoutes } from '@app/todo/core/todo.routes.ts';
+import { CalendarRoutes } from '@app/calendar/core/calendar.routes';
+import { TaskRoutes } from '@app/task/core/task.routes';
+import { TodoRoutes } from '@app/todo/core/todo.routes';
 import { Context } from 'hono';
-import { HonoEnv } from '@shared/dependent/hono/server-hono.ts';
-import { CalendarRepository } from '@app/calendar/dependent/calendar.repository.ts';
-import { TaskRepository } from '@app/task/dependent/task.repository.ts';
-import { TodoRepository } from '@app/todo/dependent/todo.repository.ts';
-import { CalendarService } from '@app/calendar/core/calendar.service.ts';
-import { TaskService } from '@app/task/core/task.service.ts';
-import { TodoService } from '@app/todo/core/todo.service.ts';
+import { HonoEnv } from '../server-hono';
+import { CalendarRepository } from '@app/calendar/dependent/calendar.repository';
+import { TaskRepository } from '@app/task/dependent/task.repository';
+import { TodoRepository } from '@app/todo/dependent/todo.repository';
+import { CalendarService } from '@app/calendar/core/calendar.service';
+import { TaskService } from '@app/task/core/task.service';
+import { TodoService } from '@app/todo/core/todo.service';
 import { createMiddleware } from 'hono/factory';
 
 export type AppContext = {

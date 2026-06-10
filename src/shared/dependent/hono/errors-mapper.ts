@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { HonoEnv } from './server-hono.ts';
+import { HonoEnv } from './server-hono';
 
 export const getKoResponse = (
   mapError2StatusCode: Map<Function, number>,

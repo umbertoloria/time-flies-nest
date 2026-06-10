@@ -2,15 +2,15 @@ import { Env, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
-import { ExtendedPrismaClient } from '../prisma.repository.ts';
-import { getConfigs } from '../configs';
-import { authMiddleware } from './auth.middleware';
-import { prismaMiddleware } from '../db/prisma.middleware.ts';
+import { ExtendedPrismaClient } from '@shared/dependent/prisma';
+import { getConfig } from '@shared/core/config';
+import { authMiddleware } from 'src/shared/dependent/hono/middleware/auth.middleware';
+import { prismaMiddleware } from '@shared/dependent/hono/middleware/prisma.middleware';
 import {
   AppContext,
   appContextMiddleware,
-} from '@shared/dependent/hono/app-context.middleware.ts';
-import { getHttpErrorName, getKoResponse } from './errors-mapper.ts';
+} from '@shared/dependent/hono/middleware/app-context.middleware';
+import { getHttpErrorName, getKoResponse } from './errors-mapper';
 
 export type HonoEnv = Env & {
   Bindings: {
@@ -29,7 +29,7 @@ export function createHonoServer(mapError2StatusCode: Map<Function, number>) {
   app.use(
     '*',
     cors({
-      origin: getConfigs().corsAllowedOrigins,
+      origin: getConfig().corsAllowedOrigins,
       allowHeaders: ['Content-Type', 'Authorization'],
       // allowMethods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       allowMethods: ['GET', 'POST'],

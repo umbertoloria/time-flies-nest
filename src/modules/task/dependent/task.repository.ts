@@ -1,7 +1,4 @@
-import {
-  ExtendedPrismaClient,
-  Task,
-} from '@shared/dependent/prisma.repository';
+import { ExtendedPrismaClient, Task } from '@shared/dependent/prisma';
 import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
 
 export class TaskRepository {

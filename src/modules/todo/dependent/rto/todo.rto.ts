@@ -1,4 +1,4 @@
-import { Todo } from '@shared/dependent/prisma.repository';
+import { Todo } from '@shared/dependent/prisma';
 import { TDay, TNewTodo } from '@shared/core/sdk/types';
 
 export class TodoRto {

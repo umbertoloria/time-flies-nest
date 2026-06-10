@@ -1,8 +1,8 @@
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
-import { ForbiddenError } from '../../core/errors';
-import { getConfigs } from '../configs';
+import { ForbiddenError } from '@shared/core/errors';
+import { getConfig } from '@shared/core/config';
 
-const jwks = createRemoteJWKSet(new URL(getConfigs().jwtJwksUri));
+const jwks = createRemoteJWKSet(new URL(getConfig().jwtJwksUri));
 
 export async function verifyJwtAndCreateReqUser(token: string) {
   const payload = await validateToken(token);
@@ -14,7 +14,7 @@ export async function verifyJwtAndCreateReqUser(token: string) {
 
 async function validateToken(token: string): Promise<JWTPayload> {
   const { payload } = await jwtVerify(token, jwks, {
-    issuer: getConfigs().jwtIssuer,
+    issuer: getConfig().jwtIssuer,
   });
 
   return payload;
@@ -30,7 +30,7 @@ function verifyPayload(payload: JWTPayload): void {
     : payload.aud
       ? [payload.aud]
       : [];
-  if (!audiences.includes(getConfigs().jwtAudience)) {
+  if (!audiences.includes(getConfig().jwtAudience)) {
     throw new ForbiddenError('Invalid audience');
   }
 
