@@ -12,6 +12,7 @@
       "@core/*": ["./src/core/*"],
       "@dep/*": ["./src/dep/*"],
       "@app/*": ["./src/modules/*"],
+      "@prismagen/*": ["./generated/*"],
     },
 
     // "strict": true,
