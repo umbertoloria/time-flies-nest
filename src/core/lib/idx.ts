@@ -1,8 +1,15 @@
-type IdxItem = {
-  id: number | string;
+type TIdxItemId = number | string;
+
+type TIdxItem<K extends TIdxItemId> = {
+  id: K;
 };
 
-export const createIdxItemsAndIds = <T extends IdxItem>(items: T[]) => {
+export const createIdxItemsAndIds = <
+  K extends TIdxItemId,
+  T extends TIdxItem<K>,
+>(
+  items: T[],
+) => {
   const res = items.reduce(
     (res, item) => {
       res.idx[item.id] = item;

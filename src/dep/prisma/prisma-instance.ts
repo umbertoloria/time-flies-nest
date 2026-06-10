@@ -5,6 +5,7 @@ import {
   PrismaClient,
   Task as PrismaTask,
   Todo as PrismaTodo,
+  // @ts-ignore
 } from 'generated/prisma/client';
 
 export type Calendar = PrismaCalendar;

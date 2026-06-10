@@ -6,12 +6,12 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
 
-    "baseUrl": "./",
+    // "baseUrl": "./",
 
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@dep/*": ["src/dep/*"],
-      "@app/*": ["src/modules/*"],
+      "@core/*": ["./src/core/*"],
+      "@dep/*": ["./src/dep/*"],
+      "@app/*": ["./src/modules/*"],
     },
 
     // "strict": true,
