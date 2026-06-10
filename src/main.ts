@@ -1,4 +1,4 @@
-import { createHonoServer } from '@dep/hono/server-hono';
+import { createHonoServer } from '@dep/hono';
 import { todoApp } from '@app/todo/dependent/todo.hono';
 import { calendarApp } from '@app/calendar/dependent/calendar.hono';
 import { taskApp } from '@app/task/dependent/task.hono';

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { HonoEnv } from '@dep/hono/server-hono';
+import { HonoEnv } from '@dep/hono';
 
 const app = new Hono<HonoEnv>();
 
