@@ -10,7 +10,7 @@
 
     "paths": {
       "@core/*": ["src/core/*"],
-      "@dep/*": ["src/dependent/*"],
+      "@dep/*": ["src/dep/*"],
       "@app/*": ["src/modules/*"],
     },
 
