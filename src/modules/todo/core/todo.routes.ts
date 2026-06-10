@@ -16,6 +16,7 @@ import { TodoService } from './todo.service';
 import { CalendarService } from '@app/calendar/core/calendar.service';
 import { TaskService } from '@app/task/core/task.service';
 import { TodoAlreadyDoneError } from './errors';
+import { CalendarRto } from '@app/calendar/core/rto';
 
 export class TodoRoutes {
   constructor(
@@ -77,7 +78,7 @@ export class TodoRoutes {
                     (task) => task.calendarId === calendar.id,
                   );
                   return {
-                    ...calendar.toTCalendarRcd(),
+                    ...CalendarRto.fromEntity(calendar).toTCalendarRcd(),
                     sortedPin: calendar.sortedPin,
                     todos: dateCalendarUndoneTodos.length
                       ? dateCalendarUndoneTodos.map((todo) => todo.toTNewTodo())

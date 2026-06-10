@@ -5,6 +5,7 @@ import {
   ReadCalendarsDto,
   UpdateCalendarDto,
 } from './dto';
+import { CalendarRto } from './rto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
@@ -54,7 +55,7 @@ export class CalendarRoutes {
       )!.todoDates;
 
       return {
-        ...calendar.toTCalendarRcd(),
+        ...CalendarRto.fromEntity(calendar).toTCalendarRcd(),
         doneTaskDates,
         todoDates,
       };
@@ -66,7 +67,7 @@ export class CalendarRoutes {
 
     const createdCalendar = await this.calendarService.createCalendar(dto);
 
-    return createdCalendar.toTCalendarRcd();
+    return CalendarRto.fromEntity(createdCalendar).toTCalendarRcd();
   }
 
   async read(paramCalendarId: string, user: ReqUser) {
@@ -121,6 +122,6 @@ export class CalendarRoutes {
 
     const updatedCalendar = await this.calendarService.updateCalendar(dto);
 
-    return updatedCalendar.toTCalendarRcd();
+    return CalendarRto.fromEntity(updatedCalendar).toTCalendarRcd();
   }
 }

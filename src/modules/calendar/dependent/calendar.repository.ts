@@ -1,11 +1,11 @@
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { CreateCalendarDto, UpdateCalendarDto } from '../core/dto';
+import { CalendarEntity } from '../core/entity';
 import {
   entitiesFromCalendars,
   entityFromCalendar,
   entityFromCalendarOrNull,
-} from './entity-mapper.ts';
-import { CalendarEntity } from '@app/calendar/core/entity';
+} from './entity-mapper';
 
 export class CalendarRepository {
   constructor(private prisma: ExtendedPrismaClient) {}

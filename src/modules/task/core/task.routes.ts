@@ -3,6 +3,7 @@ import { TCalendarSDK, TNewDoneTask } from '@core/sdk/types';
 import { TaskService } from './task.service';
 import { CalendarService } from '@app/calendar/core/calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
+import { CalendarRto } from '@app/calendar/core/rto';
 
 export class TaskRoutes {
   constructor(
@@ -49,7 +50,7 @@ export class TaskRoutes {
     );
 
     return {
-      calendar: calendar.toTCalendarRcd(),
+      calendar: CalendarRto.fromEntity(calendar).toTCalendarRcd(),
       date: dto.date,
       doneTasks: doneTasks.map((doneTask) => doneTask.toTNewDoneTask()),
       todos: undoneTodos.map((todo) => todo.toTNewTodo()),

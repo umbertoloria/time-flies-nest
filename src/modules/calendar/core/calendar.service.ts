@@ -1,4 +1,4 @@
-import { CalendarRto } from './rto';
+import { CalendarEntity } from './entity';
 import { CalendarRepository } from '../dependent/calendar.repository';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
@@ -6,17 +6,14 @@ import { CalendarNotFoundError } from './errors';
 export class CalendarService {
   constructor(private calendarRepository: CalendarRepository) {}
 
-  async readCalendarIDsFromUserIdViaSortedPin(
+  readCalendarIDsFromUserIdViaSortedPin(
     userId: string,
     showAll: boolean,
-  ): Promise<CalendarRto[]> {
-    const calendars =
-      await this.calendarRepository.findCalendarsFromUserIdViaSortedPin(
-        userId,
-        showAll,
-      );
-
-    return calendars.map(CalendarRto.fromEntity);
+  ): Promise<CalendarEntity[]> {
+    return this.calendarRepository.findCalendarsFromUserIdViaSortedPin(
+      userId,
+      showAll,
+    );
   }
 
   async findCalendarFromUser(calendarId: number, userId: string) {
@@ -26,13 +23,11 @@ export class CalendarService {
       throw new CalendarNotFoundError();
     }
 
-    return CalendarRto.fromEntity(calendar);
+    return calendar;
   }
 
   async createCalendar(dto: CreateCalendarDto) {
-    const calendar = await this.calendarRepository.create(dto);
-
-    return CalendarRto.fromEntity(calendar);
+    return this.calendarRepository.create(dto);
   }
 
   async updateCalendar(dto: UpdateCalendarDto) {
@@ -44,6 +39,6 @@ export class CalendarService {
       throw new CalendarNotFoundError();
     }
 
-    return CalendarRto.fromEntity(upd);
+    return upd;
   }
 }
