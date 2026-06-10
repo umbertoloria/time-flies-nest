@@ -1,23 +1,34 @@
-import { ExtendedPrismaClient, Task } from '@dep/prisma';
+import { ExtendedPrismaClient } from '@dep/prisma';
 import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
+import { TaskEntity } from '../core/entity';
+import {
+  entitiesFromTasks,
+  entityFromTask,
+  entityFromTaskOrNull,
+} from './entity-mapper';
 
 export class TaskRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  public findTask(calendarId: number, taskId: number): Promise<Task | null> {
-    return this.prisma.task.findUnique({
+  public async findTask(
+    calendarId: number,
+    taskId: number,
+  ): Promise<TaskEntity | null> {
+    const record = await this.prisma.task.findUnique({
       where: {
         id: taskId,
         calendar_id: calendarId,
       },
     });
+
+    return entityFromTaskOrNull(record);
   }
 
-  public findTasksFromCalendarsAndDate(
+  public async findTasksFromCalendarsAndDate(
     calendarIds: number[],
     dateFrom: string,
   ) {
-    return this.prisma.task.findMany({
+    const records = await this.prisma.task.findMany({
       where: {
         calendar_id: {
           in: calendarIds,
@@ -30,10 +41,14 @@ export class TaskRepository {
         date: 'asc',
       },
     });
+
+    return entitiesFromTasks(records);
   }
 
-  public findTasksFromCalendar(calendarId: number): Promise<Task[]> {
-    return this.prisma.task.findMany({
+  public async findTasksFromCalendar(
+    calendarId: number,
+  ): Promise<TaskEntity[]> {
+    const records = await this.prisma.task.findMany({
       where: {
         calendar_id: calendarId,
       },
@@ -41,6 +56,8 @@ export class TaskRepository {
         date: 'asc',
       },
     });
+
+    return entitiesFromTasks(records);
   }
 
   public countTasksWithNotesFromCalendar(calendarId: number) {
@@ -54,30 +71,34 @@ export class TaskRepository {
     });
   }
 
-  public findTaskFromCalendarAndDate(
+  public async findTaskFromCalendarAndDate(
     calendarId: number,
     date: string,
-  ): Promise<Task[]> {
-    return this.prisma.task.findMany({
+  ): Promise<TaskEntity[]> {
+    const records = await this.prisma.task.findMany({
       where: {
         calendar_id: calendarId,
         date,
       },
     });
+
+    return entitiesFromTasks(records);
   }
 
-  public create(dto: CreateTaskDto): Promise<Task> {
-    return this.prisma.task.create({
+  public async create(dto: CreateTaskDto): Promise<TaskEntity> {
+    const record = await this.prisma.task.create({
       data: {
         calendar_id: dto.calendarId,
         date: dto.date,
         notes: dto.notes || undefined,
       },
     });
+
+    return entityFromTask(record);
   }
 
-  public update(dto: UpdateTaskDto): Promise<Task> {
-    return this.prisma.task.update({
+  public async update(dto: UpdateTaskDto): Promise<TaskEntity> {
+    const record = await this.prisma.task.update({
       where: {
         id: dto.taskId,
         calendar_id: dto.calendarId,
@@ -86,5 +107,7 @@ export class TaskRepository {
         notes: dto.notes || null,
       },
     });
+
+    return entityFromTask(record);
   }
 }

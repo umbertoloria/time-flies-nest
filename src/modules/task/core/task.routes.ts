@@ -4,6 +4,7 @@ import { TaskService } from './task.service';
 import { CalendarService } from '@app/calendar/core/calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
 import { CalendarRto } from '@app/calendar/core/rto';
+import { TaskRto } from '@app/task/core/rto';
 
 export class TaskRoutes {
   constructor(
@@ -22,7 +23,7 @@ export class TaskRoutes {
 
     const createdTask = await this.taskService.createDoneTask(dto);
 
-    return createdTask.toTNewDoneTask();
+    return TaskRto.fromEntity(createdTask).toTNewDoneTask();
   }
 
   async read(
@@ -52,7 +53,9 @@ export class TaskRoutes {
     return {
       calendar: CalendarRto.fromEntity(calendar).toTCalendarRcd(),
       date: dto.date,
-      doneTasks: doneTasks.map((doneTask) => doneTask.toTNewDoneTask()),
+      doneTasks: doneTasks.map((doneTask) =>
+        TaskRto.fromEntity(doneTask).toTNewDoneTask(),
+      ),
       todos: undoneTodos.map((todo) => todo.toTNewTodo()),
     };
   }
@@ -68,6 +71,6 @@ export class TaskRoutes {
 
     const updatedTask = await this.taskService.updateTaskNotesByDate(dto);
 
-    return updatedTask.toTNewDoneTask();
+    return TaskRto.fromEntity(updatedTask).toTNewDoneTask();
   }
 }

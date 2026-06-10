@@ -1,4 +1,4 @@
-import { Task } from '@dep/prisma';
+import { TaskEntity } from '../entity';
 import { TDay, TNewDoneTask } from '@core/sdk/types';
 
 export class TaskRto {
@@ -9,10 +9,10 @@ export class TaskRto {
     public readonly notes?: string,
   ) {}
 
-  static fromEntity(entity: Task) {
+  static fromEntity(entity: TaskEntity) {
     return new TaskRto(
       entity.id,
-      entity.calendar_id,
+      entity.calendarId,
       entity.date,
       entity.notes ?? undefined,
     );

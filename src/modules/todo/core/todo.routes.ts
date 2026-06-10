@@ -17,6 +17,7 @@ import { CalendarService } from '@app/calendar/core/calendar.service';
 import { TaskService } from '@app/task/core/task.service';
 import { TodoAlreadyDoneError } from './errors';
 import { CalendarRto } from '@app/calendar/core/rto';
+import { TaskRto } from '@app/task/core/rto';
 
 export class TodoRoutes {
   constructor(
@@ -85,7 +86,7 @@ export class TodoRoutes {
                       : undefined,
                     doneTasks: dateCalendarDoneTasks.length
                       ? dateCalendarDoneTasks.map((task) =>
-                          task.toTNewDoneTask(),
+                          TaskRto.fromEntity(task).toTNewDoneTask(),
                         )
                       : undefined,
                   };
@@ -195,6 +196,6 @@ export class TodoRoutes {
     const createdDoneTask =
       await this.taskService.createDoneTask(createTaskDto);
 
-    return createdDoneTask.toTNewDoneTask();
+    return TaskRto.fromEntity(createdDoneTask).toTNewDoneTask();
   }
 }
