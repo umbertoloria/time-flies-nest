@@ -1,16 +1,19 @@
 import { createMiddleware } from 'hono/factory';
+import { HonoEnv } from '@dep/hono';
+import { getEnvConfig } from '../config';
+import { verifyJwtAndCreateReqUser } from '@dep/jose';
 import { HTTPException } from 'hono/http-exception';
 import { UnauthorizedError } from '@core/errors';
-import { verifyJwtAndCreateReqUser } from '@dep/jose';
-import { HonoEnv } from '../server-hono';
 
 export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   const headers = c.req.header();
 
+  const config = getEnvConfig(c);
+
   try {
     const token = extractBearerTokenFromHeaders(headers.authorization);
 
-    const reqUser = await verifyJwtAndCreateReqUser(token);
+    const reqUser = await verifyJwtAndCreateReqUser(config, token);
 
     c.set('user', reqUser);
 

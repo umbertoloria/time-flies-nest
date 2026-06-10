@@ -1,9 +1,12 @@
 import { createMiddleware } from 'hono/factory';
-import { HonoEnv } from '../server-hono';
+import { HonoEnv } from '@dep/hono';
+import { getEnvConfig } from '../config';
 import { getPrismaInstance } from '@dep/prisma';
 
 export const prismaMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
-  const dbUrl = c.env?.DATABASE_URL || process.env.DATABASE_URL;
+  const config = getEnvConfig(c);
+
+  const dbUrl = config.dbUrl;
   if (!dbUrl) {
     return c.json(
       {

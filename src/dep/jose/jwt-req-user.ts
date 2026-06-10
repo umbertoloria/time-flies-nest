@@ -1,26 +1,36 @@
 import { createRemoteJWKSet, JWTPayload, jwtVerify } from 'jose';
+import { IEnvConfig } from '@core/config';
 import { ForbiddenError } from '@core/errors';
-import { getConfig } from '@core/config';
 
-const jwks = createRemoteJWKSet(new URL(getConfig().jwtJwksUri));
+function getJwks(config: IEnvConfig) {
+  return createRemoteJWKSet(new URL(config.jwtJwksUri));
+}
 
-export async function verifyJwtAndCreateReqUser(token: string) {
-  const payload = await validateToken(token);
+export async function verifyJwtAndCreateReqUser(
+  config: IEnvConfig,
+  token: string,
+) {
+  const payload = await validateToken(token, config);
 
-  verifyPayload(payload);
+  verifyPayload(payload, config);
 
   return createReqUserFromJWT(payload);
 }
 
-async function validateToken(token: string): Promise<JWTPayload> {
+async function validateToken(
+  token: string,
+  config: IEnvConfig,
+): Promise<JWTPayload> {
+  const jwks = getJwks(config);
+
   const { payload } = await jwtVerify(token, jwks, {
-    issuer: getConfig().jwtIssuer,
+    issuer: config.jwtIssuer,
   });
 
   return payload;
 }
 
-function verifyPayload(payload: JWTPayload): void {
+function verifyPayload(payload: JWTPayload, config: IEnvConfig): void {
   // console.debug('JWT Payload');
   // console.debug(payload);
 
@@ -30,7 +40,7 @@ function verifyPayload(payload: JWTPayload): void {
     : payload.aud
       ? [payload.aud]
       : [];
-  if (!audiences.includes(getConfig().jwtAudience)) {
+  if (!audiences.includes(config.jwtAudience)) {
     throw new ForbiddenError('Invalid audience');
   }
 

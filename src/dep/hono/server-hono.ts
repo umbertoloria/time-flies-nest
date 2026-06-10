@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
 import { ExtendedPrismaClient } from '@dep/prisma';
-import { getConfig } from '@core/config';
+import { getEnvConfig } from './config';
 import { authMiddleware } from './middleware/auth.middleware';
 import { prismaMiddleware } from './middleware/prisma.middleware';
 import {
@@ -14,6 +14,10 @@ import { getHttpErrorName, getKoResponse } from './errors-mapper';
 
 export type HonoEnv = Env & {
   Bindings: {
+    CORS_ORIGINS_WHITELIST: string;
+    JWT_JWKS_URI: string;
+    JWT_ISSUER: string;
+    JWT_AUDIENCE: string;
     DATABASE_URL: string;
   };
   Variables: {
@@ -26,16 +30,15 @@ export type HonoEnv = Env & {
 export function createHonoServer(mapError2StatusCode: Map<Function, number>) {
   const app = new Hono<HonoEnv>();
 
-  app.use(
-    '*',
-    cors({
-      origin: getConfig().corsAllowedOrigins,
+  app.use('*', (c, next) => {
+    return cors({
+      origin: getEnvConfig(c).corsAllowedOrigins,
       allowHeaders: ['Content-Type', 'Authorization'],
       // allowMethods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       allowMethods: ['GET', 'POST'],
       credentials: true,
-    }),
-  );
+    })(c, next);
+  });
 
   app.use('*', authMiddleware);
   app.use('*', prismaMiddleware);
