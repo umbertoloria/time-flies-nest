@@ -9,7 +9,7 @@
     "baseUrl": "./",
 
     "paths": {
-      "@shared/*": ["src/common/*"],
+      "@shared/*": ["src/shared/*"],
       "@app/*": ["src/modules/*"],
     },
 
