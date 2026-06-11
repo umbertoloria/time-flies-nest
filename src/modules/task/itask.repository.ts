@@ -4,7 +4,7 @@ import { CreateTaskDto, UpdateTaskDto } from './dto';
 export interface ITaskRepository {
   findTask(calendarId: number, taskId: number): Promise<TaskEntity | null>;
 
-  findTasksFromCalendarsAndDate(
+  findTasksByCalendarIdsAndDate(
     calendarIds: number[],
     dateFrom: string,
   ): Promise<TaskEntity[]>;

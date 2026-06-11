@@ -25,7 +25,7 @@ export class TaskRepository implements ITaskRepository {
     return entityFromTaskOrNull(record);
   }
 
-  async findTasksFromCalendarsAndDate(calendarIds: number[], dateFrom: string) {
+  async findTasksByCalendarIdsAndDate(calendarIds: number[], dateFrom: string) {
     const records = await this.prisma.task.findMany({
       where: {
         calendar_id: {

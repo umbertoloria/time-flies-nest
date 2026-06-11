@@ -16,7 +16,7 @@ import {
   createCreateCalendarDtoFromBody,
   createReadCalendarDtoFromParam,
 } from './dto-mapper';
-import { excludeDuplicates, getIds } from '@core/lib/extract';
+import { getIds } from '@core/utils';
 
 export class CalendarRoutes {
   constructor(
@@ -36,34 +36,19 @@ export class CalendarRoutes {
       );
     const calendarIds = getIds(calendars);
 
-    const [undoneTodos, doneTasks] = await Promise.all([
-      this.todoService.findUndoneTodosByCalendars(calendarIds),
-      this.taskService.findTasksDatesFromCalendars(dto.dateFrom, calendarIds),
-    ]);
-    // TODO: Improve indexing
-    const mapCalendar2UndoneTodoDates = calendarIds.map((calendarId) => ({
-      calendarId,
-      todoDates: undoneTodos
-        .filter((todo) => todo.calendarId === calendarId)
-        .map((todo) => todo.date),
-    }));
-    const mapCalendar2DoneTaskDates = calendarIds.map((calendarId) => ({
-      calendarId,
-      dates: excludeDuplicates(
-        doneTasks
-          .filter((task) => task.calendarId === calendarId)
-          .map((task) => task.date),
-      ),
-    }));
+    const [mapCalendar2DoneTaskDates, mapCalendar2UndoneTodoDates] =
+      await Promise.all([
+        this.taskService.mapCalendarIds2DoneTaskDates(
+          dto.dateFrom,
+          calendarIds,
+        ),
+        this.todoService.mapCalendarIds2UndoneTodoDates(calendarIds),
+      ]);
 
     // Response
     return calendars.map<TCalendarPrev>((calendar) => {
-      const doneTaskDates = mapCalendar2DoneTaskDates.find(
-        (task) => task.calendarId === calendar.id,
-      )!.dates;
-      const todoDates = mapCalendar2UndoneTodoDates.find(
-        (todo) => todo.calendarId === calendar.id,
-      )!.todoDates;
+      const doneTaskDates = mapCalendar2DoneTaskDates[calendar.id];
+      const todoDates = mapCalendar2UndoneTodoDates[calendar.id];
 
       return {
         ...CalendarRto.fromEntity(calendar).toTCalendarRcd(),

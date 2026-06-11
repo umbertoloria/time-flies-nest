@@ -2,22 +2,39 @@ import { ITaskRepository } from './itask.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { TaskEntity } from './entity';
 import { TaskNotFoundError } from './errors';
+import {
+  createGroupedItemsAndIds,
+  excludeDuplicates,
+  fromEntries,
+} from '@core/utils';
 
 export class TaskService {
   constructor(private repository: ITaskRepository) {}
-
-  findTasksDatesFromCalendars(
-    dateFrom: string,
-    calendarIds: number[],
-  ): Promise<TaskEntity[]> {
-    return this.repository.findTasksFromCalendarsAndDate(calendarIds, dateFrom);
-  }
 
   findTasksFromCalendarsAndDate(
     calendarIds: number[],
     dateFrom: string,
   ): Promise<TaskEntity[]> {
-    return this.repository.findTasksFromCalendarsAndDate(calendarIds, dateFrom);
+    return this.repository.findTasksByCalendarIdsAndDate(calendarIds, dateFrom);
+  }
+
+  async mapCalendarIds2DoneTaskDates(
+    dateFrom: string,
+    calendarIds: number[],
+  ): Promise<Record<number, string[] | undefined>> {
+    const tasks = await this.findTasksFromCalendarsAndDate(
+      calendarIds,
+      dateFrom,
+    );
+
+    const { idx, ids } = createGroupedItemsAndIds(tasks, 'calendarId');
+
+    return fromEntries(
+      ids.map((calendarId) => [
+        calendarId,
+        excludeDuplicates(idx[calendarId]!.map((task) => task.date)),
+      ]),
+    );
   }
 
   findTasksFromCalendar(calendarId: number) {

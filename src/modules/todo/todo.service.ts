@@ -8,6 +8,11 @@ import {
 } from './dto';
 import { TodoEntity } from './entity';
 import { TodoNotFoundError } from './errors';
+import {
+  createGroupedItemsAndIds,
+  excludeDuplicates,
+  fromEntries,
+} from '@core/utils';
 
 export class TodoService {
   constructor(
@@ -17,6 +22,21 @@ export class TodoService {
 
   findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
     return this.repository.findUndoneTodosByCalendarIds(calendarIds);
+  }
+
+  async mapCalendarIds2UndoneTodoDates(
+    calendarIds: number[],
+  ): Promise<Record<number, string[] | undefined>> {
+    const todos = await this.findUndoneTodosByCalendars(calendarIds);
+
+    const { idx, ids } = createGroupedItemsAndIds(todos, 'calendarId');
+
+    return fromEntries(
+      ids.map((calendarId) => [
+        calendarId,
+        excludeDuplicates(idx[calendarId]!.map((todo) => todo.date)),
+      ]),
+    );
   }
 
   findUndoneTodosByCalendar(
