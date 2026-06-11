@@ -1,24 +1,20 @@
-type TIdxItemId = number | string;
-
-type TIdxItem<K extends TIdxItemId> = {
-  id: K;
-};
-
 export const createIdxItemsAndIds = <
-  K extends TIdxItemId,
-  T extends TIdxItem<K>,
+  T extends Record<PropertyKey, any>,
+  K extends keyof T,
 >(
   items: T[],
+  key: K,
 ) => {
   const res = items.reduce(
-    (res, item) => {
-      res.idx[item.id] = item;
-      res.ids.add(item.id);
-      return res;
+    (acc, item) => {
+      const keyValue = item[key];
+      acc.idx[keyValue] = item;
+      acc.ids.add(keyValue);
+      return acc;
     },
     {
-      idx: {} as Record<T['id'], T | undefined>,
-      ids: new Set<T['id']>(),
+      idx: {} as Record<T[K], T | undefined>,
+      ids: new Set<T[K]>(),
     },
   );
   return {
