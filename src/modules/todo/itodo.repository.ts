@@ -22,7 +22,7 @@ export interface ITodoRepository {
 
   updateNotes(dto: UpdateTodoDto): Promise<TodoEntity>;
 
-  updateDate(dto: MoveTodoDto): Promise<TodoEntity | null>;
+  updateDate(dto: MoveTodoDto): Promise<TodoEntity>;
 
   updateTodoDoneDate(
     dto: UpdateDoneTodoDto,

@@ -77,10 +77,6 @@ export class TodoService {
     // TODO: There could be multiple ToDos on the same day
     const upd = await this.repository.updateDate(dto);
 
-    if (!upd || typeof upd !== 'object') {
-      throw new TodoNotFoundError();
-    }
-
     console.log('updated', upd);
 
     return upd;

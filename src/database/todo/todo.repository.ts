@@ -97,7 +97,6 @@ export class TodoRepository implements ITodoRepository {
   }
 
   async updateDate(dto: MoveTodoDto) {
-    // FIXME: Returns also nulls or not?
     const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
@@ -108,7 +107,7 @@ export class TodoRepository implements ITodoRepository {
       },
     });
 
-    return entityFromTodoOrNull(record);
+    return entityFromTodo(record);
   }
 
   async updateTodoDoneDate(dto: UpdateDoneTodoDto, doneDate: string) {
