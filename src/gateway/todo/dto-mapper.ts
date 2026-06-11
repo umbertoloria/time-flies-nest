@@ -97,10 +97,12 @@ export function createMoveTodoDtoFromBody(
 
 export function createCreateTaskDtoFromTodoSetAsDone(
   updTodo: TodoEntity,
+  user: ReqUser,
 ): CreateTaskDto {
   return {
     calendarId: updTodo.calendarId,
     date: updTodo.date,
     notes: updTodo.notes ?? undefined,
+    user,
   };
 }

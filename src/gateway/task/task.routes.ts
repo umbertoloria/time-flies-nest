@@ -53,8 +53,9 @@ export class TaskRoutes {
     body: any,
     user: ReqUser,
   ): Promise<TNewDoneTask> {
-    // FIXME: Ops... forgot to check if user owns the calendar...
-    const dto = createCreateTaskDtoFromBody(paramCalendarId, body);
+    const dto = createCreateTaskDtoFromBody(paramCalendarId, body, user);
+
+    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
 
     const createdTask = await this.taskService.createDoneTask(dto);
 
@@ -68,8 +69,14 @@ export class TaskRoutes {
     body: any,
     user: ReqUser,
   ) {
-    // FIXME: Ops... forgot to check if user owns the calendar...
-    const dto = createUpdateTaskDtoFomBody(paramCalendarId, paramTaskId, body);
+    const dto = createUpdateTaskDtoFomBody(
+      paramCalendarId,
+      paramTaskId,
+      body,
+      user,
+    );
+
+    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
 
     const updatedTask = await this.taskService.updateTaskNotesByDate(dto);
 

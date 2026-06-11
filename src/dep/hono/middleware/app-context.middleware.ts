@@ -36,7 +36,7 @@ const createAppContext = (c: Context<HonoEnv>): AppContext => {
   const calendarService = new CalendarService(calendarRepository);
   const calendarAuthz = new CalendarAuthz(calendarRepository);
   const taskService = new TaskService(taskRepository);
-  const todoService = new TodoService(todoRepository, calendarService);
+  const todoService = new TodoService(todoRepository);
 
   const calendarRoutes = new CalendarRoutes(
     calendarAuthz,

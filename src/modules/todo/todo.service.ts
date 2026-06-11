@@ -1,5 +1,4 @@
 import { ITodoRepository } from './itodo.repository';
-import { CalendarService } from '@app/calendar/calendar.service';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -15,10 +14,7 @@ import {
 } from '@core/utils';
 
 export class TodoService {
-  constructor(
-    private repository: ITodoRepository,
-    private calendarService: CalendarService,
-  ) {}
+  constructor(private repository: ITodoRepository) {}
 
   findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
     return this.repository.findUndoneTodosByCalendarIds(calendarIds);
@@ -68,9 +64,9 @@ export class TodoService {
   }
 
   async updateTodoNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
+    // FIXME: This is part of authz
     const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
 
-    // TODO: Verify calendar is user's
     if (todo.doneDate) {
       // To-do Notes can't be updated after it's Done.
       throw new TodoAlreadyDoneError();
@@ -86,9 +82,9 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
+    // FIXME: This is part of authz
     const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
 
-    // TODO: Verify calendar is user's
     if (todo.doneDate) {
       // To-do can't be MOVED after it's Done.
       throw new TodoAlreadyDoneError();

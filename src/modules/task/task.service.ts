@@ -62,6 +62,7 @@ export class TaskService {
   }
 
   async updateTaskNotesByDate(dto: UpdateTaskDto) {
+    // FIXME: This is part of authz
     const task = await this.repository.findTask(dto.calendarId, dto.taskId);
 
     if (!task) {

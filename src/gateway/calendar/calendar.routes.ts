@@ -106,23 +106,21 @@ export class CalendarRoutes {
 
     // Pre-check
     if (!dto.usesNotes) {
-      // Calendar "Uses Notes" cannot be disabled if it contains Notes...
-
       const [
         areThereTodosWithNotesInCalendar,
         areThereTasksWithNotesInCalendar,
       ] = await Promise.all([
-        // ... from Todos.
+        // ...from Todos
         this.todoService.areThereTodosWithNotes(calendar.id),
-        // ... from (Done) Tasks.
+        // ...from (Done) Tasks
         this.taskService.areThereTasksWithNotes(calendar.id),
       ]);
 
-      if (areThereTodosWithNotesInCalendar) {
-        // TODO: This is a leak if user is not the Calendar owner
-        throw new CalendarUsesNotesCannotBeDisabledError();
-      }
-      if (areThereTasksWithNotesInCalendar) {
+      // Calendar "Uses Notes" cannot be disabled if it contains Notes...
+      if (
+        areThereTodosWithNotesInCalendar ||
+        areThereTasksWithNotesInCalendar
+      ) {
         throw new CalendarUsesNotesCannotBeDisabledError();
       }
     }

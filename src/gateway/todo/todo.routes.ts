@@ -122,10 +122,11 @@ export class TodoRoutes {
       user,
     );
 
+    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+
     const updTodo = await this.todoService.updateTodoNotes(dto);
     console.log('updated', updTodo);
 
-    // Response
     return TodoRto.fromEntity(updTodo).toTNewTodo();
   }
 
@@ -143,9 +144,10 @@ export class TodoRoutes {
       user,
     );
 
+    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+
     const todo = await this.todoService.moveTodo(dto);
 
-    // Response
     return TodoRto.fromEntity(todo).toTNewTodo();
   }
 
@@ -167,7 +169,7 @@ export class TodoRoutes {
 
     const updTodo = await this.todoService.updateTodoSetAsDone(dto);
 
-    const createTaskDto = createCreateTaskDtoFromTodoSetAsDone(updTodo);
+    const createTaskDto = createCreateTaskDtoFromTodoSetAsDone(updTodo, user);
     const createdDoneTask =
       await this.taskService.createDoneTask(createTaskDto);
 

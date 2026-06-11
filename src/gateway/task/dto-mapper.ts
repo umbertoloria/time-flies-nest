@@ -12,6 +12,7 @@ import {
 export function createCreateTaskDtoFromBody(
   paramCalendarId: string,
   body: any,
+  user: ReqUser,
 ): CreateTaskDto {
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
@@ -22,6 +23,7 @@ export function createCreateTaskDtoFromBody(
     calendarId,
     date,
     notes,
+    user,
   };
 }
 
@@ -44,6 +46,7 @@ export function createUpdateTaskDtoFomBody(
   paramCalendarId: string,
   paramTaskId: string,
   body: any,
+  user: ReqUser,
 ): UpdateTaskDto {
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
@@ -54,5 +57,6 @@ export function createUpdateTaskDtoFomBody(
     calendarId,
     taskId,
     notes,
+    user,
   };
 }
