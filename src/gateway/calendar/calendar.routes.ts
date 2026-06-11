@@ -1,7 +1,4 @@
-import {
-  ReadCalendarsGdto,
-  UpdateCalendarGdto,
-} from '@app/calendar/dependent/gdto';
+import { ReadCalendarsGdto, UpdateCalendarGdto } from '@gateway/calendar/gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,

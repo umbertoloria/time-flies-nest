@@ -1,5 +1,5 @@
 import { fromBodyValidateInt, validateColor } from '@core/lib/validate';
-import { UpdateCalendarGdto } from '../dependent/gdto';
+import { UpdateCalendarGdto } from '@gateway/calendar/gdto';
 
 export class UpdateCalendarDto {
   constructor(
