@@ -6,11 +6,14 @@ import { CalendarNotFoundError } from './errors';
 export class CalendarService {
   constructor(private repository: ICalendarRepository) {}
 
-  readCalendarIDsFromUserIdViaSortedPin(
+  readUserCalendarsUsingSortedPin(
     userId: string,
     showAll: boolean,
   ): Promise<CalendarEntity[]> {
-    return this.repository.findCalendarsFromUserIdViaSortedPin(userId, showAll);
+    return this.repository.findCalendarsByUserIdOrderedBySortedPin(
+      userId,
+      showAll,
+    );
   }
 
   async findCalendarFromUser(calendarId: number, userId: string) {

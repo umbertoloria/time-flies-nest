@@ -2,7 +2,7 @@ import { CalendarEntity } from './entity';
 import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 
 export interface ICalendarRepository {
-  findCalendarsFromUserIdViaSortedPin(
+  findCalendarsByUserIdOrderedBySortedPin(
     userId: string,
     showAll: boolean,
   ): Promise<CalendarEntity[]>;

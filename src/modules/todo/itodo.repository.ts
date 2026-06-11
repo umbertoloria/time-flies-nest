@@ -7,7 +7,7 @@ import {
 } from './dto';
 
 export interface ITodoRepository {
-  findTodosFromCalendars(calendarIds: number[]): Promise<TodoEntity[]>;
+  findUndoneTodosByCalendarIds(calendarIds: number[]): Promise<TodoEntity[]>;
 
   findUndoneTodosByCalendar(
     calendarId: number,

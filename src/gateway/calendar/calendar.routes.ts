@@ -16,6 +16,7 @@ import {
   createCreateCalendarDtoFromBody,
   createReadCalendarDtoFromParam,
 } from './dto-mapper';
+import { getIds } from '@core/lib/extract';
 
 export class CalendarRoutes {
   constructor(
@@ -29,26 +30,22 @@ export class CalendarRoutes {
 
     // BL
     const calendars =
-      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.calendarService.readUserCalendarsUsingSortedPin(
         dto.user.id,
         dto.showAll,
       );
-    const calendarIds = calendars.map((calendar) => calendar.id);
+    const calendarIds = getIds(calendars);
 
-    const undoneTodos =
-      await this.todoService.findUndoneTodosByCalendars(calendarIds);
+    const [undoneTodos, mapCalendar2DoneTasks] = await Promise.all([
+      this.todoService.findUndoneTodosByCalendars(calendarIds),
+      this.taskService.findTasksDatesFromCalendars(dto.dateFrom, calendarIds),
+    ]);
     const mapCalendar2Todos = calendarIds.map((calendarId) => ({
       calendarId,
       todoDates: undoneTodos
         .filter((todo) => todo.calendarId === calendarId)
         .map((todo) => todo.date),
     }));
-
-    const mapCalendar2DoneTasks =
-      await this.taskService.findTasksDatesFromCalendars(
-        dto.dateFrom,
-        calendarIds,
-      );
 
     // Response
     return calendars.map<TCalendarPrev>((calendar) => {

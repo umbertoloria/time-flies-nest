@@ -34,7 +34,7 @@ export class TodoRoutes {
 
     // BL
     const calendars =
-      await this.calendarService.readCalendarIDsFromUserIdViaSortedPin(
+      await this.calendarService.readUserCalendarsUsingSortedPin(
         dto.user.id,
         true,
       );

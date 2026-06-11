@@ -15,7 +15,7 @@ import {
 export class TodoRepository implements ITodoRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  async findTodosFromCalendars(calendarIds: number[]) {
+  async findUndoneTodosByCalendarIds(calendarIds: number[]) {
     const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: {

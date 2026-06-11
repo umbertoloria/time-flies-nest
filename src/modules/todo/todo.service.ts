@@ -16,7 +16,7 @@ export class TodoService {
   ) {}
 
   findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
-    return this.repository.findTodosFromCalendars(calendarIds);
+    return this.repository.findUndoneTodosByCalendarIds(calendarIds);
   }
 
   findUndoneTodosByCalendar(
