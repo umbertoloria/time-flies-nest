@@ -26,7 +26,9 @@ export function TraceMethod(): MethodDecorator {
       };
 
       const calcDurationAndLogKo = () => {
-        const duration = (performance.now() - start).toFixed(2);
+        const duration = (performance.now() - start)
+          .toFixed(2)
+          .padStart(7, ' ');
         console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Error`);
       };
 
