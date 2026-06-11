@@ -5,10 +5,10 @@ import { isFirstOne } from '@core/lib/list';
 import { TaskNotFoundError } from './errors';
 
 export class TaskService {
-  constructor(private taskRepository: ITaskRepository) {}
+  constructor(private repository: ITaskRepository) {}
 
   async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
-    const allTasks = await this.taskRepository.findTasksFromCalendarsAndDate(
+    const allTasks = await this.repository.findTasksFromCalendarsAndDate(
       calendarIds,
       dateFrom,
     );
@@ -27,19 +27,16 @@ export class TaskService {
     calendarIds: number[],
     dateFrom: string,
   ): Promise<TaskEntity[]> {
-    return this.taskRepository.findTasksFromCalendarsAndDate(
-      calendarIds,
-      dateFrom,
-    );
+    return this.repository.findTasksFromCalendarsAndDate(calendarIds, dateFrom);
   }
 
   findTasksFromCalendar(calendarId: number) {
-    return this.taskRepository.findTasksFromCalendar(calendarId);
+    return this.repository.findTasksFromCalendar(calendarId);
   }
 
   async areThereTasksWithNotes(calendarId: number) {
     const count =
-      await this.taskRepository.countTasksWithNotesFromCalendar(calendarId);
+      await this.repository.countTasksWithNotesFromCalendar(calendarId);
 
     return count > 0;
   }
@@ -50,20 +47,20 @@ export class TaskService {
   ): Promise<TaskEntity[]> {
     // TODO: This may return multiple Tasks for the same Date
 
-    return this.taskRepository.findTaskFromCalendarAndDate(calendarId, date);
+    return this.repository.findTaskFromCalendarAndDate(calendarId, date);
   }
 
   async createDoneTask(dto: CreateTaskDto) {
-    return this.taskRepository.create(dto);
+    return this.repository.create(dto);
   }
 
   async updateTaskNotesByDate(dto: UpdateTaskDto) {
-    const task = await this.taskRepository.findTask(dto.calendarId, dto.taskId);
+    const task = await this.repository.findTask(dto.calendarId, dto.taskId);
 
     if (!task) {
       throw new TaskNotFoundError();
     }
 
-    return await this.taskRepository.update(dto);
+    return await this.repository.update(dto);
   }
 }

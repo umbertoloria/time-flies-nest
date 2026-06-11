@@ -11,26 +11,23 @@ import { TodoNotFoundError } from './errors';
 
 export class TodoService {
   constructor(
-    private todoRepository: ITodoRepository,
+    private repository: ITodoRepository,
     private calendarService: CalendarService,
   ) {}
 
   findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
-    return this.todoRepository.findTodosFromCalendars(calendarIds);
+    return this.repository.findTodosFromCalendars(calendarIds);
   }
 
   findUndoneTodosByCalendar(
     calendarId: number,
     filterDate: string,
   ): Promise<TodoEntity[]> {
-    return this.todoRepository.findUndoneTodosByCalendar(
-      calendarId,
-      filterDate,
-    );
+    return this.repository.findUndoneTodosByCalendar(calendarId, filterDate);
   }
 
   async findTodoFromCalendar(calendarId: number, todoId: number) {
-    const todo = await this.todoRepository.findById(todoId);
+    const todo = await this.repository.findById(todoId);
 
     if (!todo || todo.calendarId !== calendarId) {
       throw new TodoNotFoundError();
@@ -41,7 +38,7 @@ export class TodoService {
 
   async areThereTodosWithNotes(calendarId: number) {
     const count =
-      await this.todoRepository.countTodosWithNotesFromCalendar(calendarId);
+      await this.repository.countTodosWithNotesFromCalendar(calendarId);
 
     return count > 0;
   }
@@ -52,11 +49,11 @@ export class TodoService {
       dto.user.id,
     );
 
-    return await this.todoRepository.create(dto);
+    return await this.repository.create(dto);
   }
 
   async updateTodoNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
-    const upd = await this.todoRepository.updateNotes(dto);
+    const upd = await this.repository.updateNotes(dto);
 
     if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();
@@ -66,7 +63,7 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
-    const upd = await this.todoRepository.updateDate(dto);
+    const upd = await this.repository.updateDate(dto);
 
     if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();
@@ -85,7 +82,7 @@ export class TodoService {
 
     const doneDate = todo.date; // Always using the To-do Date as "default".
 
-    const upd = await this.todoRepository.updateTodoDoneDate(
+    const upd = await this.repository.updateTodoDoneDate(
       todo.id,
       doneDate,
       dto,
