@@ -4,7 +4,6 @@ import {
   getIds,
   getValuesFromList,
 } from '@core/lib/extract';
-import { CreateTaskDto } from '@app/task/dto';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -19,6 +18,7 @@ import { TodoAlreadyDoneError } from '@app/todo/errors';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
+import { createCreateTaskDtoFromTodoSetAsDone } from './dto-mapper';
 
 export class TodoRoutes {
   constructor(
@@ -195,7 +195,7 @@ export class TodoRoutes {
     // BL
     const updTodo = await this.todoService.updateTodoSetAsDone(dto);
 
-    const createTaskDto = CreateTaskDto.fromTodoSetAsDone(updTodo);
+    const createTaskDto = createCreateTaskDtoFromTodoSetAsDone(updTodo);
     const createdDoneTask =
       await this.taskService.createDoneTask(createTaskDto);
 

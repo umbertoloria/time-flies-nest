@@ -1,8 +1,4 @@
-import {
-  CreateTaskDto,
-  ReadCalendarDateDto,
-  UpdateTaskDto,
-} from '@app/task/dto';
+import { ReadCalendarDateDto, UpdateTaskDto } from '@app/task/dto';
 import { TCalendarSDK, TNewDoneTask } from '@core/sdk/types';
 import { TaskService } from '@app/task/task.service';
 import { CalendarService } from '@app/calendar/calendar.service';
@@ -10,6 +6,7 @@ import { TodoService } from '@app/todo/todo.service';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
+import { createCreateTaskDtoFromBody } from './dto-mapper';
 
 export class TaskRoutes {
   constructor(
@@ -24,7 +21,7 @@ export class TaskRoutes {
     user: ReqUser,
   ): Promise<TNewDoneTask> {
     // FIXME: Ops... forgot to check if user owns the calendar...
-    const dto = CreateTaskDto.fromBody(paramCalendarId, body);
+    const dto = createCreateTaskDtoFromBody(paramCalendarId, body);
 
     const createdTask = await this.taskService.createDoneTask(dto);
 
