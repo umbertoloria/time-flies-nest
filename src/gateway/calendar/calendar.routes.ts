@@ -3,7 +3,7 @@ import {
   dtoFromUpdateCalendarGdto,
   ReadCalendarsGdto,
   UpdateCalendarGdto,
-} from '@gateway/calendar/gdto';
+} from './gdto';
 import { CalendarRto } from '@app/calendar/rto';
 import { CalendarUsesNotesCannotBeDisabledError } from '@app/calendar/errors';
 import { CalendarService } from '@app/calendar/calendar.service';
