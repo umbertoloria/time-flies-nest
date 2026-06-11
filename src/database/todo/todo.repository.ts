@@ -11,10 +11,12 @@ import {
   entityFromTodo,
   entityFromTodoOrNull,
 } from './entity-mapper';
+import { TraceMethod } from '@core/trace';
 
 export class TodoRepository implements ITodoRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
+  @TraceMethod()
   async findUndoneTodosByCalendarIds(calendarIds: number[]) {
     const records = await this.prisma.todo.findMany({
       where: {
@@ -31,6 +33,7 @@ export class TodoRepository implements ITodoRepository {
     return entitiesFromTodos(records);
   }
 
+  @TraceMethod()
   async findUndoneTodosByCalendar(calendarId: number, filterDate: string) {
     const records = await this.prisma.todo.findMany({
       where: {
@@ -46,6 +49,7 @@ export class TodoRepository implements ITodoRepository {
     return entitiesFromTodos(records);
   }
 
+  @TraceMethod()
   async findById(todoId: number) {
     const record = await this.prisma.todo.findUnique({
       where: {
@@ -56,6 +60,7 @@ export class TodoRepository implements ITodoRepository {
     return entityFromTodoOrNull(record);
   }
 
+  @TraceMethod()
   countTodosWithNotesFromCalendar(calendarId: number) {
     return this.prisma.todo.count({
       where: {

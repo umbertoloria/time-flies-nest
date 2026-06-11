@@ -7,10 +7,12 @@ import {
   entityFromTask,
   entityFromTaskOrNull,
 } from './entity-mapper';
+import { TraceMethod } from '@core/trace';
 
 export class TaskRepository implements ITaskRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
+  @TraceMethod()
   async findTask(
     calendarId: number,
     taskId: number,
@@ -25,6 +27,7 @@ export class TaskRepository implements ITaskRepository {
     return entityFromTaskOrNull(record);
   }
 
+  @TraceMethod()
   async findTasksByCalendarIdsAndDate(calendarIds: number[], dateFrom: string) {
     const records = await this.prisma.task.findMany({
       where: {
@@ -43,6 +46,7 @@ export class TaskRepository implements ITaskRepository {
     return entitiesFromTasks(records);
   }
 
+  @TraceMethod()
   async findTasksFromCalendar(calendarId: number) {
     const records = await this.prisma.task.findMany({
       where: {
@@ -56,6 +60,7 @@ export class TaskRepository implements ITaskRepository {
     return entitiesFromTasks(records);
   }
 
+  @TraceMethod()
   countTasksWithNotesFromCalendar(calendarId: number) {
     return this.prisma.task.count({
       where: {
@@ -67,6 +72,7 @@ export class TaskRepository implements ITaskRepository {
     });
   }
 
+  @TraceMethod()
   async findTaskFromCalendarAndDate(calendarId: number, date: string) {
     const records = await this.prisma.task.findMany({
       where: {

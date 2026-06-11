@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "experimentalDecorators": true,
 
     // "baseUrl": "./",
 
