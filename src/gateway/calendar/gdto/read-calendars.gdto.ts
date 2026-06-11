@@ -22,7 +22,7 @@ export function dtoFromReadCalendarsGdto(
 
   return {
     dateFrom,
-    showAll,
+    showArchived: showAll,
     user,
   };
 }

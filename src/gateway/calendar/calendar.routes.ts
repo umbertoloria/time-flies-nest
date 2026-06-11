@@ -30,7 +30,10 @@ export class CalendarRoutes {
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = dtoFromReadCalendarsGdto(gdto, user);
 
-    const calendars = await this.calendarService.findUserCalendars(dto.user);
+    const calendars = await this.calendarService.findUserCalendars(
+      dto.user,
+      dto.showArchived,
+    );
 
     const calendarIds = getIds(calendars);
     const [mapCalendar2DoneTaskDates, mapCalendar2UndoneTodoDates] =

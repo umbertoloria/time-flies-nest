@@ -8,7 +8,17 @@ export class CalendarService {
 
   // AUTHZ
 
-  findUserCalendars(user: ReqUser): Promise<CalendarEntity[]> {
+  findUserCalendars(
+    user: ReqUser,
+    showArchived: boolean,
+  ): Promise<CalendarEntity[]> {
+    return this.repository.findByUserIdOrderedBySortedPin(
+      user.id,
+      showArchived,
+    );
+  }
+
+  findUserCalendarsAll(user: ReqUser): Promise<CalendarEntity[]> {
     return this.repository.findByUserIdOrderedBySortedPin(user.id, true);
   }
 
@@ -26,13 +36,6 @@ export class CalendarService {
   }
 
   // BUSINESS
-
-  readUserCalendarsUsingSortedPin(
-    userId: string,
-    showAll: boolean,
-  ): Promise<CalendarEntity[]> {
-    return this.repository.findByUserIdOrderedBySortedPin(userId, showAll);
-  }
 
   async createCalendar(dto: CreateCalendarDto) {
     return this.repository.create(dto);

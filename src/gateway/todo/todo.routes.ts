@@ -29,13 +29,9 @@ export class TodoRoutes {
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
     const dto = createReadStreamlineFromBody(user);
 
-    const calendars =
-      await this.calendarService.readUserCalendarsUsingSortedPin(
-        dto.user.id,
-        true,
-      );
-    const calendarIds = getIds(calendars);
+    const calendars = await this.calendarService.findUserCalendarsAll(dto.user);
 
+    const calendarIds = getIds(calendars);
     const undoneTodos =
       await this.todoService.findUndoneTodosByCalendars(calendarIds);
 
