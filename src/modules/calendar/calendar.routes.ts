@@ -9,9 +9,9 @@ import { CalendarRto } from './rto';
 import { CalendarUsesNotesCannotBeDisabledError } from './errors';
 import { CalendarService } from './calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
-import { TaskService } from '@app/task/core/task.service';
+import { TaskService } from '@app/task/task.service';
 import { TCalendarPrev } from '@core/sdk/types';
-import { TaskRto } from '@app/task/core/rto';
+import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/core/rto';
 
 export class CalendarRoutes {

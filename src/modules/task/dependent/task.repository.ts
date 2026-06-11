@@ -1,7 +1,7 @@
-import { ITaskRepository } from '../core/itask.repository';
+import { ITaskRepository } from '../itask.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
-import { CreateTaskDto, UpdateTaskDto } from '../core/dto';
-import { TaskEntity } from '../core/entity';
+import { CreateTaskDto, UpdateTaskDto } from '../dto';
+import { TaskEntity } from '../entity';
 import {
   entitiesFromTasks,
   entityFromTask,

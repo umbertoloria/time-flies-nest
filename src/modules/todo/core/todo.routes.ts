@@ -4,7 +4,7 @@ import {
   getIds,
   getValuesFromList,
 } from '@core/lib/extract';
-import { CreateTaskDto } from '@app/task/core/dto';
+import { CreateTaskDto } from '@app/task/dto';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -14,10 +14,10 @@ import {
 } from './dto';
 import { TodoService } from './todo.service';
 import { CalendarService } from '@app/calendar/calendar.service';
-import { TaskService } from '@app/task/core/task.service';
+import { TaskService } from '@app/task/task.service';
 import { TodoAlreadyDoneError } from './errors';
 import { CalendarRto } from '@app/calendar/rto';
-import { TaskRto } from '@app/task/core/rto';
+import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/core/rto';
 
 export class TodoRoutes {

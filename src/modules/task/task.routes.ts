@@ -4,7 +4,7 @@ import { TaskService } from './task.service';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/core/todo.service';
 import { CalendarRto } from '@app/calendar/rto';
-import { TaskRto } from '@app/task/core/rto';
+import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/core/rto';
 
 export class TaskRoutes {
