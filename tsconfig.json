@@ -10,6 +10,7 @@
 
     "paths": {
       "@core/*": ["./src/core/*"],
+      "@gateway/*": ["./src/gateway/*"],
       "@dep/*": ["./src/dep/*"],
       "@app/*": ["./src/modules/*"],
       "@prismagen/*": ["./generated/*"],

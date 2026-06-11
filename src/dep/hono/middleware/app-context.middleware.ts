@@ -1,15 +1,15 @@
-import { CalendarRoutes } from '@app/calendar/calendar.routes';
-import { TaskRoutes } from '@app/task/task.routes';
-import { TodoRoutes } from '@app/todo/todo.routes';
-import { Context } from 'hono';
+import { CalendarRoutes } from '@gateway/calendar/calendar.routes';
+import { TaskRoutes } from '@gateway/task/task.routes';
+import { TodoRoutes } from '@gateway/todo/todo.routes';
+import { createMiddleware } from 'hono/factory';
 import { HonoEnv } from '@dep/hono';
+import { Context } from 'hono';
 import { CalendarRepository } from '@app/calendar/dependent/calendar.repository';
 import { TaskRepository } from '@app/task/dependent/task.repository';
 import { TodoRepository } from '@app/todo/dependent/todo.repository';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TaskService } from '@app/task/task.service';
 import { TodoService } from '@app/todo/todo.service';
-import { createMiddleware } from 'hono/factory';
 
 export type AppContext = {
   calendarRoutes: CalendarRoutes;
@@ -17,7 +17,15 @@ export type AppContext = {
   todoRoutes: TodoRoutes;
 };
 
-export const createAppContext = (c: Context<HonoEnv>): AppContext => {
+export const appContextMiddleware = createMiddleware<HonoEnv>(
+  async (c, next) => {
+    const ctx = createAppContext(c);
+    c.set('ctx', ctx);
+    await next();
+  },
+);
+
+const createAppContext = (c: Context<HonoEnv>): AppContext => {
   const prisma = c.get('prisma');
 
   const calendarRepository = new CalendarRepository(prisma);
@@ -42,11 +50,3 @@ export const createAppContext = (c: Context<HonoEnv>): AppContext => {
     todoRoutes,
   };
 };
-
-export const appContextMiddleware = createMiddleware<HonoEnv>(
-  async (c, next) => {
-    const ctx = createAppContext(c);
-    c.set('ctx', ctx);
-    await next();
-  },
-);

@@ -11,11 +11,11 @@ import {
   ReadStreamlineDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
-} from './dto';
-import { TodoService } from './todo.service';
+} from '@app/todo/dto';
+import { TodoService } from '@app/todo/todo.service';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TaskService } from '@app/task/task.service';
-import { TodoAlreadyDoneError } from './errors';
+import { TodoAlreadyDoneError } from '@app/todo/errors';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';

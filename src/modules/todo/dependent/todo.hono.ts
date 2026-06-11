@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@dep/hono';
-import { TodoRoutes } from '@app/todo/todo.routes';
+import { TodoRoutes } from '@gateway/todo/todo.routes';
 
 const app = new Hono<HonoEnv>();
 

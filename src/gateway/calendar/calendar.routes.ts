@@ -1,13 +1,16 @@
-import { ReadCalendarsGdto, UpdateCalendarGdto } from './dependent/gdto';
+import {
+  ReadCalendarsGdto,
+  UpdateCalendarGdto,
+} from '@app/calendar/dependent/gdto';
 import {
   CreateCalendarDto,
   ReadCalendarDto,
   ReadCalendarsDto,
   UpdateCalendarDto,
-} from './dto';
-import { CalendarRto } from './rto';
-import { CalendarUsesNotesCannotBeDisabledError } from './errors';
-import { CalendarService } from './calendar.service';
+} from '@app/calendar/dto';
+import { CalendarRto } from '@app/calendar/rto';
+import { CalendarUsesNotesCannotBeDisabledError } from '@app/calendar/errors';
+import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/todo.service';
 import { TaskService } from '@app/task/task.service';
 import { TCalendarPrev } from '@core/sdk/types';

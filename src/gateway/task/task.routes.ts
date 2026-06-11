@@ -1,6 +1,10 @@
-import { CreateTaskDto, ReadCalendarDateDto, UpdateTaskDto } from './dto';
+import {
+  CreateTaskDto,
+  ReadCalendarDateDto,
+  UpdateTaskDto,
+} from '@app/task/dto';
 import { TCalendarSDK, TNewDoneTask } from '@core/sdk/types';
-import { TaskService } from './task.service';
+import { TaskService } from '@app/task/task.service';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/todo.service';
 import { CalendarRto } from '@app/calendar/rto';

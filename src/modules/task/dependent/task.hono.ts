@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@dep/hono';
-import { TaskRoutes } from '@app/task/task.routes';
+import { TaskRoutes } from '@gateway/task/task.routes';
 
 const app = new Hono<HonoEnv>();
 
