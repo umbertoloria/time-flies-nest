@@ -18,7 +18,7 @@ import { TaskService } from '@app/task/task.service';
 import { TodoAlreadyDoneError } from './errors';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
-import { TodoRto } from '@app/todo/core/rto';
+import { TodoRto } from '@app/todo/rto';
 
 export class TodoRoutes {
   constructor(
