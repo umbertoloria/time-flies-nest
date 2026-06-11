@@ -65,7 +65,7 @@ export class TaskRoutes {
     paramTaskId: string,
     body: any,
     user: ReqUser,
-  ) {
+  ): Promise<TNewDoneTask> {
     const dto = createUpdateTaskDtoFomBody(
       paramCalendarId,
       paramTaskId,

@@ -10,7 +10,7 @@ import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/todo.service';
 import { TaskService } from '@app/task/task.service';
-import { TCalendarPrev } from '@core/sdk/types';
+import { TCalendarPrev, TCalendarRcd } from '@core/sdk/types';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
 import {
@@ -29,7 +29,10 @@ export class CalendarRoutes {
   ) {}
 
   @TraceMethod()
-  async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
+  async readAll(
+    gdto: ReadCalendarsGdto,
+    user: ReqUser,
+  ): Promise<TCalendarPrev[]> {
     const dto = dtoFromReadCalendarsGdto(gdto, user);
 
     const calendars = await this.authz.findUserCalendars(
@@ -83,7 +86,7 @@ export class CalendarRoutes {
   }
 
   @TraceMethod()
-  async create(body: any, user: ReqUser) {
+  async create(body: any, user: ReqUser): Promise<TCalendarRcd> {
     const dto = createCreateCalendarDtoFromBody(body, user);
 
     const createdCalendar = await this.calendarService.createCalendar(dto);
@@ -96,7 +99,7 @@ export class CalendarRoutes {
     paramCalendarId: string,
     gdto: UpdateCalendarGdto,
     user: ReqUser,
-  ) {
+  ): Promise<TCalendarRcd> {
     const dto = dtoFromUpdateCalendarGdto(paramCalendarId, gdto, user);
 
     const calendar = await this.authz.findUserOwnCalendar(
