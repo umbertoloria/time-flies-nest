@@ -11,6 +11,7 @@ import { CalendarService } from '@app/calendar/calendar.service';
 import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { TaskService } from '@app/task/task.service';
 import { TodoService } from '@app/todo/todo.service';
+import { Authz } from '@gateway/authz';
 
 export type AppContext = {
   calendarRoutes: CalendarRoutes;
@@ -38,14 +39,15 @@ const createAppContext = (c: Context<HonoEnv>): AppContext => {
   const taskService = new TaskService(taskRepository);
   const todoService = new TodoService(todoRepository);
 
+  const authz = new Authz(calendarAuthz, taskService, todoService);
   const calendarRoutes = new CalendarRoutes(
     calendarAuthz,
     calendarService,
     taskService,
     todoService,
   );
-  const taskRoutes = new TaskRoutes(calendarAuthz, taskService, todoService);
-  const todoRoutes = new TodoRoutes(calendarAuthz, todoService, taskService);
+  const taskRoutes = new TaskRoutes(authz, taskService, todoService);
+  const todoRoutes = new TodoRoutes(authz, todoService, taskService);
 
   return {
     calendarRoutes,

@@ -1,7 +1,7 @@
 import { TCalendarSDK, TNewDoneTask, TNewTodo } from '@core/sdk/types';
 import { excludeDuplicates, getIds, getValuesFromList } from '@core/utils';
 import { TodoService } from '@app/todo/todo.service';
-import { CalendarAuthz } from '@app/calendar/calendar.authz';
+import { Authz } from '@gateway/authz';
 import { TaskService } from '@app/task/task.service';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
@@ -15,10 +15,11 @@ import {
   createUpdateTodoDtoFromBody,
 } from './dto-mapper';
 import { TraceMethod } from '@core/trace';
+import { TodoAlreadyDoneError } from '@app/todo/errors';
 
 export class TodoRoutes {
   constructor(
-    private authz: CalendarAuthz,
+    private authz: Authz,
     private todoService: TodoService,
     private taskService: TaskService,
   ) {}
@@ -29,7 +30,7 @@ export class TodoRoutes {
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
     const dto = createReadStreamlineFromBody(user);
 
-    const calendars = await this.authz.findUserCalendarsAll(dto.user);
+    const calendars = await this.authz.allUserCalendars(dto.user);
 
     const calendarIds = getIds(calendars);
     const undoneTodos =
@@ -100,7 +101,7 @@ export class TodoRoutes {
   ): Promise<TNewTodo> {
     const dto = createCreateTodoDtoFromBody(paramCalendarId, body, user);
 
-    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+    await this.authz.userOnCalendar(dto.calendarId, dto.user);
 
     const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
@@ -122,7 +123,16 @@ export class TodoRoutes {
       user,
     );
 
-    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+    const [_, todo] = await this.authz.userOnCalendarTodo(
+      dto.calendarId,
+      dto.todoId,
+      dto.user,
+    );
+
+    if (todo.doneDate) {
+      // To-do Notes can't be updated after it's Done.
+      throw new TodoAlreadyDoneError();
+    }
 
     const updTodo = await this.todoService.updateTodoNotes(dto);
     console.log('updated', updTodo);
@@ -144,11 +154,25 @@ export class TodoRoutes {
       user,
     );
 
-    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+    const [_, todo] = await this.authz.userOnCalendarTodo(
+      dto.calendarId,
+      dto.todoId,
+      dto.user,
+    );
 
-    const todo = await this.todoService.moveTodo(dto);
+    if (todo.doneDate) {
+      // To-do can't be MOVED after it's Done.
+      throw new TodoAlreadyDoneError();
+    }
 
-    return TodoRto.fromEntity(todo).toTNewTodo();
+    if (todo.date === dto.date) {
+      // Avoid pointless update.
+      return todo;
+    }
+
+    const updTodo = await this.todoService.moveTodo(dto);
+
+    return TodoRto.fromEntity(updTodo).toTNewTodo();
   }
 
   @TraceMethod()
@@ -165,9 +189,15 @@ export class TodoRoutes {
       user,
     );
 
-    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+    const [_, todo] = await this.authz.userOnCalendarTodo(
+      dto.calendarId,
+      dto.todoId,
+      dto.user,
+    );
 
-    const updTodo = await this.todoService.updateTodoSetAsDone(dto);
+    const doneDate = todo.date; // Always using the To-do Date as "default".
+
+    const updTodo = await this.todoService.updateTodoSetAsDone(dto, doneDate);
 
     const createTaskDto = createCreateTaskDtoFromTodoSetAsDone(updTodo, user);
     const createdDoneTask =

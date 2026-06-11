@@ -1,6 +1,6 @@
 import { TCalendarSDK, TNewDoneTask } from '@core/sdk/types';
 import { TaskService } from '@app/task/task.service';
-import { CalendarAuthz } from '@app/calendar/calendar.authz';
+import { Authz } from '@gateway/authz';
 import { TodoService } from '@app/todo/todo.service';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
@@ -14,7 +14,7 @@ import { TraceMethod } from '@core/trace';
 
 export class TaskRoutes {
   constructor(
-    private authz: CalendarAuthz,
+    private authz: Authz,
     private taskService: TaskService,
     private todoService: TodoService,
   ) {}
@@ -27,10 +27,7 @@ export class TaskRoutes {
   ): Promise<TCalendarSDK.ReadDateResponse> {
     const dto = createReadCalendarDateDtoFromBody(paramCalendarId, date, user);
 
-    const calendar = await this.authz.findUserOwnCalendar(
-      dto.calendarId,
-      dto.user,
-    );
+    const calendar = await this.authz.userOnCalendar(dto.calendarId, dto.user);
 
     const [undoneTodos, doneTasks] = await Promise.all([
       this.todoService.findUndoneTodosByCalendar(calendar.id, dto.date),
@@ -55,7 +52,7 @@ export class TaskRoutes {
   ): Promise<TNewDoneTask> {
     const dto = createCreateTaskDtoFromBody(paramCalendarId, body, user);
 
-    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+    await this.authz.userOnCalendar(dto.calendarId, dto.user);
 
     const createdTask = await this.taskService.createDoneTask(dto);
 
@@ -76,7 +73,7 @@ export class TaskRoutes {
       user,
     );
 
-    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
+    await this.authz.userOnCalendarTask(dto.calendarId, dto.taskId, dto.user);
 
     const updatedTask = await this.taskService.updateTaskNotesByDate(dto);
 

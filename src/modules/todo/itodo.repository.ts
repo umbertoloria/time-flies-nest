@@ -14,7 +14,7 @@ export interface ITodoRepository {
     filterDate: string,
   ): Promise<TodoEntity[]>;
 
-  findById(todoId: number): Promise<TodoEntity | null>;
+  findTodo(calendarId: number, todoId: number): Promise<TodoEntity | null>;
 
   countTodosWithNotesFromCalendar(calendarId: number): Promise<number>;
 
@@ -25,8 +25,7 @@ export interface ITodoRepository {
   updateDate(dto: MoveTodoDto): Promise<TodoEntity | null>;
 
   updateTodoDoneDate(
-    todoId: number,
-    doneDate: string,
     dto: UpdateDoneTodoDto,
+    doneDate: string,
   ): Promise<TodoEntity>;
 }

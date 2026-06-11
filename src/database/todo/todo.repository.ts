@@ -46,10 +46,11 @@ export class TodoRepository implements ITodoRepository {
     return entitiesFromTodos(records);
   }
 
-  async findById(todoId: number) {
+  async findTodo(calendarId: number, todoId: number) {
     const record = await this.prisma.todo.findUnique({
       where: {
         id: todoId,
+        calendar_id: calendarId,
       },
     });
 
@@ -110,14 +111,10 @@ export class TodoRepository implements ITodoRepository {
     return entityFromTodoOrNull(record);
   }
 
-  async updateTodoDoneDate(
-    todoId: number,
-    doneDate: string,
-    dto: UpdateDoneTodoDto,
-  ) {
+  async updateTodoDoneDate(dto: UpdateDoneTodoDto, doneDate: string) {
     const record = await this.prisma.todo.update({
       where: {
-        id: todoId,
+        id: dto.todoId,
       },
       data: {
         done_date: doneDate,

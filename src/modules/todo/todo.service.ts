@@ -6,7 +6,7 @@ import {
   UpdateTodoDto,
 } from './dto';
 import { TodoEntity } from './entity';
-import { TodoAlreadyDoneError, TodoNotFoundError } from './errors';
+import { TodoNotFoundError } from './errors';
 import {
   createGroupedItemsAndIds,
   excludeDuplicates,
@@ -15,6 +15,16 @@ import {
 
 export class TodoService {
   constructor(private repository: ITodoRepository) {}
+
+  async findTodoValidate(calendarId: number, todoId: number) {
+    const todo = await this.repository.findTodo(calendarId, todoId);
+
+    if (!todo || todo.calendarId !== calendarId) {
+      throw new TodoNotFoundError();
+    }
+
+    return todo;
+  }
 
   findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
     return this.repository.findUndoneTodosByCalendarIds(calendarIds);
@@ -42,16 +52,6 @@ export class TodoService {
     return this.repository.findUndoneTodosByCalendar(calendarId, filterDate);
   }
 
-  async findTodoFromCalendar(calendarId: number, todoId: number) {
-    const todo = await this.repository.findById(todoId);
-
-    if (!todo || todo.calendarId !== calendarId) {
-      throw new TodoNotFoundError();
-    }
-
-    return todo;
-  }
-
   async areThereTodosWithNotes(calendarId: number) {
     const count =
       await this.repository.countTodosWithNotesFromCalendar(calendarId);
@@ -64,14 +64,6 @@ export class TodoService {
   }
 
   async updateTodoNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
-    // FIXME: This is part of authz
-    const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
-
-    if (todo.doneDate) {
-      // To-do Notes can't be updated after it's Done.
-      throw new TodoAlreadyDoneError();
-    }
-
     const upd = await this.repository.updateNotes(dto);
 
     if (!upd || typeof upd !== 'object') {
@@ -82,19 +74,6 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
-    // FIXME: This is part of authz
-    const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
-
-    if (todo.doneDate) {
-      // To-do can't be MOVED after it's Done.
-      throw new TodoAlreadyDoneError();
-    }
-
-    if (todo.date === dto.date) {
-      // Avoid pointless update.
-      return todo;
-    }
-
     // TODO: There could be multiple ToDos on the same day
     const upd = await this.repository.updateDate(dto);
 
@@ -107,16 +86,11 @@ export class TodoService {
     return upd;
   }
 
-  async updateTodoSetAsDone(dto: UpdateDoneTodoDto): Promise<TodoEntity> {
-    const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
-
-    const doneDate = todo.date; // Always using the To-do Date as "default".
-
-    const upd = await this.repository.updateTodoDoneDate(
-      todo.id,
-      doneDate,
-      dto,
-    );
+  async updateTodoSetAsDone(
+    dto: UpdateDoneTodoDto,
+    doneDate: string,
+  ): Promise<TodoEntity> {
+    const upd = await this.repository.updateTodoDoneDate(dto, doneDate);
 
     if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();

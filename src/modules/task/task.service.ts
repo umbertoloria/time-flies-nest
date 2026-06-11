@@ -11,6 +11,19 @@ import {
 export class TaskService {
   constructor(private repository: ITaskRepository) {}
 
+  async findTaskValidate(
+    calendarId: number,
+    taskId: number,
+  ): Promise<TaskEntity> {
+    const task = await this.repository.findTask(calendarId, taskId);
+
+    if (!task) {
+      throw new TaskNotFoundError();
+    }
+
+    return task;
+  }
+
   findTasksFromCalendarsAndDate(
     calendarIds: number[],
     dateFrom: string,
@@ -62,13 +75,6 @@ export class TaskService {
   }
 
   async updateTaskNotesByDate(dto: UpdateTaskDto) {
-    // FIXME: This is part of authz
-    const task = await this.repository.findTask(dto.calendarId, dto.taskId);
-
-    if (!task) {
-      throw new TaskNotFoundError();
-    }
-
     return await this.repository.update(dto);
   }
 }
