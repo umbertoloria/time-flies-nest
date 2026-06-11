@@ -4,7 +4,6 @@ import {
   ReadCalendarsGdto,
   UpdateCalendarGdto,
 } from '@gateway/calendar/gdto';
-import { CreateCalendarDto, ReadCalendarDto } from '@app/calendar/dto';
 import { CalendarRto } from '@app/calendar/rto';
 import { CalendarUsesNotesCannotBeDisabledError } from '@app/calendar/errors';
 import { CalendarService } from '@app/calendar/calendar.service';
@@ -13,6 +12,10 @@ import { TaskService } from '@app/task/task.service';
 import { TCalendarPrev } from '@core/sdk/types';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
+import {
+  createCreateCalendarDtoFromBody,
+  createReadCalendarDtoFromParam,
+} from './dto-mapper';
 
 export class CalendarRoutes {
   constructor(
@@ -65,7 +68,7 @@ export class CalendarRoutes {
   }
 
   async create(body: any, user: ReqUser) {
-    const dto = CreateCalendarDto.fromBody(body, user);
+    const dto = createCreateCalendarDtoFromBody(body, user);
 
     const createdCalendar = await this.calendarService.createCalendar(dto);
 
@@ -73,7 +76,7 @@ export class CalendarRoutes {
   }
 
   async read(paramCalendarId: string, user: ReqUser) {
-    const dto = ReadCalendarDto.fromParam(paramCalendarId, user);
+    const dto = createReadCalendarDtoFromParam(paramCalendarId, user);
 
     // BL
     const calendar = await this.calendarService.findCalendarFromUser(
