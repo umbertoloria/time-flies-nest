@@ -3,7 +3,6 @@ import { excludeDuplicates, getIds, getValuesFromList } from '@core/utils';
 import { TodoService } from '@app/todo/todo.service';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TaskService } from '@app/task/task.service';
-import { TodoAlreadyDoneError } from '@app/todo/errors';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
@@ -148,26 +147,7 @@ export class TodoRoutes {
       user,
     );
 
-    // BL
-    const todo = await this.todoService.findTodoFromCalendar(
-      dto.calendarId,
-      dto.todoId,
-    );
-
-    // TODO: Verify calendar is user's
-    if (todo.doneDate) {
-      // To-do can't be MOVED after it's Done.
-      throw new TodoAlreadyDoneError();
-    }
-
-    if (todo.date !== dto.date) {
-      const updTodo = await this.todoService.moveTodo(dto);
-      console.log('updated', updTodo);
-      // TODO: There could be multiple ToDos on the same day
-
-      return TodoRto.fromEntity(updTodo).toTNewTodo();
-    }
-    // Otherwise, pointless update...
+    const todo = await this.todoService.moveTodo(dto);
 
     // Response
     return TodoRto.fromEntity(todo).toTNewTodo();

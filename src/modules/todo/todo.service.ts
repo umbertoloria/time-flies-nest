@@ -91,11 +91,27 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
+    const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
+
+    // TODO: Verify calendar is user's
+    if (todo.doneDate) {
+      // To-do can't be MOVED after it's Done.
+      throw new TodoAlreadyDoneError();
+    }
+
+    if (todo.date === dto.date) {
+      // Avoid pointless update.
+      return todo;
+    }
+
+    // TODO: There could be multiple ToDos on the same day
     const upd = await this.repository.updateDate(dto);
 
     if (!upd || typeof upd !== 'object') {
       throw new TodoNotFoundError();
     }
+
+    console.log('updated', upd);
 
     return upd;
   }
