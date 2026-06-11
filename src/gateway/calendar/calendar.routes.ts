@@ -6,6 +6,7 @@ import {
 } from './gdto';
 import { CalendarRto } from '@app/calendar/rto';
 import { CalendarUsesNotesCannotBeDisabledError } from '@app/calendar/errors';
+import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/todo.service';
 import { TaskService } from '@app/task/task.service';
@@ -21,6 +22,7 @@ import { TraceMethod } from '@core/trace';
 
 export class CalendarRoutes {
   constructor(
+    private authz: CalendarAuthz,
     private calendarService: CalendarService,
     private taskService: TaskService,
     private todoService: TodoService,
@@ -30,7 +32,7 @@ export class CalendarRoutes {
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = dtoFromReadCalendarsGdto(gdto, user);
 
-    const calendars = await this.calendarService.findUserCalendars(
+    const calendars = await this.authz.findUserCalendars(
       dto.user,
       dto.showArchived,
     );
@@ -61,7 +63,7 @@ export class CalendarRoutes {
   async read(paramCalendarId: string, user: ReqUser) {
     const dto = createReadCalendarDtoFromParam(paramCalendarId, user);
 
-    const calendar = await this.calendarService.findUserOwnCalendar(
+    const calendar = await this.authz.findUserOwnCalendar(
       dto.calendarId,
       dto.user,
     );
@@ -97,7 +99,7 @@ export class CalendarRoutes {
   ) {
     const dto = dtoFromUpdateCalendarGdto(paramCalendarId, gdto, user);
 
-    const calendar = await this.calendarService.findUserOwnCalendar(
+    const calendar = await this.authz.findUserOwnCalendar(
       dto.calendarId,
       dto.user,
     );

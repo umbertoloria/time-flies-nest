@@ -8,6 +8,7 @@ import { CalendarRepository } from '@database/calendar/calendar.repository';
 import { TaskRepository } from '@database/task/task.repository';
 import { TodoRepository } from '@database/todo/todo.repository';
 import { CalendarService } from '@app/calendar/calendar.service';
+import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { TaskService } from '@app/task/task.service';
 import { TodoService } from '@app/todo/todo.service';
 
@@ -33,16 +34,18 @@ const createAppContext = (c: Context<HonoEnv>): AppContext => {
   const todoRepository = new TodoRepository(prisma);
 
   const calendarService = new CalendarService(calendarRepository);
+  const calendarAuthz = new CalendarAuthz(calendarRepository);
   const taskService = new TaskService(taskRepository);
   const todoService = new TodoService(todoRepository, calendarService);
 
   const calendarRoutes = new CalendarRoutes(
+    calendarAuthz,
     calendarService,
     taskService,
     todoService,
   );
-  const taskRoutes = new TaskRoutes(taskService, calendarService, todoService);
-  const todoRoutes = new TodoRoutes(todoService, calendarService, taskService);
+  const taskRoutes = new TaskRoutes(calendarAuthz, taskService, todoService);
+  const todoRoutes = new TodoRoutes(calendarAuthz, todoService, taskService);
 
   return {
     calendarRoutes,

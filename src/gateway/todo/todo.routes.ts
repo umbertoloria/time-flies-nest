@@ -1,7 +1,7 @@
 import { TCalendarSDK, TNewDoneTask, TNewTodo } from '@core/sdk/types';
 import { excludeDuplicates, getIds, getValuesFromList } from '@core/utils';
 import { TodoService } from '@app/todo/todo.service';
-import { CalendarService } from '@app/calendar/calendar.service';
+import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { TaskService } from '@app/task/task.service';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
@@ -18,8 +18,8 @@ import { TraceMethod } from '@core/trace';
 
 export class TodoRoutes {
   constructor(
+    private authz: CalendarAuthz,
     private todoService: TodoService,
-    private calendarService: CalendarService,
     private taskService: TaskService,
   ) {}
 
@@ -29,7 +29,7 @@ export class TodoRoutes {
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
     const dto = createReadStreamlineFromBody(user);
 
-    const calendars = await this.calendarService.findUserCalendarsAll(dto.user);
+    const calendars = await this.authz.findUserCalendarsAll(dto.user);
 
     const calendarIds = getIds(calendars);
     const undoneTodos =
@@ -100,7 +100,7 @@ export class TodoRoutes {
   ): Promise<TNewTodo> {
     const dto = createCreateTodoDtoFromBody(paramCalendarId, body, user);
 
-    await this.calendarService.findUserOwnCalendar(dto.calendarId, dto.user);
+    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
 
     const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
@@ -163,7 +163,7 @@ export class TodoRoutes {
       user,
     );
 
-    await this.calendarService.findUserOwnCalendar(dto.calendarId, dto.user);
+    await this.authz.findUserOwnCalendar(dto.calendarId, dto.user);
 
     const updTodo = await this.todoService.updateTodoSetAsDone(dto);
 

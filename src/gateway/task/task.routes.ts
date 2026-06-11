@@ -1,6 +1,6 @@
 import { TCalendarSDK, TNewDoneTask } from '@core/sdk/types';
 import { TaskService } from '@app/task/task.service';
-import { CalendarService } from '@app/calendar/calendar.service';
+import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { TodoService } from '@app/todo/todo.service';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
@@ -14,8 +14,8 @@ import { TraceMethod } from '@core/trace';
 
 export class TaskRoutes {
   constructor(
+    private authz: CalendarAuthz,
     private taskService: TaskService,
-    private calendarService: CalendarService,
     private todoService: TodoService,
   ) {}
 
@@ -27,7 +27,7 @@ export class TaskRoutes {
   ): Promise<TCalendarSDK.ReadDateResponse> {
     const dto = createReadCalendarDateDtoFromBody(paramCalendarId, date, user);
 
-    const calendar = await this.calendarService.findUserOwnCalendar(
+    const calendar = await this.authz.findUserOwnCalendar(
       dto.calendarId,
       dto.user,
     );
