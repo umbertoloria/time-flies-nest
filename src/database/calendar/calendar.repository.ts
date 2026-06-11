@@ -10,10 +10,7 @@ import {
 export class CalendarRepository implements ICalendarRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  async findCalendarsByUserIdOrderedBySortedPin(
-    userId: string,
-    showAll: boolean,
-  ) {
+  async findByUserIdOrderedBySortedPin(userId: string, showAll: boolean) {
     const records = await this.prisma.calendar.findMany({
       where: {
         user_id: userId,

@@ -64,11 +64,6 @@ export class TodoService {
   }
 
   async createTodo(dto: CreateTodoDto) {
-    await this.calendarService.findCalendarFromUserCheckOwnership(
-      dto.calendarId,
-      dto.user.id,
-    );
-
     return await this.repository.create(dto);
   }
 
@@ -117,11 +112,6 @@ export class TodoService {
   }
 
   async updateTodoSetAsDone(dto: UpdateDoneTodoDto): Promise<TodoEntity> {
-    await this.calendarService.findCalendarFromUserCheckOwnership(
-      dto.calendarId,
-      dto.user.id,
-    );
-
     const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
 
     const doneDate = todo.date; // Always using the To-do Date as "default".

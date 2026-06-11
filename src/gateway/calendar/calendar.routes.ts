@@ -30,13 +30,9 @@ export class CalendarRoutes {
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = dtoFromReadCalendarsGdto(gdto, user);
 
-    const calendars =
-      await this.calendarService.readUserCalendarsUsingSortedPin(
-        dto.user.id,
-        dto.showAll,
-      );
-    const calendarIds = getIds(calendars);
+    const calendars = await this.calendarService.findUserCalendars(dto.user);
 
+    const calendarIds = getIds(calendars);
     const [mapCalendar2DoneTaskDates, mapCalendar2UndoneTodoDates] =
       await Promise.all([
         this.taskService.mapCalendarIds2DoneTaskDates(
@@ -47,8 +43,8 @@ export class CalendarRoutes {
       ]);
 
     return calendars.map<TCalendarPrev>((calendar) => {
-      const doneTaskDates = mapCalendar2DoneTaskDates[calendar.id];
-      const todoDates = mapCalendar2UndoneTodoDates[calendar.id];
+      const doneTaskDates = mapCalendar2DoneTaskDates[calendar.id] ?? undefined;
+      const todoDates = mapCalendar2UndoneTodoDates[calendar.id] ?? undefined;
 
       return {
         ...CalendarRto.fromEntity(calendar).toTCalendarRcd(),
@@ -62,7 +58,10 @@ export class CalendarRoutes {
   async read(paramCalendarId: string, user: ReqUser) {
     const dto = createReadCalendarDtoFromParam(paramCalendarId, user);
 
-    const calendar = await this.calendarService.findUserCalendar(dto);
+    const calendar = await this.calendarService.findUserOwnCalendar(
+      dto.calendarId,
+      dto.user,
+    );
 
     const [undoneTodos, doneTasks] = await Promise.all([
       this.todoService.findUndoneTodosByCalendars([calendar.id]),
@@ -95,6 +94,12 @@ export class CalendarRoutes {
   ) {
     const dto = dtoFromUpdateCalendarGdto(paramCalendarId, gdto, user);
 
+    const calendar = await this.calendarService.findUserOwnCalendar(
+      dto.calendarId,
+      dto.user,
+    );
+
+    // Pre-check
     if (!dto.usesNotes) {
       // Calendar "Uses Notes" cannot be disabled if it contains Notes...
 
@@ -103,9 +108,9 @@ export class CalendarRoutes {
         areThereTasksWithNotesInCalendar,
       ] = await Promise.all([
         // ... from Todos.
-        this.todoService.areThereTodosWithNotes(dto.calendarId),
+        this.todoService.areThereTodosWithNotes(calendar.id),
         // ... from (Done) Tasks.
-        this.taskService.areThereTasksWithNotes(dto.calendarId),
+        this.taskService.areThereTasksWithNotes(calendar.id),
       ]);
 
       if (areThereTodosWithNotesInCalendar) {

@@ -27,11 +27,10 @@ export class TaskRoutes {
   ): Promise<TCalendarSDK.ReadDateResponse> {
     const dto = createReadCalendarDateDtoFromBody(paramCalendarId, date, user);
 
-    const calendar =
-      await this.calendarService.findCalendarFromUserCheckOwnership(
-        dto.calendarId,
-        dto.user.id,
-      );
+    const calendar = await this.calendarService.findUserOwnCalendar(
+      dto.calendarId,
+      dto.user,
+    );
 
     const [undoneTodos, doneTasks] = await Promise.all([
       this.todoService.findUndoneTodosByCalendar(calendar.id, dto.date),

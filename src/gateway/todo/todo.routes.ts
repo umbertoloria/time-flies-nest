@@ -29,7 +29,6 @@ export class TodoRoutes {
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
     const dto = createReadStreamlineFromBody(user);
 
-    // BL
     const calendars =
       await this.calendarService.readUserCalendarsUsingSortedPin(
         dto.user.id,
@@ -52,7 +51,6 @@ export class TodoRoutes {
       ...getValuesFromList(doneTasks, 'date'),
     ]);
 
-    // Response
     return {
       dates: sortedDates.map<TCalendarSDK.ReadPlannedEventsResponseDateBox>(
         (date) => {
@@ -105,6 +103,8 @@ export class TodoRoutes {
     user: ReqUser,
   ): Promise<TNewTodo> {
     const dto = createCreateTodoDtoFromBody(paramCalendarId, body, user);
+
+    await this.calendarService.findUserOwnCalendar(dto.calendarId, dto.user);
 
     const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
@@ -167,7 +167,8 @@ export class TodoRoutes {
       user,
     );
 
-    // BL
+    await this.calendarService.findUserOwnCalendar(dto.calendarId, dto.user);
+
     const updTodo = await this.todoService.updateTodoSetAsDone(dto);
 
     const createTaskDto = createCreateTaskDtoFromTodoSetAsDone(updTodo);
