@@ -1,6 +1,6 @@
-import { ICalendarRepository } from '../icalendar.repository';
+import { ICalendarRepository } from '@app/calendar/icalendar.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
-import { CreateCalendarDto, UpdateCalendarDto } from '../dto';
+import { CreateCalendarDto, UpdateCalendarDto } from '@app/calendar/dto';
 import {
   entitiesFromCalendars,
   entityFromCalendar,

@@ -11,6 +11,7 @@
     "paths": {
       "@core/*": ["./src/core/*"],
       "@gateway/*": ["./src/gateway/*"],
+      "@database/*": ["./src/database/*"],
       "@dep/*": ["./src/dep/*"],
       "@app/*": ["./src/modules/*"],
       "@prismagen/*": ["./generated/*"],

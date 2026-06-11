@@ -1,5 +1,5 @@
 import { Task } from '@dep/prisma';
-import { TaskEntity } from '../entity';
+import { TaskEntity } from '@app/task/entity';
 
 export const entityFromTask = (record: Task): TaskEntity => ({
   id: record.id,

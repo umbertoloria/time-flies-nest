@@ -1,11 +1,11 @@
-import { ITodoRepository } from '../itodo.repository';
+import { ITodoRepository } from '@app/todo/itodo.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import {
   CreateTodoDto,
   MoveTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
-} from '../dto';
+} from '@app/todo/dto';
 import {
   entitiesFromTodos,
   entityFromTodo,
