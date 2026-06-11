@@ -127,18 +127,6 @@ export class TodoRoutes {
       user,
     );
 
-    // BL
-    const todo = await this.todoService.findTodoFromCalendar(
-      dto.calendarId,
-      dto.todoId,
-    );
-
-    // TODO: Verify calendar is user's
-    if (todo.doneDate) {
-      // To-do Notes can't be updated after it's Done.
-      throw new TodoAlreadyDoneError();
-    }
-
     const updTodo = await this.todoService.updateTodoNotes(dto);
     console.log('updated', updTodo);
 

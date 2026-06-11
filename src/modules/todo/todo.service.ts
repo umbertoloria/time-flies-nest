@@ -7,7 +7,7 @@ import {
   UpdateTodoDto,
 } from './dto';
 import { TodoEntity } from './entity';
-import { TodoNotFoundError } from './errors';
+import { TodoAlreadyDoneError, TodoNotFoundError } from './errors';
 import {
   createGroupedItemsAndIds,
   excludeDuplicates,
@@ -73,6 +73,14 @@ export class TodoService {
   }
 
   async updateTodoNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
+    const todo = await this.findTodoFromCalendar(dto.calendarId, dto.todoId);
+
+    // TODO: Verify calendar is user's
+    if (todo.doneDate) {
+      // To-do Notes can't be updated after it's Done.
+      throw new TodoAlreadyDoneError();
+    }
+
     const upd = await this.repository.updateNotes(dto);
 
     if (!upd || typeof upd !== 'object') {
