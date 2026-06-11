@@ -1,5 +1,5 @@
 import { Todo } from '@dep/prisma';
-import { TodoEntity } from '@app/todo/entity';
+import { TodoEntity } from '../entity';
 
 export const entityFromTodo = (record: Todo): TodoEntity => ({
   id: record.id,

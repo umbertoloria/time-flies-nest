@@ -1,10 +1,10 @@
-import { ReadCalendarsGdto, UpdateCalendarGdto } from '@gateway/calendar/gdto';
 import {
-  CreateCalendarDto,
-  ReadCalendarDto,
-  ReadCalendarsDto,
-  UpdateCalendarDto,
-} from '@app/calendar/dto';
+  dtoFromReadCalendarsGdto,
+  dtoFromUpdateCalendarGdto,
+  ReadCalendarsGdto,
+  UpdateCalendarGdto,
+} from '@gateway/calendar/gdto';
+import { CreateCalendarDto, ReadCalendarDto } from '@app/calendar/dto';
 import { CalendarRto } from '@app/calendar/rto';
 import { CalendarUsesNotesCannotBeDisabledError } from '@app/calendar/errors';
 import { CalendarService } from '@app/calendar/calendar.service';
@@ -22,7 +22,7 @@ export class CalendarRoutes {
   ) {}
 
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
-    const dto = ReadCalendarsDto.fromGateway(gdto, user);
+    const dto = dtoFromReadCalendarsGdto(gdto, user);
 
     // BL
     const calendars =
@@ -102,7 +102,7 @@ export class CalendarRoutes {
     gdto: UpdateCalendarGdto,
     user: ReqUser,
   ) {
-    const dto = UpdateCalendarDto.fromParam(paramCalendarId, gdto, user);
+    const dto = dtoFromUpdateCalendarGdto(paramCalendarId, gdto, user);
 
     // BL
     if (!dto.usesNotes) {

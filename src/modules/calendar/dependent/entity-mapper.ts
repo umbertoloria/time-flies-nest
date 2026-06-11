@@ -1,5 +1,5 @@
 import { Calendar } from '@dep/prisma';
-import { CalendarEntity } from '@app/calendar/entity';
+import { CalendarEntity } from '../entity';
 
 export const entityFromCalendar = (record: Calendar): CalendarEntity => ({
   id: record.id,
