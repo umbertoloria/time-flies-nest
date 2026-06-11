@@ -1,26 +1,16 @@
 import { ITaskRepository } from './itask.repository';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { TaskEntity } from './entity';
-import { isFirstOne } from '@core/lib/list';
 import { TaskNotFoundError } from './errors';
 
 export class TaskService {
   constructor(private repository: ITaskRepository) {}
 
-  async findTasksDatesFromCalendars(dateFrom: string, calendarIds: number[]) {
-    const allTasks = await this.repository.findTasksFromCalendarsAndDate(
-      calendarIds,
-      dateFrom,
-    );
-
-    // TODO: Index tasks
-    return calendarIds.map((calendarId) => ({
-      calendarId,
-      dates: allTasks
-        .filter((task) => task.calendarId === calendarId)
-        .map((task) => task.date)
-        .filter(isFirstOne),
-    }));
+  findTasksDatesFromCalendars(
+    dateFrom: string,
+    calendarIds: number[],
+  ): Promise<TaskEntity[]> {
+    return this.repository.findTasksFromCalendarsAndDate(calendarIds, dateFrom);
   }
 
   findTasksFromCalendarsAndDate(
