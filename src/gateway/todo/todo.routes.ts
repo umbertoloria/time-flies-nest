@@ -4,13 +4,6 @@ import {
   getIds,
   getValuesFromList,
 } from '@core/lib/extract';
-import {
-  CreateTodoDto,
-  MoveTodoDto,
-  ReadStreamlineDto,
-  UpdateDoneTodoDto,
-  UpdateTodoDto,
-} from '@app/todo/dto';
 import { TodoService } from '@app/todo/todo.service';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TaskService } from '@app/task/task.service';
@@ -18,7 +11,14 @@ import { TodoAlreadyDoneError } from '@app/todo/errors';
 import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
-import { createCreateTaskDtoFromTodoSetAsDone } from './dto-mapper';
+import {
+  createCreateTaskDtoFromTodoSetAsDone,
+  createCreateTodoDtoFromBody,
+  createMoveTodoDtoFromBody,
+  createReadStreamlineFromBody,
+  createUpdateDoneTodoDtoFromBody,
+  createUpdateTodoDtoFromBody,
+} from './dto-mapper';
 
 export class TodoRoutes {
   constructor(
@@ -30,7 +30,7 @@ export class TodoRoutes {
   async readStreamline(
     user: ReqUser,
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
-    const dto = ReadStreamlineDto.fromBody(user);
+    const dto = createReadStreamlineFromBody(user);
 
     // BL
     const calendars =
@@ -106,7 +106,7 @@ export class TodoRoutes {
     body: any,
     user: ReqUser,
   ): Promise<TNewTodo> {
-    const dto = CreateTodoDto.fromBody(paramCalendarId, body, user);
+    const dto = createCreateTodoDtoFromBody(paramCalendarId, body, user);
 
     const insTodo = await this.todoService.createTodo(dto);
     console.log('created', insTodo);
@@ -120,7 +120,7 @@ export class TodoRoutes {
     body: any,
     user: ReqUser,
   ): Promise<TNewTodo> {
-    const dto = UpdateTodoDto.fromBody(
+    const dto = createUpdateTodoDtoFromBody(
       paramCalendarId,
       paramTodoId,
       body,
@@ -152,7 +152,12 @@ export class TodoRoutes {
     body: any,
     user: ReqUser,
   ): Promise<TNewTodo> {
-    const dto = MoveTodoDto.fromBody(paramCalendarId, paramTodoId, body, user);
+    const dto = createMoveTodoDtoFromBody(
+      paramCalendarId,
+      paramTodoId,
+      body,
+      user,
+    );
 
     // BL
     const todo = await this.todoService.findTodoFromCalendar(
@@ -185,7 +190,7 @@ export class TodoRoutes {
     body: any,
     user: ReqUser,
   ): Promise<TNewDoneTask> {
-    const dto = UpdateDoneTodoDto.fromBody(
+    const dto = createUpdateDoneTodoDtoFromBody(
       paramCalendarId,
       paramTodoId,
       body,
