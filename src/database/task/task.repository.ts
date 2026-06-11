@@ -1,5 +1,6 @@
 import { ITaskRepository } from '@app/task/itask.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
+import { TraceMethod } from '@core/trace';
 import { CreateTaskDto, UpdateTaskDto } from '@app/task/dto';
 import { TaskEntity } from '@app/task/entity';
 import {
@@ -25,6 +26,7 @@ export class TaskRepository implements ITaskRepository {
     return entityFromTaskOrNull(record);
   }
 
+  @TraceMethod()
   async findTasksByCalendarIdsAndDate(calendarIds: number[], dateFrom: string) {
     const records = await this.prisma.task.findMany({
       where: {

@@ -1,5 +1,6 @@
 import { ICalendarRepository } from '@app/calendar/icalendar.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
+import { TraceMethod } from '@core/trace';
 import { CreateCalendarDto, UpdateCalendarDto } from '@app/calendar/dto';
 import {
   entitiesFromCalendars,
@@ -10,6 +11,7 @@ import {
 export class CalendarRepository implements ICalendarRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
+  @TraceMethod()
   async findByUserIdOrderedBySortedPin(userId: string, showArchived: boolean) {
     const records = await this.prisma.calendar.findMany({
       where: {

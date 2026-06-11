@@ -35,6 +35,7 @@ export class TaskService {
     dateFrom: string,
     calendarIds: number[],
   ): Promise<Record<number, string[] | undefined>> {
+    // FIXME: Get only the dates
     const tasks = await this.findTasksFromCalendarsAndDate(
       calendarIds,
       dateFrom,

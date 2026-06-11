@@ -1,5 +1,6 @@
 import { ITodoRepository } from '@app/todo/itodo.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
+import { TraceMethod } from '@core/trace';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -15,6 +16,7 @@ import {
 export class TodoRepository implements ITodoRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
+  @TraceMethod()
   async findUndoneTodosByCalendarIds(calendarIds: number[]) {
     const records = await this.prisma.todo.findMany({
       where: {

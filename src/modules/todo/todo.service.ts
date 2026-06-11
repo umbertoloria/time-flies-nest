@@ -33,6 +33,7 @@ export class TodoService {
   async mapCalendarIds2UndoneTodoDates(
     calendarIds: number[],
   ): Promise<Record<number, string[] | undefined>> {
+    // FIXME: Get only the dates
     const todos = await this.findUndoneTodosByCalendars(calendarIds);
 
     const { idx, ids } = createGroupedItemsAndIds(todos, 'calendarId');
