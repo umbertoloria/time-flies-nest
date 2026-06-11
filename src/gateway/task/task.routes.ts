@@ -29,10 +29,11 @@ export class TaskRoutes {
     const dto = createReadCalendarDateDtoFromBody(paramCalendarId, date, user);
 
     // BL
-    const calendar = await this.calendarService.findCalendarFromUser(
-      dto.calendarId,
-      dto.user.id,
-    );
+    const calendar =
+      await this.calendarService.findCalendarFromUserCheckOwnership(
+        dto.calendarId,
+        dto.user.id,
+      );
 
     const undoneTodos = await this.todoService.findUndoneTodosByCalendar(
       calendar.id,

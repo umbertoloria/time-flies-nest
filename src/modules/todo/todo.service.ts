@@ -64,7 +64,7 @@ export class TodoService {
   }
 
   async createTodo(dto: CreateTodoDto) {
-    await this.calendarService.findCalendarFromUser(
+    await this.calendarService.findCalendarFromUserCheckOwnership(
       dto.calendarId,
       dto.user.id,
     );
@@ -93,7 +93,7 @@ export class TodoService {
   }
 
   async updateTodoSetAsDone(dto: UpdateDoneTodoDto): Promise<TodoEntity> {
-    await this.calendarService.findCalendarFromUser(
+    await this.calendarService.findCalendarFromUserCheckOwnership(
       dto.calendarId,
       dto.user.id,
     );

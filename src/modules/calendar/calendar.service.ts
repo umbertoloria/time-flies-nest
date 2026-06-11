@@ -1,6 +1,6 @@
 import { ICalendarRepository } from './icalendar.repository';
 import { CalendarEntity } from './entity';
-import { CreateCalendarDto, UpdateCalendarDto } from './dto';
+import { CreateCalendarDto, ReadCalendarDto, UpdateCalendarDto } from './dto';
 import { CalendarNotFoundError } from './errors';
 
 export class CalendarService {
@@ -16,7 +16,7 @@ export class CalendarService {
     );
   }
 
-  async findCalendarFromUser(calendarId: number, userId: string) {
+  async findCalendarFromUserCheckOwnership(calendarId: number, userId: string) {
     const calendar = await this.repository.findById(calendarId);
 
     if (!calendar || calendar.userId !== userId) {
@@ -26,12 +26,16 @@ export class CalendarService {
     return calendar;
   }
 
+  async findUserCalendar(dto: ReadCalendarDto) {
+    return this.findCalendarFromUserCheckOwnership(dto.calendarId, dto.user.id);
+  }
+
   async createCalendar(dto: CreateCalendarDto) {
     return this.repository.create(dto);
   }
 
   async updateCalendar(dto: UpdateCalendarDto) {
-    await this.findCalendarFromUser(dto.calendarId, dto.user.id);
+    await this.findCalendarFromUserCheckOwnership(dto.calendarId, dto.user.id);
 
     const upd = await this.repository.update(dto);
 
