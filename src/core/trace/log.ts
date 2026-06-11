@@ -19,13 +19,15 @@ export function TraceMethod(): MethodDecorator {
       const fnId = `${className ? `${className}.` : ''}${methodName}`;
 
       const calcDurationAndLogOk = () => {
-        const duration = (performance.now() - start).toFixed(2).padStart(7, ' ');
-        console.log(`[PERF] ${fnId} - Completato in |${duration}ms|`);
+        const duration = (performance.now() - start)
+          .toFixed(2)
+          .padStart(7, ' ');
+        console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Ok`);
       };
 
       const calcDurationAndLogKo = () => {
         const duration = (performance.now() - start).toFixed(2);
-        console.log(`[PERF] ${fnId} - Errore     in |${duration}ms|`);
+        console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Error`);
       };
 
       try {

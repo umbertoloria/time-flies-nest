@@ -15,6 +15,7 @@ import {
   createUpdateDoneTodoDtoFromBody,
   createUpdateTodoDtoFromBody,
 } from './dto-mapper';
+import { TraceMethod } from '@core/trace';
 
 export class TodoRoutes {
   constructor(
@@ -23,6 +24,7 @@ export class TodoRoutes {
     private taskService: TaskService,
   ) {}
 
+  @TraceMethod()
   async readStreamline(
     user: ReqUser,
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
@@ -97,6 +99,7 @@ export class TodoRoutes {
     };
   }
 
+  @TraceMethod()
   async create(
     paramCalendarId: string,
     body: any,
@@ -110,6 +113,7 @@ export class TodoRoutes {
     return TodoRto.fromEntity(insTodo).toTNewTodo();
   }
 
+  @TraceMethod()
   async updateTodoNotes(
     paramCalendarId: string,
     paramTodoId: string,
@@ -142,6 +146,7 @@ export class TodoRoutes {
     return TodoRto.fromEntity(updTodo).toTNewTodo();
   }
 
+  @TraceMethod()
   async moveTodo(
     paramCalendarId: string,
     paramTodoId: string,
@@ -180,6 +185,7 @@ export class TodoRoutes {
     return TodoRto.fromEntity(todo).toTNewTodo();
   }
 
+  @TraceMethod()
   async updateTodoSetAsDone(
     paramCalendarId: string,
     paramTodoId: string,

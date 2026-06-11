@@ -6,12 +6,10 @@ import {
   entityFromCalendar,
   entityFromCalendarOrNull,
 } from './entity-mapper';
-import { TraceMethod } from '@core/trace';
 
 export class CalendarRepository implements ICalendarRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
-  @TraceMethod()
   async findCalendarsByUserIdOrderedBySortedPin(
     userId: string,
     showAll: boolean,
@@ -35,7 +33,6 @@ export class CalendarRepository implements ICalendarRepository {
     return entitiesFromCalendars(records);
   }
 
-  @TraceMethod()
   async findById(calendarId: number) {
     const record = await this.prisma.calendar.findUnique({
       where: {

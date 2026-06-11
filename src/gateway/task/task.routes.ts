@@ -10,6 +10,7 @@ import {
   createReadCalendarDateDtoFromBody,
   createUpdateTaskDtoFomBody,
 } from './dto-mapper';
+import { TraceMethod } from '@core/trace';
 
 export class TaskRoutes {
   constructor(
@@ -18,19 +19,7 @@ export class TaskRoutes {
     private todoService: TodoService,
   ) {}
 
-  async create(
-    paramCalendarId: string,
-    body: any,
-    user: ReqUser,
-  ): Promise<TNewDoneTask> {
-    // FIXME: Ops... forgot to check if user owns the calendar...
-    const dto = createCreateTaskDtoFromBody(paramCalendarId, body);
-
-    const createdTask = await this.taskService.createDoneTask(dto);
-
-    return TaskRto.fromEntity(createdTask).toTNewDoneTask();
-  }
-
+  @TraceMethod()
   async read(
     paramCalendarId: string,
     date: string,
@@ -65,6 +54,21 @@ export class TaskRoutes {
     };
   }
 
+  @TraceMethod()
+  async create(
+    paramCalendarId: string,
+    body: any,
+    user: ReqUser,
+  ): Promise<TNewDoneTask> {
+    // FIXME: Ops... forgot to check if user owns the calendar...
+    const dto = createCreateTaskDtoFromBody(paramCalendarId, body);
+
+    const createdTask = await this.taskService.createDoneTask(dto);
+
+    return TaskRto.fromEntity(createdTask).toTNewDoneTask();
+  }
+
+  @TraceMethod()
   async update(
     paramCalendarId: string,
     paramTaskId: string,

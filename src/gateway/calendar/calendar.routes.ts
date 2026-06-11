@@ -17,6 +17,7 @@ import {
   createReadCalendarDtoFromParam,
 } from './dto-mapper';
 import { getIds } from '@core/utils';
+import { TraceMethod } from '@core/trace';
 
 export class CalendarRoutes {
   constructor(
@@ -25,6 +26,7 @@ export class CalendarRoutes {
     private todoService: TodoService,
   ) {}
 
+  @TraceMethod()
   async readAll(gdto: ReadCalendarsGdto, user: ReqUser) {
     const dto = dtoFromReadCalendarsGdto(gdto, user);
 
@@ -58,14 +60,7 @@ export class CalendarRoutes {
     });
   }
 
-  async create(body: any, user: ReqUser) {
-    const dto = createCreateCalendarDtoFromBody(body, user);
-
-    const createdCalendar = await this.calendarService.createCalendar(dto);
-
-    return CalendarRto.fromEntity(createdCalendar).toTCalendarRcd();
-  }
-
+  @TraceMethod()
   async read(paramCalendarId: string, user: ReqUser) {
     const dto = createReadCalendarDtoFromParam(paramCalendarId, user);
 
@@ -91,6 +86,16 @@ export class CalendarRoutes {
     };
   }
 
+  @TraceMethod()
+  async create(body: any, user: ReqUser) {
+    const dto = createCreateCalendarDtoFromBody(body, user);
+
+    const createdCalendar = await this.calendarService.createCalendar(dto);
+
+    return CalendarRto.fromEntity(createdCalendar).toTCalendarRcd();
+  }
+
+  @TraceMethod()
   async update(
     paramCalendarId: string,
     gdto: UpdateCalendarGdto,
