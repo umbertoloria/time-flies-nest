@@ -3,7 +3,7 @@ import { todoApp } from '@app/todo/dependent/todo.hono';
 import { calendarApp } from '@app/calendar/dependent/calendar.hono';
 import { taskApp } from '@app/task/dependent/task.hono';
 import { mapAppError2StatusCode } from '@core/errors';
-import { mapCalendarError2StatusCode } from '@app/calendar/core/errors';
+import { mapCalendarError2StatusCode } from '@app/calendar/errors';
 import { mapTaskError2StatusCode } from '@app/task/core/errors';
 import { mapTodoError2StatusCode } from '@app/todo/core/errors';
 

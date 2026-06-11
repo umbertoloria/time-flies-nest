@@ -1,5 +1,5 @@
 import { ITodoRepository } from './itodo.repository';
-import { CalendarService } from '@app/calendar/core/calendar.service';
+import { CalendarService } from '@app/calendar/calendar.service';
 import {
   CreateTodoDto,
   MoveTodoDto,

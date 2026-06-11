@@ -1,5 +1,5 @@
 import { validateDate } from '@core/lib/validate';
-import { ReadCalendarsGdto } from '../../dependent/gdto';
+import { ReadCalendarsGdto } from '../dependent/gdto';
 
 export class ReadCalendarsDto {
   constructor(

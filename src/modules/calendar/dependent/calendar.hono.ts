@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@dep/hono';
 import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from './gdto';
-import { CalendarRoutes } from '@app/calendar/core/calendar.routes';
+import { CalendarRoutes } from '@app/calendar/calendar.routes';
 
 const app = new Hono<HonoEnv>();
 

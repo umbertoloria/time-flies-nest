@@ -13,10 +13,10 @@ import {
   UpdateTodoDto,
 } from './dto';
 import { TodoService } from './todo.service';
-import { CalendarService } from '@app/calendar/core/calendar.service';
+import { CalendarService } from '@app/calendar/calendar.service';
 import { TaskService } from '@app/task/core/task.service';
 import { TodoAlreadyDoneError } from './errors';
-import { CalendarRto } from '@app/calendar/core/rto';
+import { CalendarRto } from '@app/calendar/rto';
 import { TaskRto } from '@app/task/core/rto';
 import { TodoRto } from '@app/todo/core/rto';
 
