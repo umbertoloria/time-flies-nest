@@ -165,7 +165,7 @@ export class TodoRoutes {
       throw new TodoAlreadyDoneError();
     }
 
-    if (todo.date === dto.date) {
+    if (todo.date === dto.fields.date) {
       // Avoid pointless update.
       return todo;
     }

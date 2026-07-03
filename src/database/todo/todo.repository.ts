@@ -116,7 +116,7 @@ export class TodoRepository implements ITodoRepository {
         calendar_id: dto.calendarId,
       },
       data: {
-        notes: dto.notes || null,
+        notes: dto.fields.notes || null,
       },
     });
 
@@ -130,7 +130,7 @@ export class TodoRepository implements ITodoRepository {
         calendar_id: dto.calendarId,
       },
       data: {
-        date: dto.date,
+        date: dto.fields.date,
       },
     });
 
@@ -145,7 +145,7 @@ export class TodoRepository implements ITodoRepository {
       data: {
         done_date: doneDate,
         // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
-        notes: dto.notes || undefined,
+        notes: dto.fields.notes || undefined,
       },
     });
 

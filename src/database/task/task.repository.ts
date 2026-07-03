@@ -132,7 +132,7 @@ export class TaskRepository implements ITaskRepository {
         calendar_id: dto.calendarId,
       },
       data: {
-        notes: dto.notes || null,
+        notes: dto.fields.notes || null,
       },
     });
 

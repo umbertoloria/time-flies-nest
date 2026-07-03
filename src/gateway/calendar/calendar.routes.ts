@@ -108,7 +108,7 @@ export class CalendarRoutes {
     );
 
     // Pre-check
-    if (!dto.usesNotes) {
+    if (!dto.fields.usesNotes) {
       const [
         areThereTodosWithNotesInCalendar,
         areThereTasksWithNotesInCalendar,

@@ -62,10 +62,10 @@ export class CalendarRepository implements ICalendarRepository {
         id: dto.calendarId,
       },
       data: {
-        name: dto.name,
-        color: dto.color,
-        planned_color: dto.plannedColor,
-        uses_notes: dto.usesNotes,
+        name: dto.fields.name,
+        color: dto.fields.color,
+        planned_color: dto.fields.plannedColor,
+        uses_notes: dto.fields.usesNotes,
       },
     });
 

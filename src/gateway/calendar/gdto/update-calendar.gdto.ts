@@ -33,10 +33,12 @@ export function dtoFromUpdateCalendarGdto(
 
   return {
     calendarId,
-    name,
-    color,
-    plannedColor,
-    usesNotes,
+    fields: {
+      name,
+      color,
+      plannedColor,
+      usesNotes,
+    },
     user,
   };
 }

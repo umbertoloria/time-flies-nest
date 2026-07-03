@@ -68,7 +68,9 @@ export function createUpdateTodoDtoFromBody(
   return {
     calendarId,
     todoId,
-    notes,
+    fields: {
+      notes,
+    },
     user,
   };
 }
@@ -87,7 +89,9 @@ export function createUpdateDoneTodoDtoFromBody(
   return {
     calendarId,
     todoId,
-    notes,
+    fields: {
+      notes,
+    },
     user,
   };
 }
@@ -106,7 +110,9 @@ export function createMoveTodoDtoFromBody(
   return {
     calendarId,
     todoId,
-    date,
+    fields: {
+      date,
+    },
     user,
   };
 }

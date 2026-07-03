@@ -1,6 +1,8 @@
 export interface MoveTodoDto {
   calendarId: number;
   todoId: number;
-  date: string;
+  fields: {
+    date: string;
+  };
   user: ReqUser;
 }

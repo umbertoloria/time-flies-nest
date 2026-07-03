@@ -56,7 +56,9 @@ export function createUpdateTaskDtoFomBody(
   return {
     calendarId,
     taskId,
-    notes,
+    fields: {
+      notes,
+    },
     user,
   };
 }
