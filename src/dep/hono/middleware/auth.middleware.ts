@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory';
 import { HonoEnv } from '@dep/hono';
 import { getEnvConfig } from '../config';
-import { verifyJwtAndCreateReqUser } from '@dep/jose';
+import { verifyJwtAndCreateReqUser } from '@core/authentication';
 import { HTTPException } from 'hono/http-exception';
 import { UnauthorizedError } from '@core/errors';
 
@@ -20,10 +20,10 @@ export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
     await next();
   } catch (err: any) {
     if (err instanceof HTTPException) throw err;
-    if (err.status === 401 || err.name === 'JWTExpired') {
+    if (err instanceof UnauthorizedError) {
       throw new HTTPException(401, { message: err.message || 'Unauthorized' });
     }
-    throw new HTTPException(403, { message: err.message || 'Forbidden' });
+    throw new HTTPException(500, { message: 'Internal Server Error' });
   }
 });
 

@@ -8,9 +8,8 @@ export const getEnvConfig = (c: Context<HonoEnv>): IEnvConfig => {
       (
         c.env?.CORS_ORIGINS_WHITELIST || process.env.CORS_ORIGINS_WHITELIST
       )?.split(',') || [],
-    jwtJwksUri: c.env?.JWT_JWKS_URI || process.env.JWT_JWKS_URI!,
-    jwtIssuer: c.env?.JWT_ISSUER || process.env.JWT_ISSUER!,
-    jwtAudience: c.env?.JWT_AUDIENCE || process.env.JWT_AUDIENCE!,
+    oidcUserInfoUri:
+      c.env?.OIDC_USER_INFO_URI || process.env.OIDC_USER_INFO_URI!,
     dbUrl: c.env?.DATABASE_URL || process.env.DATABASE_URL!,
   };
 };

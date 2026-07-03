@@ -15,9 +15,7 @@ import { getHttpErrorName, getKoResponse } from './errors-mapper';
 export type HonoEnv = Env & {
   Bindings: {
     CORS_ORIGINS_WHITELIST: string;
-    JWT_JWKS_URI: string;
-    JWT_ISSUER: string;
-    JWT_AUDIENCE: string;
+    OIDC_USER_INFO_URI: string;
     DATABASE_URL: string;
   };
   Variables: {
