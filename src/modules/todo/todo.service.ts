@@ -2,7 +2,7 @@ import { ITodoRepository } from './itodo.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
-  ReadTodoDto,
+  ReadTodosFromDateDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
@@ -47,7 +47,7 @@ export class TodoService {
     );
   }
 
-  findUndoneTodosByCalendar(dto: ReadTodoDto): Promise<TodoEntity[]> {
+  findUndoneTodosByCalendar(dto: ReadTodosFromDateDto): Promise<TodoEntity[]> {
     return this.repository.findUndoneTodosByCalendar(dto);
   }
 

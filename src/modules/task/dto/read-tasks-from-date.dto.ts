@@ -1,4 +1,4 @@
-export interface ReadTodoDto {
+export interface ReadTasksFromDateDto {
   calendarId: number;
   date: string;
   user: ReqUser;

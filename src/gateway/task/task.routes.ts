@@ -7,11 +7,11 @@ import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
 import {
   createCreateTaskDtoFromBody,
-  createReadTaskDtoFromBody,
+  createReadTasksFromDateDtoFromBody,
   createUpdateTaskDtoFomBody,
 } from './dto-mapper';
 import { TraceMethod } from '@core/trace';
-import { createReadTodoDtoFromBody } from '@gateway/todo/dto-mapper';
+import { createReadTodosFromDateDtoFromBody } from '@gateway/todo/dto-mapper';
 
 export class TaskRoutes {
   constructor(
@@ -26,8 +26,16 @@ export class TaskRoutes {
     date: string,
     user: ReqUser,
   ): Promise<TCalendarSDK.ReadDateResponse> {
-    const dtoTodos = createReadTodoDtoFromBody(paramCalendarId, date, user);
-    const dtoTasks = createReadTaskDtoFromBody(paramCalendarId, date, user);
+    const dtoTodos = createReadTodosFromDateDtoFromBody(
+      paramCalendarId,
+      date,
+      user,
+    );
+    const dtoTasks = createReadTasksFromDateDtoFromBody(
+      paramCalendarId,
+      date,
+      user,
+    );
 
     const calendar = await this.authz.userOnCalendar(
       dtoTasks.calendarId,

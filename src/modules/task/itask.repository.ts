@@ -1,5 +1,5 @@
 import { TaskEntity } from './entity';
-import { CreateTaskDto, ReadTaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, ReadTasksFromDateDto, UpdateTaskDto } from './dto';
 
 export interface ITaskRepository {
   findTask(calendarId: number, taskId: number): Promise<TaskEntity | null>;
@@ -13,7 +13,7 @@ export interface ITaskRepository {
 
   countTasksWithNotesFromCalendar(calendarId: number): Promise<number>;
 
-  findTaskFromCalendarAndDate(dto: ReadTaskDto): Promise<TaskEntity[]>;
+  findTaskFromCalendarAndDate(dto: ReadTasksFromDateDto): Promise<TaskEntity[]>;
 
   create(dto: CreateTaskDto): Promise<TaskEntity>;
 

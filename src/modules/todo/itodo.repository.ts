@@ -2,7 +2,7 @@ import { TodoEntity } from './entity';
 import {
   CreateTodoDto,
   MoveTodoDto,
-  ReadTodoDto,
+  ReadTodosFromDateDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
@@ -10,7 +10,7 @@ import {
 export interface ITodoRepository {
   findUndoneTodosByCalendarIds(calendarIds: number[]): Promise<TodoEntity[]>;
 
-  findUndoneTodosByCalendar(dto: ReadTodoDto): Promise<TodoEntity[]>;
+  findUndoneTodosByCalendar(dto: ReadTodosFromDateDto): Promise<TodoEntity[]>;
 
   findTodo(calendarId: number, todoId: number): Promise<TodoEntity | null>;
 

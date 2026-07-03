@@ -4,7 +4,7 @@ import { TraceMethod } from '@core/trace';
 import {
   CreateTodoDto,
   MoveTodoDto,
-  ReadTodoDto,
+  ReadTodosFromDateDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from '@app/todo/dto';
@@ -34,7 +34,7 @@ export class TodoRepository implements ITodoRepository {
     return entitiesFromTodos(records);
   }
 
-  async findUndoneTodosByCalendar(dto: ReadTodoDto) {
+  async findUndoneTodosByCalendar(dto: ReadTodosFromDateDto) {
     const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: dto.calendarId,
