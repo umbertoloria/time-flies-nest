@@ -11,7 +11,7 @@ export interface ITodoRepository {
 
   findUndoneTodosByCalendar(
     calendarId: number,
-    filterDate: string,
+    date: string,
   ): Promise<TodoEntity[]>;
 
   findTodo(calendarId: number, todoId: number): Promise<TodoEntity | null>;

@@ -3,11 +3,7 @@ import {
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '@core/lib/validate';
-import {
-  CreateTaskDto,
-  ReadCalendarDateDto,
-  UpdateTaskDto,
-} from '@app/task/dto';
+import { CreateTaskDto, ReadTaskDto, UpdateTaskDto } from '@app/task/dto';
 
 export function createCreateTaskDtoFromBody(
   paramCalendarId: string,
@@ -27,11 +23,11 @@ export function createCreateTaskDtoFromBody(
   };
 }
 
-export function createReadCalendarDateDtoFromBody(
+export function createReadTaskDtoFromBody(
   paramCalendarId: string,
   date: string,
   user: ReqUser,
-): ReadCalendarDateDto {
+): ReadTaskDto {
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
 

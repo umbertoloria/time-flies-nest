@@ -33,11 +33,11 @@ export class TodoRepository implements ITodoRepository {
     return entitiesFromTodos(records);
   }
 
-  async findUndoneTodosByCalendar(calendarId: number, filterDate: string) {
+  async findUndoneTodosByCalendar(calendarId: number, date: string) {
     const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: calendarId,
-        date: filterDate,
+        date,
         done_date: null,
       },
       orderBy: {

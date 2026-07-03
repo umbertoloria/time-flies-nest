@@ -48,9 +48,9 @@ export class TodoService {
 
   findUndoneTodosByCalendar(
     calendarId: number,
-    filterDate: string,
+    date: string,
   ): Promise<TodoEntity[]> {
-    return this.repository.findUndoneTodosByCalendar(calendarId, filterDate);
+    return this.repository.findUndoneTodosByCalendar(calendarId, date);
   }
 
   async areThereTodosWithNotes(calendarId: number) {
