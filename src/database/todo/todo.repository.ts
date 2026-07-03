@@ -1,4 +1,4 @@
-import { ITodoRepository } from '@app/todo/itodo.repository';
+import { ITodoRepository, TodoDate } from '@app/todo/itodo.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
 import {
@@ -32,6 +32,30 @@ export class TodoRepository implements ITodoRepository {
     });
 
     return entitiesFromTodos(records);
+  }
+
+  @TraceMethod()
+  async findUndoneTodosDatesByCalendarIds(calendarIds: number[]) {
+    const records = await this.prisma.todo.findMany({
+      where: {
+        calendar_id: {
+          in: calendarIds,
+        },
+        done_date: null,
+      },
+      select: {
+        calendar_id: true,
+        date: true,
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+
+    return records.map<TodoDate>((record) => ({
+      calendarId: record.calendar_id,
+      date: record.date,
+    }));
   }
 
   async findUndoneTodosByCalendar(dto: ReadTodosFromDateDto) {

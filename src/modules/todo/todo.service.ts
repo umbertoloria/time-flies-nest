@@ -34,8 +34,8 @@ export class TodoService {
   async mapCalendarIds2UndoneTodoDates(
     calendarIds: number[],
   ): Promise<Record<number, string[] | undefined>> {
-    // FIXME: Get only the dates
-    const todos = await this.findUndoneTodosByCalendars(calendarIds);
+    const todos =
+      await this.repository.findUndoneTodosDatesByCalendarIds(calendarIds);
 
     const { idx, ids } = createGroupedItemsAndIds(todos, 'calendarId');
 
@@ -73,7 +73,6 @@ export class TodoService {
   }
 
   async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
-    // TODO: There could be multiple ToDos on the same day
     const upd = await this.repository.updateDate(dto);
 
     console.log('updated', upd);

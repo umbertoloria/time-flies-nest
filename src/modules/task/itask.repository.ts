@@ -1,6 +1,11 @@
 import { TaskEntity } from './entity';
 import { CreateTaskDto, ReadTasksFromDateDto, UpdateTaskDto } from './dto';
 
+export type TaskDate = {
+  calendarId: number;
+  date: string;
+};
+
 export interface ITaskRepository {
   findTask(calendarId: number, taskId: number): Promise<TaskEntity | null>;
 
@@ -8,6 +13,11 @@ export interface ITaskRepository {
     calendarIds: number[],
     dateFrom: string,
   ): Promise<TaskEntity[]>;
+
+  findTasksDatesByCalendarIdsAndDate(
+    calendarIds: number[],
+    dateFrom: string,
+  ): Promise<TaskDate[]>;
 
   findTasksFromCalendar(calendarId: number): Promise<TaskEntity[]>;
 
