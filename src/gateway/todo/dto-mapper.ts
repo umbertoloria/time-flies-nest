@@ -7,11 +7,27 @@ import {
   CreateTodoDto,
   MoveTodoDto,
   ReadStreamlineDto,
+  ReadTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from '@app/todo/dto';
 import { TodoEntity } from '@app/todo/entity';
 import { CreateTaskDto } from '@app/task/dto';
+
+export function createReadTodoDtoFromBody(
+  paramCalendarId: string,
+  date: string,
+  user: ReqUser,
+): ReadTodoDto {
+  // Validation
+  const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
+
+  return {
+    calendarId,
+    date,
+    user,
+  };
+}
 
 export function createReadStreamlineFromBody(user: ReqUser): ReadStreamlineDto {
   return {

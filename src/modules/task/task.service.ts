@@ -1,5 +1,5 @@
 import { ITaskRepository } from './itask.repository';
-import { CreateTaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, ReadTaskDto, UpdateTaskDto } from './dto';
 import { TaskEntity } from './entity';
 import { TaskNotFoundError } from './errors';
 import {
@@ -62,13 +62,10 @@ export class TaskService {
     return count > 0;
   }
 
-  findTasksFromCalendarAndDate(
-    calendarId: number,
-    date: string,
-  ): Promise<TaskEntity[]> {
+  findTasksFromCalendarAndDate(dto: ReadTaskDto): Promise<TaskEntity[]> {
     // TODO: This may return multiple Tasks for the same Date
 
-    return this.repository.findTaskFromCalendarAndDate(calendarId, date);
+    return this.repository.findTaskFromCalendarAndDate(dto);
   }
 
   async createDoneTask(dto: CreateTaskDto) {

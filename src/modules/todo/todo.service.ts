@@ -2,6 +2,7 @@ import { ITodoRepository } from './itodo.repository';
 import {
   CreateTodoDto,
   MoveTodoDto,
+  ReadTodoDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from './dto';
@@ -46,11 +47,8 @@ export class TodoService {
     );
   }
 
-  findUndoneTodosByCalendar(
-    calendarId: number,
-    date: string,
-  ): Promise<TodoEntity[]> {
-    return this.repository.findUndoneTodosByCalendar(calendarId, date);
+  findUndoneTodosByCalendar(dto: ReadTodoDto): Promise<TodoEntity[]> {
+    return this.repository.findUndoneTodosByCalendar(dto);
   }
 
   async areThereTodosWithNotes(calendarId: number) {

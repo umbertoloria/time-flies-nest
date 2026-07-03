@@ -1,5 +1,5 @@
-import { IEnvConfig } from '@core/config.ts';
-import { UnauthorizedError } from '@core/errors.ts';
+import { IEnvConfig } from '@core/config';
+import { UnauthorizedError } from '@core/errors';
 
 export async function verifyJwtAndCreateReqUser(
   config: IEnvConfig,

@@ -11,6 +11,7 @@ import {
   createUpdateTaskDtoFomBody,
 } from './dto-mapper';
 import { TraceMethod } from '@core/trace';
+import { createReadTodoDtoFromBody } from '@gateway/todo/dto-mapper';
 
 export class TaskRoutes {
   constructor(
@@ -25,18 +26,22 @@ export class TaskRoutes {
     date: string,
     user: ReqUser,
   ): Promise<TCalendarSDK.ReadDateResponse> {
-    const dto = createReadTaskDtoFromBody(paramCalendarId, date, user);
+    const dtoTodos = createReadTodoDtoFromBody(paramCalendarId, date, user);
+    const dtoTasks = createReadTaskDtoFromBody(paramCalendarId, date, user);
 
-    const calendar = await this.authz.userOnCalendar(dto.calendarId, dto.user);
+    const calendar = await this.authz.userOnCalendar(
+      dtoTasks.calendarId,
+      dtoTasks.user,
+    );
 
     const [undoneTodos, doneTasks] = await Promise.all([
-      this.todoService.findUndoneTodosByCalendar(calendar.id, dto.date),
-      this.taskService.findTasksFromCalendarAndDate(dto.calendarId, dto.date),
+      this.todoService.findUndoneTodosByCalendar(dtoTodos),
+      this.taskService.findTasksFromCalendarAndDate(dtoTasks),
     ]);
 
     return {
       calendar: CalendarRto.fromEntity(calendar).toTCalendarRcd(),
-      date: dto.date,
+      date: dtoTasks.date,
       doneTasks: doneTasks.map((doneTask) =>
         TaskRto.fromEntity(doneTask).toTNewDoneTask(),
       ),
