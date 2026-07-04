@@ -13,10 +13,10 @@ export function TraceMethod(): MethodDecorator {
     const methodName = String(propertyKey);
     const className: string | undefined = target.constructor?.name;
 
-    descriptor.value = function (...args: any[]) {
-      const start = performance.now();
+    const fnId = `${className ? `${className}.` : ''}${methodName}`;
 
-      const fnId = `${className ? `${className}.` : ''}${methodName}`;
+    descriptor.value = function (this: any, ...args: any[]) {
+      const start = performance.now();
 
       const calcDurationAndLogOk = () => {
         const duration = (performance.now() - start)

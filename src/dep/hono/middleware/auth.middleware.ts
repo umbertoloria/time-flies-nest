@@ -4,6 +4,7 @@ import { getEnvConfig } from '../config';
 import { verifyJwtAndCreateReqUser } from '@core/authentication';
 import { HTTPException } from 'hono/http-exception';
 import { UnauthorizedError } from '@core/errors';
+import { traceFunction } from '@core/trace/log-fn';
 
 export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   const headers = c.req.header();
@@ -13,7 +14,9 @@ export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   try {
     const token = extractBearerTokenFromHeaders(headers.authorization);
 
-    const reqUser = await verifyJwtAndCreateReqUser(config, token);
+    const reqUser = await traceFunction(() =>
+      verifyJwtAndCreateReqUser(config, token),
+    )();
 
     c.set('user', reqUser);
 
