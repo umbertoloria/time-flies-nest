@@ -19,7 +19,7 @@ export class TodoService {
   async findTodoValidate(calendarId: number, todoId: number) {
     const todo = await this.repository.findTodo(calendarId, todoId);
 
-    if (!todo || todo.calendarId !== calendarId) {
+    if (!todo) {
       throw new TodoNotFoundError();
     }
 

@@ -4,5 +4,4 @@ export interface TodoEntity {
   date: string;
   doneDate?: string;
   notes?: string;
-  missed?: boolean;
 }

@@ -108,7 +108,6 @@ export class TodoRepository implements ITodoRepository {
         date: dto.date,
         done_date: null,
         notes: dto.notes || undefined,
-        // missed: undefined, // TODO: Deal with Legacy "missed" flag
       },
     });
 
