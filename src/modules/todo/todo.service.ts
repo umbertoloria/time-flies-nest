@@ -1,7 +1,6 @@
 import { ITodoRepository } from './itodo.repository';
 import {
   CreateTodoDto,
-  MoveTodoDto,
   ReadTodosFromDateDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
@@ -62,18 +61,8 @@ export class TodoService {
     return await this.repository.create(dto);
   }
 
-  async updateTodoNotes(dto: UpdateTodoDto): Promise<TodoEntity> {
-    const upd = await this.repository.updateNotes(dto);
-
-    if (!upd || typeof upd !== 'object') {
-      throw new TodoNotFoundError();
-    }
-
-    return upd;
-  }
-
-  async moveTodo(dto: MoveTodoDto): Promise<TodoEntity> {
-    const upd = await this.repository.updateDate(dto);
+  async updateTodo(dto: UpdateTodoDto): Promise<TodoEntity> {
+    const upd = await this.repository.update(dto);
 
     console.log('updated', upd);
 

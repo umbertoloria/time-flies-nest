@@ -2,7 +2,8 @@ export interface UpdateTodoDto {
   calendarId: number;
   todoId: number;
   fields: {
-    notes: string | undefined;
+    date?: string;
+    notes?: string | null;
   };
   user: ReqUser;
 }

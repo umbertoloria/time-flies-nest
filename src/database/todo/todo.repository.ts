@@ -1,10 +1,9 @@
 import { ITodoRepository, TodoDate } from '@app/todo/itodo.repository';
-import { ExtendedPrismaClient } from '@dep/prisma';
+import { ExtendedPrismaClient, TodoUpdateInput } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
 import { CacheMethod, EvictCache } from '@core/cache';
 import {
   CreateTodoDto,
-  MoveTodoDto,
   ReadTodosFromDateDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
@@ -117,30 +116,21 @@ export class TodoRepository implements ITodoRepository {
   }
 
   @EvictCache()
-  async updateNotes(dto: UpdateTodoDto) {
+  async update(dto: UpdateTodoDto) {
+    const data: TodoUpdateInput = {};
+    if (dto.fields.date) {
+      data.date = dto.fields.date;
+    }
+    if (dto.fields.notes !== undefined) {
+      data.notes = dto.fields.notes;
+    }
+
     const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
       },
-      data: {
-        notes: dto.fields.notes || null,
-      },
-    });
-
-    return entityFromTodo(record);
-  }
-
-  @EvictCache()
-  async updateDate(dto: MoveTodoDto) {
-    const record = await this.prisma.todo.update({
-      where: {
-        id: dto.todoId,
-        calendar_id: dto.calendarId,
-      },
-      data: {
-        date: dto.fields.date,
-      },
+      data,
     });
 
     return entityFromTodo(record);
@@ -151,6 +141,7 @@ export class TodoRepository implements ITodoRepository {
     const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
+        calendar_id: dto.calendarId,
       },
       data: {
         done_date: doneDate,

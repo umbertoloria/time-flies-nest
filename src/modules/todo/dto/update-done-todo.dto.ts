@@ -7,4 +7,4 @@ export interface UpdateDoneTodoDto {
   user: ReqUser;
 }
 
-// TODO: Unify with "UpdateTodoDto" and "MoveTodoDto"
+// TODO: Unify with "UpdateDoneTodoDto" and "UpdateTodoDto"

@@ -139,8 +139,8 @@ export class TaskRepository implements ITaskRepository {
     if (dto.fields.date) {
       data.date = dto.fields.date;
     }
-    if (typeof dto.fields.notes === 'string') {
-      data.notes = dto.fields.notes || null;
+    if (dto.fields.notes !== undefined) {
+      data.notes = dto.fields.notes;
     }
     const record = await this.prisma.task.update({
       where: {

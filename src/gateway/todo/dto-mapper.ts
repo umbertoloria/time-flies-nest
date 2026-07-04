@@ -1,17 +1,18 @@
 import {
+  fromBodyGetOptionalLocalDate,
   fromBodyGetOptionalString,
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '@core/lib/validate';
 import {
   CreateTodoDto,
-  MoveTodoDto,
   ReadStreamlineDto,
   ReadTodosFromDateDto,
   UpdateDoneTodoDto,
   UpdateTodoDto,
 } from '@app/todo/dto';
 import { TodoEntity } from '@app/todo/entity';
+import { BadRequestError } from '@core/errors';
 import { CreateTaskDto } from '@app/task/dto';
 
 export function createReadTodosFromDateDtoFromBody(
@@ -62,12 +63,23 @@ export function createUpdateTodoDtoFromBody(
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
   const todoId = fromBodyValidateInt(paramTodoId, 'Invalid TodoID');
-  const notes = fromBodyGetOptionalString(body, 'notes');
+  const date = fromBodyGetOptionalLocalDate(body, 'date');
+  let notes: string | null | undefined = fromBodyGetOptionalString(
+    body,
+    'notes',
+  );
+  if (notes === '') {
+    notes = null;
+  }
+  if (date === undefined && notes === undefined) {
+    throw new BadRequestError('Invalid fields to update');
+  }
 
   return {
     calendarId,
     todoId,
     fields: {
+      date,
       notes,
     },
     user,
@@ -90,27 +102,6 @@ export function createUpdateDoneTodoDtoFromBody(
     todoId,
     fields: {
       notes,
-    },
-    user,
-  };
-}
-
-export function createMoveTodoDtoFromBody(
-  paramCalendarId: string,
-  paramTodoId: string,
-  body: any,
-  user: ReqUser,
-): MoveTodoDto {
-  // Validation
-  const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
-  const todoId = fromBodyValidateInt(paramTodoId, 'Invalid TodoID');
-  const date = fromBodyGetRequiredLocalDate(body, 'date');
-
-  return {
-    calendarId,
-    todoId,
-    fields: {
-      date,
     },
     user,
   };

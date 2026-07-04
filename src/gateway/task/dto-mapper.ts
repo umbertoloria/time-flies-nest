@@ -54,7 +54,13 @@ export function createUpdateTaskDtoFomBody(
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
   const taskId = fromBodyValidateInt(paramTaskId, 'Invalid TaskID');
   const date = fromBodyGetOptionalLocalDate(body, 'date');
-  const notes = fromBodyGetOptionalString(body, 'notes');
+  let notes: string | null | undefined = fromBodyGetOptionalString(
+    body,
+    'notes',
+  );
+  if (notes === '') {
+    notes = null;
+  }
   if (date === undefined && notes === undefined) {
     throw new BadRequestError('Invalid fields to update');
   }

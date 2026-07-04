@@ -24,7 +24,7 @@ app.post('/calendars/:id/todos', async (c) => {
   return c.json(response);
 });
 
-app.post('/calendars/:id/todos/:tid/update-notes', async (c) => {
+app.post('/calendars/:id/todos/:tid', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
@@ -32,23 +32,6 @@ app.post('/calendars/:id/todos/:tid/update-notes', async (c) => {
   const body = await c.req.json();
 
   const response = await todoRoutes.updateTodoNotes(
-    paramCalendarId,
-    paramTodoId,
-    body,
-    user,
-  );
-
-  return c.json(response);
-});
-
-app.post('/calendars/:id/todos/:tid/move', async (c) => {
-  const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
-  const user = c.get('user');
-  const paramCalendarId = c.req.param('id');
-  const paramTodoId = c.req.param('tid');
-  const body = await c.req.json();
-
-  const response = await todoRoutes.moveTodo(
     paramCalendarId,
     paramTodoId,
     body,

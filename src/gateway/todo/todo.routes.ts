@@ -9,7 +9,6 @@ import { TodoRto } from '@app/todo/rto';
 import {
   createCreateTaskDtoFromTodoSetAsDone,
   createCreateTodoDtoFromBody,
-  createMoveTodoDtoFromBody,
   createReadStreamlineFromBody,
   createUpdateDoneTodoDtoFromBody,
   createUpdateTodoDtoFromBody,
@@ -134,43 +133,21 @@ export class TodoRoutes {
       throw new TodoAlreadyDoneError();
     }
 
-    const updTodo = await this.todoService.updateTodoNotes(dto);
-    console.log('updated', updTodo);
-
-    return TodoRto.fromEntity(updTodo).toTNewTodo();
-  }
-
-  @TraceMethod()
-  async moveTodo(
-    paramCalendarId: string,
-    paramTodoId: string,
-    body: any,
-    user: ReqUser,
-  ): Promise<TNewTodo> {
-    const dto = createMoveTodoDtoFromBody(
-      paramCalendarId,
-      paramTodoId,
-      body,
-      user,
-    );
-
-    const [_, todo] = await this.authz.userOnCalendarTodo(
-      dto.calendarId,
-      dto.todoId,
-      dto.user,
-    );
-
-    if (todo.doneDate) {
-      // To-do can't be MOVED after it's Done.
-      throw new TodoAlreadyDoneError();
-    }
-
+    // Avoid pointless updates
     if (todo.date === dto.fields.date) {
-      // Avoid pointless update.
+      dto.fields.date = undefined;
+    }
+    if (
+      (typeof todo.notes === 'string' && todo.notes === dto.fields.notes) ||
+      (todo.notes === undefined && dto.fields.notes === null)
+    ) {
+      dto.fields.date = undefined;
+    }
+    if (dto.fields.date === undefined && dto.fields.notes === undefined) {
       return todo;
     }
 
-    const updTodo = await this.todoService.moveTodo(dto);
+    const updTodo = await this.todoService.updateTodo(dto);
 
     return TodoRto.fromEntity(updTodo).toTNewTodo();
   }
