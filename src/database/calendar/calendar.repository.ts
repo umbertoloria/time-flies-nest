@@ -1,7 +1,7 @@
 import { ICalendarRepository } from '@app/calendar/icalendar.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
-import { CacheMethod } from '@core/cache';
+import { CacheMethod, EvictCache } from '@core/cache';
 import { CreateCalendarDto, UpdateCalendarDto } from '@app/calendar/dto';
 import {
   entitiesFromCalendars,
@@ -34,6 +34,7 @@ export class CalendarRepository implements ICalendarRepository {
     return entitiesFromCalendars(records);
   }
 
+  @CacheMethod()
   async findById(calendarId: number) {
     const record = await this.prisma.calendar.findUnique({
       where: {
@@ -44,6 +45,7 @@ export class CalendarRepository implements ICalendarRepository {
     return entityFromCalendarOrNull(record);
   }
 
+  @EvictCache()
   async create(dto: CreateCalendarDto) {
     const record = await this.prisma.calendar.create({
       data: {
@@ -58,6 +60,7 @@ export class CalendarRepository implements ICalendarRepository {
     return entityFromCalendar(record);
   }
 
+  @EvictCache()
   async update(dto: UpdateCalendarDto) {
     const record = await this.prisma.calendar.update({
       where: {

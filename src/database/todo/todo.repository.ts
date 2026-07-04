@@ -1,7 +1,7 @@
 import { ITodoRepository, TodoDate } from '@app/todo/itodo.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
-import { CacheMethod } from '@core/cache';
+import { CacheMethod, EvictCache } from '@core/cache';
 import {
   CreateTodoDto,
   MoveTodoDto,
@@ -61,6 +61,7 @@ export class TodoRepository implements ITodoRepository {
     }));
   }
 
+  @CacheMethod()
   async findUndoneTodosByCalendar(dto: ReadTodosFromDateDto) {
     const records = await this.prisma.todo.findMany({
       where: {
@@ -76,6 +77,7 @@ export class TodoRepository implements ITodoRepository {
     return entitiesFromTodos(records);
   }
 
+  @CacheMethod()
   async findTodo(calendarId: number, todoId: number) {
     const record = await this.prisma.todo.findUnique({
       where: {
@@ -87,6 +89,7 @@ export class TodoRepository implements ITodoRepository {
     return entityFromTodoOrNull(record);
   }
 
+  @CacheMethod()
   countTodosWithNotesFromCalendar(calendarId: number) {
     return this.prisma.todo.count({
       where: {
@@ -98,6 +101,7 @@ export class TodoRepository implements ITodoRepository {
     });
   }
 
+  @EvictCache()
   async create(dto: CreateTodoDto) {
     const record = await this.prisma.todo.create({
       data: {
@@ -112,6 +116,7 @@ export class TodoRepository implements ITodoRepository {
     return entityFromTodo(record);
   }
 
+  @EvictCache()
   async updateNotes(dto: UpdateTodoDto) {
     const record = await this.prisma.todo.update({
       where: {
@@ -126,6 +131,7 @@ export class TodoRepository implements ITodoRepository {
     return entityFromTodo(record);
   }
 
+  @EvictCache()
   async updateDate(dto: MoveTodoDto) {
     const record = await this.prisma.todo.update({
       where: {
@@ -140,6 +146,7 @@ export class TodoRepository implements ITodoRepository {
     return entityFromTodo(record);
   }
 
+  @EvictCache()
   async updateTodoDoneDate(dto: UpdateDoneTodoDto, doneDate: string) {
     const record = await this.prisma.todo.update({
       where: {

@@ -1,7 +1,7 @@
 import { ITaskRepository, TaskDate } from '@app/task/itask.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
-import { CacheMethod } from '@core/cache';
+import { CacheMethod, EvictCache } from '@core/cache';
 import {
   CreateTaskDto,
   ReadTasksFromDateDto,
@@ -17,6 +17,7 @@ import {
 export class TaskRepository implements ITaskRepository {
   constructor(private prisma: ExtendedPrismaClient) {}
 
+  @CacheMethod()
   async findTask(
     calendarId: number,
     taskId: number,
@@ -81,6 +82,7 @@ export class TaskRepository implements ITaskRepository {
     }));
   }
 
+  @CacheMethod()
   async findTasksFromCalendar(calendarId: number) {
     const records = await this.prisma.task.findMany({
       where: {
@@ -94,6 +96,7 @@ export class TaskRepository implements ITaskRepository {
     return entitiesFromTasks(records);
   }
 
+  @CacheMethod()
   countTasksWithNotesFromCalendar(calendarId: number) {
     return this.prisma.task.count({
       where: {
@@ -105,6 +108,7 @@ export class TaskRepository implements ITaskRepository {
     });
   }
 
+  @CacheMethod()
   async findTaskFromCalendarAndDate(dto: ReadTasksFromDateDto) {
     const records = await this.prisma.task.findMany({
       where: {
@@ -116,6 +120,7 @@ export class TaskRepository implements ITaskRepository {
     return entitiesFromTasks(records);
   }
 
+  @EvictCache()
   async create(dto: CreateTaskDto) {
     const record = await this.prisma.task.create({
       data: {
@@ -128,6 +133,7 @@ export class TaskRepository implements ITaskRepository {
     return entityFromTask(record);
   }
 
+  @EvictCache()
   async update(dto: UpdateTaskDto) {
     const record = await this.prisma.task.update({
       where: {

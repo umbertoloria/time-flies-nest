@@ -1,9 +1,4 @@
-import { LRUCache } from 'lru-cache';
-
-const repositoryCache = new LRUCache<string, any>({
-  max: 1000, // Max 1000 entries
-  ttl: 1000 * 60 * 5, // Expiration after 5 minutes
-});
+import { repositoryCache } from './cache-repository';
 
 export interface CacheMethodOptions {
   ttl?: number;
