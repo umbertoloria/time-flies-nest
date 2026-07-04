@@ -5,8 +5,8 @@ export const entityFromTodo = (record: Todo): TodoEntity => ({
   id: record.id,
   calendarId: record.calendar_id,
   date: record.date ?? undefined,
-  doneDate: record.done_date ?? undefined,
   notes: record.notes ?? undefined,
+  doneDate: record.done_date ?? undefined,
 });
 
 export const entitiesFromTodos = (records: Todo[]) =>

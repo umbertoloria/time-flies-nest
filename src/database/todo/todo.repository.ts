@@ -109,9 +109,9 @@ export class TodoRepository implements ITodoRepository {
     const record = await this.prisma.todo.create({
       data: {
         calendar_id: dto.calendarId,
-        date: dto.date,
+        date: dto.date || null,
+        notes: dto.notes || null,
         done_date: null,
-        notes: dto.notes || undefined,
       },
     });
 

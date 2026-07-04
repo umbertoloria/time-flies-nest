@@ -1,8 +1,8 @@
 export interface CreateTodoDto {
   calendarId: number;
-  date: string;
-  notes: string | undefined;
+  date?: string;
+  notes?: string;
   user: ReqUser;
 }
 
-// TODO: Support Unplanned Todos create (date or notes should be present)
+// NOTE: At least one between "date" and "notes" must be present

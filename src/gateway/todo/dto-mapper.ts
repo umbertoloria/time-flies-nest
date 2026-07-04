@@ -1,7 +1,6 @@
 import {
   fromBodyGetOptionalLocalDate,
   fromBodyGetOptionalString,
-  fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
 } from '@core/lib/validate';
 import {
@@ -50,8 +49,11 @@ export function createCreateTodoDtoFromBody(
 ): CreateTodoDto {
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
-  const date = fromBodyGetRequiredLocalDate(body, 'date');
+  const date = fromBodyGetOptionalLocalDate(body, 'date');
   const notes = fromBodyGetOptionalString(body, 'notes') || undefined;
+  if (date === undefined && notes === undefined) {
+    throw new BadRequestError('Invalid fields');
+  }
 
   return {
     calendarId,

@@ -36,8 +36,8 @@ model Todo {
   calendar    Calendar @relation(fields: [calendar_id], references: [id])
   calendar_id Int
   date        String?  @db.VarChar(10)
-  done_date   String?  @db.VarChar(10)
   notes       String?
+  done_date   String?  @db.VarChar(10)
 }
 
 model Task {
