@@ -1,3 +1,5 @@
+import { traceFunction } from './log-fn';
+
 export function TraceMethod(): MethodDecorator {
   return (
     target: any,
@@ -16,43 +18,7 @@ export function TraceMethod(): MethodDecorator {
     const fnId = `${className ? `${className}.` : ''}${methodName}`;
 
     descriptor.value = function (this: any, ...args: any[]) {
-      const start = performance.now();
-
-      const calcDurationAndLogOk = () => {
-        const duration = (performance.now() - start)
-          .toFixed(2)
-          .padStart(7, ' ');
-        console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Ok`);
-      };
-
-      const calcDurationAndLogKo = () => {
-        const duration = (performance.now() - start)
-          .toFixed(2)
-          .padStart(7, ' ');
-        console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Error`);
-      };
-
-      try {
-        const result = originalMethod.apply(this, args);
-
-        if (result instanceof Promise) {
-          return result
-            .then((value) => {
-              calcDurationAndLogOk();
-              return value;
-            })
-            .catch((error) => {
-              calcDurationAndLogKo();
-              throw error;
-            });
-        }
-
-        calcDurationAndLogOk();
-        return result;
-      } catch (error) {
-        calcDurationAndLogKo();
-        throw error;
-      }
+      return traceFunction(fnId, () => originalMethod.apply(this, args))();
     };
 
     return descriptor;

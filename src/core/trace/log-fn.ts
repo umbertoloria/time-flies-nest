@@ -1,25 +1,21 @@
 export type StdFn = (...args: any[]) => any;
 
 export function traceFunction<T extends StdFn>(fnId: string, fn: T): T {
-  const originalMethod = fn;
-
-  return function (this: any, ...args: Parameters<T>): ReturnType<T> {
+  return ((...args: Parameters<T>): ReturnType<T> => {
     const start = performance.now();
-
-    // const fnId = originalMethod.name || 'anonymousFunction';
 
     const calcDurationAndLogOk = () => {
       const duration = (performance.now() - start).toFixed(2).padStart(7, ' ');
-      console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Ok`);
+      console.log(`[PERF] | ${fnId.padEnd(50, ' ')}|   |${duration}ms | Ok`);
     };
 
     const calcDurationAndLogKo = () => {
       const duration = (performance.now() - start).toFixed(2).padStart(7, ' ');
-      console.log(`[PERF] |${fnId.padEnd(50, ' ')}|   |${duration}ms| Error`);
+      console.log(`[PERF] | ${fnId.padEnd(50, ' ')}|   |${duration}ms | Error`);
     };
 
     try {
-      const result = originalMethod.apply(this, args);
+      const result = fn(...args);
 
       if (result instanceof Promise) {
         return result
@@ -39,5 +35,5 @@ export function traceFunction<T extends StdFn>(fnId: string, fn: T): T {
       calcDurationAndLogKo();
       throw error;
     }
-  } as T;
+  }) as T;
 }
