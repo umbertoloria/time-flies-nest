@@ -38,7 +38,6 @@ model Todo {
   date        String?  @db.VarChar(10)
   done_date   String?  @db.VarChar(10)
   notes       String?
-  missed      Boolean? @db.Boolean
 }
 
 model Task {
