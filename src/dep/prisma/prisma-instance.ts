@@ -6,10 +6,13 @@ import {
   Task as PrismaTask,
   Todo as PrismaTodo,
 } from '@prismagen/prisma/client';
+import { TaskUpdateInput as PrismaTaskUpdateInput } from '@prismagen/prisma/models/Task';
 
 export type Calendar = PrismaCalendar;
 export type Task = PrismaTask;
 export type Todo = PrismaTodo;
+
+export type TaskUpdateInput = PrismaTaskUpdateInput;
 
 export type ExtendedPrismaClient = PrismaClient;
 

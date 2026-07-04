@@ -2,7 +2,8 @@ export interface UpdateTaskDto {
   calendarId: number;
   taskId: number;
   fields: {
-    notes: string | undefined;
+    date?: string | null;
+    notes?: string;
   };
   user: ReqUser;
 }

@@ -1,5 +1,5 @@
 import { ITaskRepository, TaskDate } from '@app/task/itask.repository';
-import { ExtendedPrismaClient } from '@dep/prisma';
+import { ExtendedPrismaClient, TaskUpdateInput } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
 import { CacheMethod, EvictCache } from '@core/cache';
 import {
@@ -135,14 +135,19 @@ export class TaskRepository implements ITaskRepository {
 
   @EvictCache()
   async update(dto: UpdateTaskDto) {
+    const data: TaskUpdateInput = {};
+    if (dto.fields.date) {
+      data.date = dto.fields.date;
+    }
+    if (typeof dto.fields.notes === 'string') {
+      data.notes = dto.fields.notes || null;
+    }
     const record = await this.prisma.task.update({
       where: {
         id: dto.taskId,
         calendar_id: dto.calendarId,
       },
-      data: {
-        notes: dto.fields.notes || null,
-      },
+      data,
     });
 
     return entityFromTask(record);

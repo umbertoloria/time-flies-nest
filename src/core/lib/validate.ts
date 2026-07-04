@@ -6,9 +6,10 @@ export function fromBodyGetOptionalString(
   paramName: string,
 ): string | undefined {
   const value = bodyParams[paramName];
-  if (typeof value !== 'string' || !value) {
+  if (typeof value !== 'string') {
     return undefined;
   }
+  // Value '' is ok.
   return value;
 }
 
@@ -17,7 +18,8 @@ export function fromBodyGetRequiredString(
   paramName: string,
 ): string {
   const value = fromBodyGetOptionalString(bodyParams, paramName);
-  if (typeof value !== 'string') {
+  if (typeof value !== 'string' || !value) {
+    // Value '' is denied.
     throw new BadRequestError(`Param "${paramName}" required`);
   }
   return value;

@@ -43,8 +43,7 @@ export function createCreateTodoDtoFromBody(
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
   const date = fromBodyGetRequiredLocalDate(body, 'date');
-  // TODO: Validate "date"
-  const notes = fromBodyGetOptionalString(body, 'notes');
+  const notes = fromBodyGetOptionalString(body, 'notes') || undefined;
 
   return {
     calendarId,

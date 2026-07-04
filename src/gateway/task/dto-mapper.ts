@@ -1,4 +1,5 @@
 import {
+  fromBodyGetOptionalLocalDate,
   fromBodyGetOptionalString,
   fromBodyGetRequiredLocalDate,
   fromBodyValidateInt,
@@ -8,6 +9,7 @@ import {
   ReadTasksFromDateDto,
   UpdateTaskDto,
 } from '@app/task/dto';
+import { BadRequestError } from '@core/errors';
 
 export function createCreateTaskDtoFromBody(
   paramCalendarId: string,
@@ -17,7 +19,7 @@ export function createCreateTaskDtoFromBody(
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
   const date = fromBodyGetRequiredLocalDate(body, 'date');
-  const notes = fromBodyGetOptionalString(body, 'notes');
+  const notes = fromBodyGetOptionalString(body, 'notes') || undefined;
 
   return {
     calendarId,
@@ -51,12 +53,17 @@ export function createUpdateTaskDtoFomBody(
   // Validation
   const calendarId = fromBodyValidateInt(paramCalendarId, 'Invalid CalendarID');
   const taskId = fromBodyValidateInt(paramTaskId, 'Invalid TaskID');
+  const date = fromBodyGetOptionalLocalDate(body, 'date');
   const notes = fromBodyGetOptionalString(body, 'notes');
+  if (date === undefined && notes === undefined) {
+    throw new BadRequestError('Invalid fields to update');
+  }
 
   return {
     calendarId,
     taskId,
     fields: {
+      date,
       notes,
     },
     user,
