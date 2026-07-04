@@ -1,7 +1,11 @@
 import { createMiddleware } from 'hono/factory';
 import { HonoEnv } from '@dep/hono';
 import { getEnvConfig } from '../config';
-import { verifyJwtAndCreateReqUser } from '@core/authentication';
+import {
+  cacheValidToken,
+  getReqUserFromTokensCache,
+  verifyJwtAndCreateReqUser,
+} from '@core/auth';
 import { HTTPException } from 'hono/http-exception';
 import { UnauthorizedError } from '@core/errors';
 
@@ -13,16 +17,24 @@ export const authMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   try {
     const token = extractBearerTokenFromHeaders(headers.authorization);
 
-    const reqUser = await verifyJwtAndCreateReqUser(config, token);
+    let reqUser = getReqUserFromTokensCache(token);
+
+    if (!reqUser) {
+      reqUser = await verifyJwtAndCreateReqUser(config, token);
+
+      cacheValidToken(token, reqUser);
+    }
 
     c.set('user', reqUser);
 
     await next();
   } catch (err: any) {
     if (err instanceof HTTPException) throw err;
+
     if (err instanceof UnauthorizedError) {
       throw new HTTPException(401, { message: err.message || 'Unauthorized' });
     }
+
     throw new HTTPException(500, { message: 'Internal Server Error' });
   }
 });
