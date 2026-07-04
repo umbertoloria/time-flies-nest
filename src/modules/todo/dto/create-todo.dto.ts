@@ -4,3 +4,5 @@ export interface CreateTodoDto {
   notes: string | undefined;
   user: ReqUser;
 }
+
+// TODO: Support Unplanned Todos create (date or notes should be present)

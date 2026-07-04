@@ -4,7 +4,7 @@ import { TodoEntity } from '@app/todo/entity';
 export const entityFromTodo = (record: Todo): TodoEntity => ({
   id: record.id,
   calendarId: record.calendar_id,
-  date: record.date,
+  date: record.date ?? undefined,
   doneDate: record.done_date ?? undefined,
   notes: record.notes ?? undefined,
 });

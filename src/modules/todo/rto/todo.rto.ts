@@ -1,11 +1,11 @@
 import { TodoEntity } from '../entity';
-import { TDay, TNewTodo } from '@core/sdk/types';
+import { TNewTodo } from '@core/sdk/types';
 
 export class TodoRto {
   constructor(
     public readonly id: number,
     public readonly calendarId: number,
-    public readonly date: string,
+    public readonly date?: string,
     public readonly doneDate?: string,
     public readonly notes?: string,
   ) {}
@@ -14,7 +14,7 @@ export class TodoRto {
     return new TodoRto(
       entity.id,
       entity.calendarId,
-      entity.date,
+      entity.date ?? undefined,
       entity.doneDate ?? undefined,
       entity.notes ?? undefined,
     );
@@ -24,14 +24,6 @@ export class TodoRto {
     return {
       id: this.id,
       notes: this.notes,
-    };
-  }
-
-  toTDayWithId(): TDay {
-    return {
-      date: this.date,
-      notes: this.notes,
-      todoId: this.id,
     };
   }
 }

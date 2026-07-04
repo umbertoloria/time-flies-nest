@@ -26,8 +26,27 @@ export class TodoService {
     return todo;
   }
 
-  findUndoneTodosByCalendars(calendarIds: number[]): Promise<TodoEntity[]> {
-    return this.repository.findUndoneTodosByCalendarIds(calendarIds);
+  async findUndoneTodosByCalendars(calendarIds: number[]): Promise<{
+    plannedTodos: Array<TodoEntity & { date: string }>;
+    unplannedTodos: Array<TodoEntity & { date: undefined }>;
+  }> {
+    const undoneTodos =
+      await this.repository.findUndoneTodosByCalendarIds(calendarIds);
+
+    const plannedTodos: Array<TodoEntity & { date: string }> = [];
+    const unplannedTodos: Array<TodoEntity & { date: undefined }> = [];
+    for (const undoneTodo of undoneTodos) {
+      if (undoneTodo.date) {
+        plannedTodos.push(undoneTodo as TodoEntity & { date: string });
+      } else {
+        unplannedTodos.push(undoneTodo as TodoEntity & { date: undefined });
+      }
+    }
+
+    return {
+      plannedTodos,
+      unplannedTodos,
+    };
   }
 
   async mapCalendarIds2UndoneTodoDates(

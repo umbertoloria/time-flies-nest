@@ -16,6 +16,7 @@ import {
 } from './dto-mapper';
 import { TraceMethod } from '@core/trace';
 import { TodoAlreadyDoneError } from '@app/todo/errors';
+import { BadRequestError } from '@core/errors';
 
 export class TodoRoutes {
   constructor(
@@ -33,25 +34,29 @@ export class TodoRoutes {
     const calendars = await this.authz.allUserCalendars(dto.user);
 
     const calendarIds = getIds(calendars);
-    const undoneTodos =
+    const { plannedTodos, unplannedTodos } =
       await this.todoService.findUndoneTodosByCalendars(calendarIds);
 
-    const doneTasks = undoneTodos.length
+    const doneTasks = plannedTodos.length
       ? await this.taskService.findTasksFromCalendarsAndDate(
           calendarIds,
-          undoneTodos[0].date,
+          plannedTodos[0].date,
         )
       : [];
 
     const sortedDates = excludeDuplicates([
-      ...getValuesFromList(undoneTodos, 'date'),
+      ...getValuesFromList(plannedTodos, 'date'),
       ...getValuesFromList(doneTasks, 'date'),
     ]);
+
+    const unplannedTodoCalendarIds = excludeDuplicates(
+      getValuesFromList(unplannedTodos, 'calendarId'),
+    );
 
     return {
       dates: sortedDates.map<TCalendarSDK.ReadPlannedEventsResponseDateBox>(
         (date) => {
-          const dateUndoneTodos = undoneTodos.filter(
+          const dateUndoneTodos = plannedTodos.filter(
             (todo) => todo.date === date,
           );
           const dateDoneTasks = doneTasks.filter((task) => task.date === date);
@@ -90,6 +95,22 @@ export class TodoRoutes {
           };
         },
       ),
+      unplannedTodosCalendars: calendars
+        .filter((calendar) => unplannedTodoCalendarIds.includes(calendar.id))
+        .map<TCalendarSDK.ReadUnplannedTodosCalendar>((calendar) => {
+          const dateCalendarUndoneTodos = unplannedTodos.filter(
+            (todo) => todo.calendarId === calendar.id,
+          );
+          return {
+            ...CalendarRto.fromEntity(calendar).toTCalendarRcd(),
+            sortedPin: calendar.sortedPin,
+            todos: dateCalendarUndoneTodos.length
+              ? dateCalendarUndoneTodos.map((todo) =>
+                  TodoRto.fromEntity(todo).toTNewTodo(),
+                )
+              : undefined,
+          };
+        }),
     };
   }
 
@@ -171,6 +192,11 @@ export class TodoRoutes {
     );
 
     const doneDate = todo.date; // Always using the To-do Date as "default".
+
+    if (!doneDate) {
+      // TODO: Figure out how to convert an Unplanned Todo into a DoneTask
+      throw new BadRequestError('Todo does not have a Date');
+    }
 
     const dtoSetTodoAsDone = createSetTodoAsDoneDtoFromValidatedFields(
       validatedFields,

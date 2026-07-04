@@ -1,6 +1,6 @@
 // Types
-// 2026-06-06T12:29:01Z
-// v3.11
+// 2026-07-04T19:07:22Z
+// v3.12
 
 // Calendar
 export type TCalendarPrev = TCalendarRcd & {
@@ -9,7 +9,8 @@ export type TCalendarPrev = TCalendarRcd & {
 };
 export type TCalendar = TCalendarRcd & {
   days: TDay[];
-  plannedDays?: TDay[];
+  plannedDays?: Array<TNewTodo & { date: string }>;
+  unplannedTodos?: TNewTodo[];
 };
 export type TCalendarRcd = {
   id: number;
@@ -66,17 +67,12 @@ export type TExerciseRecord = {
   ts_below?: number;
 };
 
-// SDK: Schedule
-export namespace TScheduleSDK {
-  export type ReadScheduleAndAllExerciseGroups = {
-    schedule: TSchedule;
-    allExerciseGroups: TExerciseGroup[];
-  };
-}
+// SDK: Calendar
 export namespace TCalendarSDK {
   // Read Planned Events Response
   export type ReadPlannedEventsResponse = {
     dates: ReadPlannedEventsResponseDateBox[];
+    unplannedTodosCalendars?: ReadUnplannedTodosCalendar[];
   };
   export type ReadPlannedEventsResponseDateBox = {
     date: string;
@@ -93,5 +89,9 @@ export namespace TCalendarSDK {
     calendar: TCalendarRcd;
     doneTasks: TNewDoneTask[];
     todos: TNewTodo[];
+  };
+  export type ReadUnplannedTodosCalendar = TCalendarRcd & {
+    sortedPin?: number;
+    todos?: TNewTodo[];
   };
 }

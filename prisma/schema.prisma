@@ -35,7 +35,7 @@ model Todo {
   id          Int      @id @default(autoincrement())
   calendar    Calendar @relation(fields: [calendar_id], references: [id])
   calendar_id Int
-  date        String   @db.VarChar(10)
+  date        String?  @db.VarChar(10)
   done_date   String?  @db.VarChar(10)
   notes       String?
   missed      Boolean? @db.Boolean

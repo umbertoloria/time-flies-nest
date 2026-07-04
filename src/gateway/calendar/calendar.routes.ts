@@ -10,7 +10,7 @@ import { CalendarAuthz } from '@app/calendar/calendar.authz';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/todo.service';
 import { TaskService } from '@app/task/task.service';
-import { TCalendarPrev, TCalendarRcd } from '@core/sdk/types';
+import { TCalendar, TCalendarPrev, TCalendarRcd } from '@core/sdk/types';
 import { TaskRto } from '@app/task/rto';
 import { TodoRto } from '@app/todo/rto';
 import {
@@ -63,7 +63,7 @@ export class CalendarRoutes {
   }
 
   @TraceMethod()
-  async read(paramCalendarId: string, user: ReqUser) {
+  async read(paramCalendarId: string, user: ReqUser): Promise<TCalendar> {
     const dto = createReadCalendarDtoFromParam(paramCalendarId, user);
 
     const calendar = await this.authz.findUserOwnCalendar(
@@ -71,7 +71,7 @@ export class CalendarRoutes {
       dto.user,
     );
 
-    const [undoneTodos, doneTasks] = await Promise.all([
+    const [{ plannedTodos, unplannedTodos }, doneTasks] = await Promise.all([
       this.todoService.findUndoneTodosByCalendars([calendar.id]),
       this.taskService.findTasksFromCalendar(dto.calendarId),
     ]);
@@ -79,8 +79,12 @@ export class CalendarRoutes {
     return {
       ...calendar,
       days: doneTasks.map((task) => TaskRto.fromEntity(task).toTDayWithId()),
-      plannedDays: undoneTodos.map((todo) =>
-        TodoRto.fromEntity(todo).toTDayWithId(),
+      plannedDays: plannedTodos.map((undoneTodo) => ({
+        ...TodoRto.fromEntity(undoneTodo).toTNewTodo(),
+        date: undoneTodo.date,
+      })),
+      unplannedTodos: unplannedTodos.map((undoneTodo) =>
+        TodoRto.fromEntity(undoneTodo).toTNewTodo(),
       ),
     };
   }

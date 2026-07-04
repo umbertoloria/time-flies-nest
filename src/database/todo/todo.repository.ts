@@ -20,6 +20,7 @@ export class TodoRepository implements ITodoRepository {
   @CacheMethod()
   @TraceMethod()
   async findUndoneTodosByCalendarIds(calendarIds: number[]) {
+    // NOTE: Unplanned Todos come last
     const records = await this.prisma.todo.findMany({
       where: {
         calendar_id: {
@@ -43,6 +44,9 @@ export class TodoRepository implements ITodoRepository {
         calendar_id: {
           in: calendarIds,
         },
+        date: {
+          not: null,
+        },
         done_date: null,
       },
       select: {
@@ -56,7 +60,7 @@ export class TodoRepository implements ITodoRepository {
 
     return records.map<TodoDate>((record) => ({
       calendarId: record.calendar_id,
-      date: record.date,
+      date: record.date!,
     }));
   }
 

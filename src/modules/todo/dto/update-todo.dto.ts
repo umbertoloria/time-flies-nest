@@ -7,3 +7,5 @@ export interface UpdateTodoDto {
   };
   user: ReqUser;
 }
+
+// TODO: Support Unplanned Todos update (date or notes should be present)
