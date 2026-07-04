@@ -46,12 +46,10 @@ app.post('/calendars/:id/todos/:tid/set-as-done', async (c) => {
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
   const paramTodoId = c.req.param('tid');
-  const body = await c.req.json();
 
   const response = await todoRoutes.updateTodoSetAsDone(
     paramCalendarId,
     paramTodoId,
-    body,
     user,
   );
 

@@ -2,7 +2,7 @@ import { TodoEntity } from './entity';
 import {
   CreateTodoDto,
   ReadTodosFromDateDto,
-  UpdateDoneTodoDto,
+  SetTodoAsDoneDto,
   UpdateTodoDto,
 } from './dto';
 
@@ -26,8 +26,5 @@ export interface ITodoRepository {
 
   update(dto: UpdateTodoDto): Promise<TodoEntity>;
 
-  updateTodoDoneDate(
-    dto: UpdateDoneTodoDto,
-    doneDate: string,
-  ): Promise<TodoEntity>;
+  setAsDone(dto: SetTodoAsDoneDto): Promise<TodoEntity>;
 }

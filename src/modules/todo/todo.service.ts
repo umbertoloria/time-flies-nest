@@ -2,7 +2,7 @@ import { ITodoRepository } from './itodo.repository';
 import {
   CreateTodoDto,
   ReadTodosFromDateDto,
-  UpdateDoneTodoDto,
+  SetTodoAsDoneDto,
   UpdateTodoDto,
 } from './dto';
 import { TodoEntity } from './entity';
@@ -69,15 +69,10 @@ export class TodoService {
     return upd;
   }
 
-  async updateTodoSetAsDone(
-    dto: UpdateDoneTodoDto,
-    doneDate: string,
-  ): Promise<TodoEntity> {
-    const upd = await this.repository.updateTodoDoneDate(dto, doneDate);
+  async setTodoAsDone(dto: SetTodoAsDoneDto): Promise<TodoEntity> {
+    const upd = await this.repository.setAsDone(dto);
 
-    if (!upd || typeof upd !== 'object') {
-      throw new TodoNotFoundError();
-    }
+    console.log('todo set as done', upd);
 
     return upd;
   }

@@ -5,7 +5,7 @@ import { CacheMethod, EvictCache } from '@core/cache';
 import {
   CreateTodoDto,
   ReadTodosFromDateDto,
-  UpdateDoneTodoDto,
+  SetTodoAsDoneDto,
   UpdateTodoDto,
 } from '@app/todo/dto';
 import {
@@ -137,16 +137,15 @@ export class TodoRepository implements ITodoRepository {
   }
 
   @EvictCache()
-  async updateTodoDoneDate(dto: UpdateDoneTodoDto, doneDate: string) {
+  async setAsDone(dto: SetTodoAsDoneDto) {
     const record = await this.prisma.todo.update({
       where: {
         id: dto.todoId,
         calendar_id: dto.calendarId,
+        done_date: null,
       },
       data: {
-        done_date: doneDate,
-        // TODO: To-do set as Done ambiguity: "notes" become NULL or kept?
-        notes: dto.fields.notes || undefined,
+        done_date: dto.doneDate,
       },
     });
 

@@ -8,7 +8,7 @@ import {
   CreateTodoDto,
   ReadStreamlineDto,
   ReadTodosFromDateDto,
-  UpdateDoneTodoDto,
+  SetTodoAsDoneDto,
   UpdateTodoDto,
 } from '@app/todo/dto';
 import { TodoEntity } from '@app/todo/entity';
@@ -86,23 +86,35 @@ export function createUpdateTodoDtoFromBody(
   };
 }
 
-export function createUpdateDoneTodoDtoFromBody(
+type SetTodoAsDoneValidatedFields = {
+  calendarId: number;
+  todoId: number;
+  notes?: string | null;
+};
+
+export function validateFieldsForSetTodoAsDoneDtoFromBody(
   urlCid: string,
   urlTid: string,
-  body: any,
-  user: ReqUser,
-): UpdateDoneTodoDto {
+): SetTodoAsDoneValidatedFields {
   // Validation
   const calendarId = fromBodyValidateInt(urlCid, 'Invalid CalendarID');
   const todoId = fromBodyValidateInt(urlTid, 'Invalid TodoID');
-  const notes = fromBodyGetOptionalString(body, 'notes');
 
   return {
     calendarId,
     todoId,
-    fields: {
-      notes,
-    },
+  };
+}
+
+export function createSetTodoAsDoneDtoFromValidatedFields(
+  validatedFields: SetTodoAsDoneValidatedFields,
+  doneDate: string,
+  user: ReqUser,
+): SetTodoAsDoneDto {
+  return {
+    calendarId: validatedFields.calendarId,
+    todoId: validatedFields.todoId,
+    doneDate,
     user,
   };
 }
@@ -113,7 +125,7 @@ export function createCreateTaskDtoFromTodoSetAsDone(
 ): CreateTaskDto {
   return {
     calendarId: updTodo.calendarId,
-    date: updTodo.date,
+    date: updTodo.doneDate!, // Assuming "updTodo" has a DoneDate.
     notes: updTodo.notes ?? undefined,
     user,
   };

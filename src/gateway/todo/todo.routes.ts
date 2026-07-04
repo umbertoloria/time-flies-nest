@@ -10,8 +10,9 @@ import {
   createCreateTaskDtoFromTodoSetAsDone,
   createCreateTodoDtoFromBody,
   createReadStreamlineFromBody,
-  createUpdateDoneTodoDtoFromBody,
+  createSetTodoAsDoneDtoFromValidatedFields,
   createUpdateTodoDtoFromBody,
+  validateFieldsForSetTodoAsDoneDtoFromBody,
 } from './dto-mapper';
 import { TraceMethod } from '@core/trace';
 import { TodoAlreadyDoneError } from '@app/todo/errors';
@@ -156,29 +157,31 @@ export class TodoRoutes {
   async updateTodoSetAsDone(
     paramCalendarId: string,
     paramTodoId: string,
-    body: any,
     user: ReqUser,
   ): Promise<TNewDoneTask> {
-    const dto = createUpdateDoneTodoDtoFromBody(
+    const validatedFields = validateFieldsForSetTodoAsDoneDtoFromBody(
       paramCalendarId,
       paramTodoId,
-      body,
-      user,
     );
 
     const [_, todo] = await this.authz.userOnCalendarTodo(
-      dto.calendarId,
-      dto.todoId,
-      dto.user,
+      validatedFields.calendarId,
+      validatedFields.todoId,
+      user,
     );
 
     const doneDate = todo.date; // Always using the To-do Date as "default".
 
-    const updTodo = await this.todoService.updateTodoSetAsDone(dto, doneDate);
+    const dtoSetTodoAsDone = createSetTodoAsDoneDtoFromValidatedFields(
+      validatedFields,
+      doneDate,
+      user,
+    );
+    const updTodo = await this.todoService.setTodoAsDone(dtoSetTodoAsDone);
 
-    const createTaskDto = createCreateTaskDtoFromTodoSetAsDone(updTodo, user);
+    const dtoCreateTask = createCreateTaskDtoFromTodoSetAsDone(updTodo, user);
     const createdDoneTask =
-      await this.taskService.createDoneTask(createTaskDto);
+      await this.taskService.createDoneTask(dtoCreateTask);
 
     return TaskRto.fromEntity(createdDoneTask).toTNewDoneTask();
   }
