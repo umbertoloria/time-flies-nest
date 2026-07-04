@@ -30,8 +30,15 @@ export function createReadTodosFromDateDtoFromBody(
   };
 }
 
-export function createReadStreamlineFromBody(user: ReqUser): ReadStreamlineDto {
+export function createReadStreamlineFromBody(
+  paramIncludeArchivedCalendars: string | undefined,
+  user: ReqUser,
+): ReadStreamlineDto {
+  // Validation
+  const includeArchivedCalendars = paramIncludeArchivedCalendars === 'true';
+
   return {
+    includeArchivedCalendars,
     user,
   };
 }

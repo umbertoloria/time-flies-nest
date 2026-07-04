@@ -12,8 +12,14 @@ export class Authz {
     private todoService: TodoService,
   ) {}
 
-  async allUserCalendars(user: ReqUser): Promise<CalendarEntity[]> {
-    return await this.calendarAuthz.findUserCalendarsAll(user);
+  async userCalendars(
+    user: ReqUser,
+    includeArchivedCalendars: boolean,
+  ): Promise<CalendarEntity[]> {
+    return await this.calendarAuthz.findUserCalendars(
+      user,
+      includeArchivedCalendars,
+    );
   }
 
   async userOnCalendar(

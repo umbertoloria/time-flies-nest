@@ -14,11 +14,14 @@ export class CalendarRepository implements ICalendarRepository {
 
   @CacheMethod()
   @TraceMethod()
-  async findByUserIdOrderedBySortedPin(userId: string, showArchived: boolean) {
+  async findByUserIdOrderedBySortedPin(
+    userId: string,
+    includeArchivedCalendars: boolean,
+  ) {
     const records = await this.prisma.calendar.findMany({
       where: {
         user_id: userId,
-        ...(showArchived
+        ...(includeArchivedCalendars
           ? {}
           : {
               sorted_pin: {

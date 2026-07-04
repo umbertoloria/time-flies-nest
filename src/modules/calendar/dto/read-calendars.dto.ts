@@ -1,5 +1,5 @@
 export interface ReadCalendarsDto {
   dateFrom: string;
-  showArchived: boolean;
+  includeArchivedCalendars: boolean;
   user: ReqUser;
 }

@@ -6,7 +6,7 @@ import {
 } from './gdto';
 import { CalendarRto } from '@app/calendar/rto';
 import { CalendarUsesNotesCannotBeDisabledError } from '@app/calendar/errors';
-import { CalendarAuthz } from '@app/calendar/calendar.authz';
+import { Authz } from '@gateway/authz';
 import { CalendarService } from '@app/calendar/calendar.service';
 import { TodoService } from '@app/todo/todo.service';
 import { TaskService } from '@app/task/task.service';
@@ -22,7 +22,7 @@ import { TraceMethod } from '@core/trace';
 
 export class CalendarRoutes {
   constructor(
-    private authz: CalendarAuthz,
+    private authz: Authz,
     private calendarService: CalendarService,
     private taskService: TaskService,
     private todoService: TodoService,
@@ -35,9 +35,9 @@ export class CalendarRoutes {
   ): Promise<TCalendarPrev[]> {
     const dto = dtoFromReadCalendarsGdto(gdto, user);
 
-    const calendars = await this.authz.findUserCalendars(
+    const calendars = await this.authz.userCalendars(
       dto.user,
-      dto.showArchived,
+      dto.includeArchivedCalendars,
     );
 
     const calendarIds = getIds(calendars);
@@ -66,10 +66,7 @@ export class CalendarRoutes {
   async read(paramCalendarId: string, user: ReqUser): Promise<TCalendar> {
     const dto = createReadCalendarDtoFromParam(paramCalendarId, user);
 
-    const calendar = await this.authz.findUserOwnCalendar(
-      dto.calendarId,
-      dto.user,
-    );
+    const calendar = await this.authz.userOnCalendar(dto.calendarId, dto.user);
 
     const [{ plannedTodos, unplannedTodos }, doneTasks] = await Promise.all([
       this.todoService.findUndoneTodosByCalendars([calendar.id]),
@@ -106,10 +103,7 @@ export class CalendarRoutes {
   ): Promise<TCalendarRcd> {
     const dto = dtoFromUpdateCalendarGdto(paramCalendarId, gdto, user);
 
-    const calendar = await this.authz.findUserOwnCalendar(
-      dto.calendarId,
-      dto.user,
-    );
+    const calendar = await this.authz.userOnCalendar(dto.calendarId, dto.user);
 
     // Pre-check
     if (!dto.fields.usesNotes) {

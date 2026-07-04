@@ -7,8 +7,12 @@ const app = new Hono<HonoEnv>();
 app.get('/calendars/streamline', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
   const user = c.get('user');
+  const paramIncludeArchivedCalendars = c.req.query('includeArchivedCalendars');
 
-  const response = await todoRoutes.readStreamline(user);
+  const response = await todoRoutes.readStreamline(
+    paramIncludeArchivedCalendars,
+    user,
+  );
 
   return c.json(response);
 });

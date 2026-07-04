@@ -4,7 +4,7 @@ import { CreateCalendarDto, UpdateCalendarDto } from './dto';
 export interface ICalendarRepository {
   findByUserIdOrderedBySortedPin(
     userId: string,
-    showArchived: boolean,
+    includeArchivedCalendars: boolean,
   ): Promise<CalendarEntity[]>;
 
   findById(calendarId: number): Promise<CalendarEntity | null>;

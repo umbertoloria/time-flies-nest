@@ -27,11 +27,18 @@ export class TodoRoutes {
 
   @TraceMethod()
   async readStreamline(
+    paramIncludeArchivedCalendars: string | undefined,
     user: ReqUser,
   ): Promise<TCalendarSDK.ReadPlannedEventsResponse> {
-    const dto = createReadStreamlineFromBody(user);
+    const dto = createReadStreamlineFromBody(
+      paramIncludeArchivedCalendars,
+      user,
+    );
 
-    const calendars = await this.authz.allUserCalendars(dto.user);
+    const calendars = await this.authz.userCalendars(
+      dto.user,
+      dto.includeArchivedCalendars,
+    );
 
     const calendarIds = getIds(calendars);
     const { plannedTodos, unplannedTodos } =

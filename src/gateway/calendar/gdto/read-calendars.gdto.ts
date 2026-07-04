@@ -18,11 +18,11 @@ export function dtoFromReadCalendarsGdto(
     gdto.dateFrom,
     'Param "dateFrom" invalid: must be a date',
   );
-  const showAll = gdto.showAll || false;
+  const includeArchivedCalendars = gdto.showAll || false;
 
   return {
     dateFrom,
-    showArchived: showAll,
+    includeArchivedCalendars,
     user,
   };
 }

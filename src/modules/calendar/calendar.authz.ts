@@ -5,18 +5,14 @@ import { CalendarNotFoundError } from './errors';
 export class CalendarAuthz {
   constructor(private repository: ICalendarRepository) {}
 
-  findUserCalendars(
+  async findUserCalendars(
     user: ReqUser,
-    showArchived: boolean,
+    includeArchivedCalendars: boolean,
   ): Promise<CalendarEntity[]> {
-    return this.repository.findByUserIdOrderedBySortedPin(
+    return await this.repository.findByUserIdOrderedBySortedPin(
       user.id,
-      showArchived,
+      includeArchivedCalendars,
     );
-  }
-
-  findUserCalendarsAll(user: ReqUser): Promise<CalendarEntity[]> {
-    return this.repository.findByUserIdOrderedBySortedPin(user.id, true);
   }
 
   async findUserOwnCalendar(
