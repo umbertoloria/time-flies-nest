@@ -44,6 +44,7 @@ export function createHonoServer(mapError2StatusCode: Map<Function, number>) {
 
   app.onError((err, c) => {
     console.error(`Hono Error: ${err.message}`);
+    console.error(err);
 
     const koResponse = getKoResponse(mapError2StatusCode, err, c);
     if (koResponse) {
