@@ -4,7 +4,7 @@ import { TaskRoutes } from './task.routes';
 
 const app = new Hono<HonoEnv>();
 
-app.post('/calendars/:id/date', async (c) => {
+app.post('/calendars/:id/tasks/done', async (c) => {
   const taskRoutes: TaskRoutes = c.get('ctx').taskRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
@@ -26,7 +26,7 @@ app.get('/calendars/:id/date/:date', async (c) => {
   return c.json(response);
 });
 
-app.post('/calendars/:id/date/:tid', async (c) => {
+app.post('/calendars/:id/tasks/:tid', async (c) => {
   const taskRoutes: TaskRoutes = c.get('ctx').taskRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');

@@ -13,7 +13,7 @@ app.get('/calendars/streamline', async (c) => {
   return c.json(response);
 });
 
-app.post('/calendars/:id/todo', async (c) => {
+app.post('/calendars/:id/todos', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
@@ -24,7 +24,7 @@ app.post('/calendars/:id/todo', async (c) => {
   return c.json(response);
 });
 
-app.post('/calendars/:id/todo/:tid/update-notes', async (c) => {
+app.post('/calendars/:id/todos/:tid/update-notes', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
@@ -41,7 +41,7 @@ app.post('/calendars/:id/todo/:tid/update-notes', async (c) => {
   return c.json(response);
 });
 
-app.post('/calendars/:id/todo/:tid/move', async (c) => {
+app.post('/calendars/:id/todos/:tid/move', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
@@ -58,7 +58,7 @@ app.post('/calendars/:id/todo/:tid/move', async (c) => {
   return c.json(response);
 });
 
-app.post('/calendars/:id/todo/:tid/set-as-done', async (c) => {
+app.post('/calendars/:id/todos/:tid/set-as-done', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;
   const user = c.get('user');
   const paramCalendarId = c.req.param('id');
