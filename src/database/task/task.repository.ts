@@ -1,6 +1,7 @@
 import { ITaskRepository, TaskDate } from '@app/task/itask.repository';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { TraceMethod } from '@core/trace';
+import { CacheMethod } from '@core/cache';
 import {
   CreateTaskDto,
   ReadTasksFromDateDto,
@@ -30,6 +31,7 @@ export class TaskRepository implements ITaskRepository {
     return entityFromTaskOrNull(record);
   }
 
+  @CacheMethod()
   @TraceMethod()
   async findTasksByCalendarIdsAndDate(calendarIds: number[], dateFrom: string) {
     const records = await this.prisma.task.findMany({
@@ -49,6 +51,7 @@ export class TaskRepository implements ITaskRepository {
     return entitiesFromTasks(records);
   }
 
+  @CacheMethod()
   @TraceMethod()
   async findTasksDatesByCalendarIdsAndDate(
     calendarIds: number[],
