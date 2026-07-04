@@ -1,7 +1,8 @@
 import { IEnvConfig } from '@core/config';
 import { UnauthorizedError } from '@core/errors';
+import { traceFunction } from '@core/trace';
 
-export async function verifyJwtAndCreateReqUser(
+async function verifyJwtAndCreateReqUserIn(
   config: IEnvConfig,
   token: string,
 ): Promise<ReqUser> {
@@ -38,3 +39,8 @@ export async function verifyJwtAndCreateReqUser(
     id: userInfo.sub,
   };
 }
+
+export const verifyJwtAndCreateReqUser = traceFunction(
+  'verifyJwtAndCreateReqUser',
+  verifyJwtAndCreateReqUserIn,
+);

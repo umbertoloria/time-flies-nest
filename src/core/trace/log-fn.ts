@@ -1,12 +1,12 @@
 export type StdFn = (...args: any[]) => any;
 
-export function traceFunction<T extends StdFn>(fn: T): T {
+export function traceFunction<T extends StdFn>(fnId: string, fn: T): T {
   const originalMethod = fn;
 
   return function (this: any, ...args: Parameters<T>): ReturnType<T> {
     const start = performance.now();
 
-    const fnId = originalMethod.name || 'anonymousFunction';
+    // const fnId = originalMethod.name || 'anonymousFunction';
 
     const calcDurationAndLogOk = () => {
       const duration = (performance.now() - start).toFixed(2).padStart(7, ' ');
