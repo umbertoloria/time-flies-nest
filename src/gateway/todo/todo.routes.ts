@@ -202,6 +202,7 @@ export class TodoRoutes {
 
     if (!doneDate) {
       // TODO: Figure out how to convert an Unplanned Todo into a DoneTask
+      // FIXME: What to do for Unplanned Todos?
       throw new BadRequestError('Todo does not have a Date');
     }
 
