@@ -3,6 +3,9 @@ import { mapCalendarError2StatusCode } from '@app/calendar/errors';
 import { mapTaskError2StatusCode } from '@app/task/errors';
 import { mapTodoError2StatusCode } from '@app/todo/errors';
 import { createHonoServer } from '@dep/hono';
+import { authMiddleware } from '@dep/hono/middleware/auth.middleware';
+import { prismaMiddleware } from '@dep/hono/middleware/prisma.middleware';
+import { appContextMiddleware } from '@dep/hono/middleware/app-context.middleware';
 import { todoApp } from '@gateway/todo/todo.hono';
 import { calendarApp } from '@gateway/calendar/calendar.hono';
 import { taskApp } from '@gateway/task/task.hono';
@@ -16,6 +19,12 @@ export const mapError2StatusCode = new Map<Function, number>([
 ]);
 
 const app = createHonoServer(mapError2StatusCode);
+
+app.use('/calendars/*', authMiddleware);
+app.use('/calendars/*', prismaMiddleware);
+app.use('/calendars/*', appContextMiddleware);
+
+app.use('/health/*', prismaMiddleware);
 
 app.route('', todoApp);
 app.route('', calendarApp);
