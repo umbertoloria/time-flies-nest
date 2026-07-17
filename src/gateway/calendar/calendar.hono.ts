@@ -1,9 +1,16 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@dep/hono';
-import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from './gdto';
+import { authMiddleware } from '@dep/hono/middleware/auth.middleware';
+import { prismaMiddleware } from '@dep/hono/middleware/prisma.middleware';
+import { appContextMiddleware } from '@dep/hono/middleware/app-context.middleware';
 import { CalendarRoutes } from './calendar.routes';
+import { ReadCalendarsGdtoSchema, UpdateCalendarGdtoSchema } from './gdto';
 
 const app = new Hono<HonoEnv>();
+
+app.use('*', authMiddleware);
+app.use('*', prismaMiddleware);
+app.use('*', appContextMiddleware);
 
 app.get('/calendars', async (c) => {
   const calendarRoutes: CalendarRoutes = c.get('ctx').calendarRoutes;

@@ -1,8 +1,15 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@dep/hono';
+import { authMiddleware } from '@dep/hono/middleware/auth.middleware';
+import { prismaMiddleware } from '@dep/hono/middleware/prisma.middleware';
+import { appContextMiddleware } from '@dep/hono/middleware/app-context.middleware';
 import { TaskRoutes } from './task.routes';
 
 const app = new Hono<HonoEnv>();
+
+app.use('*', authMiddleware);
+app.use('*', prismaMiddleware);
+app.use('*', appContextMiddleware);
 
 app.post('/calendars/:id/tasks/done', async (c) => {
   const taskRoutes: TaskRoutes = c.get('ctx').taskRoutes;

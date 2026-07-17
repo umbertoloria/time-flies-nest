@@ -1,8 +1,15 @@
 import { Hono } from 'hono';
 import { HonoEnv } from '@dep/hono';
+import { authMiddleware } from '@dep/hono/middleware/auth.middleware';
+import { prismaMiddleware } from '@dep/hono/middleware/prisma.middleware';
+import { appContextMiddleware } from '@dep/hono/middleware/app-context.middleware';
 import { TodoRoutes } from './todo.routes';
 
 const app = new Hono<HonoEnv>();
+
+app.use('*', authMiddleware);
+app.use('*', prismaMiddleware);
+app.use('*', appContextMiddleware);
 
 app.get('/calendars/streamline', async (c) => {
   const todoRoutes: TodoRoutes = c.get('ctx').todoRoutes;

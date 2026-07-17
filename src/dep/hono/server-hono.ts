@@ -4,12 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
 import { ExtendedPrismaClient } from '@dep/prisma';
 import { getEnvConfig } from './config';
-import { authMiddleware } from './middleware/auth.middleware';
-import { prismaMiddleware } from './middleware/prisma.middleware';
-import {
-  AppContext,
-  appContextMiddleware,
-} from './middleware/app-context.middleware';
+import { AppContext } from './middleware/app-context.middleware';
 import { getHttpErrorName, getKoResponse } from './errors-mapper';
 
 export type HonoEnv = Env & {
@@ -37,10 +32,6 @@ export function createHonoServer(mapError2StatusCode: Map<Function, number>) {
       credentials: true,
     })(c, next);
   });
-
-  app.use('*', authMiddleware);
-  app.use('*', prismaMiddleware);
-  app.use('*', appContextMiddleware);
 
   app.onError((err, c) => {
     console.error(`Hono Error: ${err.message}`);
